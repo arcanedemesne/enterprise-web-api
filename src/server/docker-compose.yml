@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  reverseproxy:
+    build:
+      context: ./Nginx
+      dockerfile: Nginx.Dockerfile
+    ports:
+      - "80:80"
+    restart: always
+    networks:
+      - enterprise-solution-network
+    
+  api:
+    container_name: 'enterprise-solution-api'
+    image: 'enterprisesolutionapi:dev'
+    build:
+      context: .
+      dockerfile: Enterprise.Solution.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    expose:
+      - "5000"
+    restart: always
+    depends_on:
+      - "reverseproxy"
+      - "postgres"
+    networks:
+      - enterprise-solution-network
+
+  postgres:
+    container_name: 'enterprise-solution-postgres'
+    image: postgres
+    restart: always
+    environment:
+      PGUSER: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: EnterpriseSolutionDatabase
+    expose:
+      - "5432"
+    user: postgres
+    ports:
+      - "5432:5432"
+    command: 'postgres'
+    networks:
+      - enterprise-solution-network
+
+networks:
+  enterprise-solution-network:
+    driver: bridge
+    
+# docker-compose build
+# docker-compose up -d
+# docker-compose down
+
+# Browse to: http://localhost/swagger
