@@ -2,60 +2,37 @@
 using Enterprise.Solution.Data.Entities;
 using Enterprise.Solution.Data.Helpers;
 using Enterprise.Solution.Repositories;
+using Enterprise.Solution.Repository.Base;
+using Enterprise.Solution.Service.Base;
 using Microsoft.Extensions.Logging;
 
 namespace Enterprise.Solution.Service.Services
 {
-    public class ItemService : IItemService
+    public class ItemService : BaseService<Item>, IItemService
     {
-        private readonly ILogger<ItemService> _logger;
         private readonly IItemRepository _itemRepository;
-        private readonly int maxPageSize = 20;
 
-        public ItemService(ILogger<ItemService> logger, IItemRepository itemRepository)
-        {
-
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        public ItemService(
+            ILogger<IItemService> logger,
+            IBaseRepository<Item> baseRepository,
+            IItemRepository itemRepository
+        ) : base(logger, baseRepository) {
             _itemRepository = itemRepository ?? throw new ArgumentNullException(nameof(itemRepository));
         }
 
-        public async Task<(IEnumerable<Item>, PaginationMetadata)> GetItemsAsync(
-            string? name,
-            string? searchQuery,
-            int pageNumber = 1,
-            int pageSize = 10)
+        public async Task<(IReadOnlyList<Item>, PaginationMetadata)> ListAllAsync(
+            string? filter,
+            string? search,
+            int pageNumber,
+            int pageSize
+        )
         {
-            if (pageSize > maxPageSize)
+            if (pageSize > MaxPageSize)
             {
-                pageSize = maxPageSize;
+                pageSize = MaxPageSize;
             }
 
-            return await _itemRepository.GetItemsAsync(name, searchQuery, pageNumber, pageSize);
-        }
-
-        public async Task<Item?> GetItemAsync(int itemId)
-        {
-            return await _itemRepository.GetItemAsync(itemId);
-        }
-
-        public async Task<bool> ItemExistsAsync(int intemId)
-        {
-            return await _itemRepository.ItemExistsAsync(intemId);
-        }
-
-        public async Task<bool> AddItemAsync(Item item)
-        {
-            return await _itemRepository.AddItemAsync(item);
-        }
-
-        public async Task<bool> UpdateItemAsync(Item item)
-        {
-            return await _itemRepository.UpdateItemAsync(item);
-        }
-
-        public async Task DeleteItemAsync(int itemId)
-        {
-            await _itemRepository.DeleteItemAsync(itemId);
+            return await _itemRepository.ListAllAsync(filter, search, pageNumber, pageSize);
         }
     }
 }

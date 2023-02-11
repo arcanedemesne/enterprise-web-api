@@ -11,10 +11,8 @@ namespace Enterprise.Solution.API.Controllers
     /// Controller for authenticating users to access the API
     /// </summary>
     [Route("api/authentication")]
-    public class AuthenticationController : ControllerBase
+    public class AuthenticationController : BaseController<AuthenticationController>
     {
-        private readonly IConfiguration _configuration;
-
         /// <summary>
         /// DTO for authentication requests
         /// </summary>
@@ -22,16 +20,6 @@ namespace Enterprise.Solution.API.Controllers
         {
             public string? UserName { get; set; }
             public string? Password { get; set; }
-        }
-
-        /// <summary>
-        /// Constructor for AuthenticationController
-        /// </summary>
-        /// <param name="configuration">Non-null IConfiguration</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public AuthenticationController(IConfiguration configuration)
-        {
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
         /// <summary>
@@ -52,7 +40,7 @@ namespace Enterprise.Solution.API.Controllers
                 return Unauthorized();
             }
 
-            string key = _configuration["Authentication:SecretForKey"] ?? string.Empty;
+            string key = Configuration["Authentication:SecretForKey"] ?? string.Empty;
             var securityKey = new SymmetricSecurityKey(
                 Encoding.ASCII.GetBytes(key));
             var signingCredentials = new SigningCredentials(
@@ -65,8 +53,8 @@ namespace Enterprise.Solution.API.Controllers
             claimsForToken.Add(new Claim("family_name", user.LastName.ToString()));
 
             var jwtSecurityToken = new JwtSecurityToken(
-                _configuration["Authentication:Issuer"],
-                _configuration["Authentication:Audience"],
+                Configuration["Authentication:Issuer"],
+                Configuration["Authentication:Audience"],
                 claimsForToken,
                 DateTime.UtcNow,
                 DateTime.UtcNow.AddHours(1),

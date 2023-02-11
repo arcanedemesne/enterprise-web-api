@@ -5,17 +5,17 @@ VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Enterprise.Solution.API", "Enterprise.Solution.API\Enterprise.Solution.API.csproj", "{BBEEA7B8-4C2F-4751-8E14-3F66DADD5FDC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Enterprise.Solution.Data", "Enterprise.Solution.Data\Enterprise.Solution.Data.csproj", "{553F211E-6C0D-448D-ACF1-FA1C96D234BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Enterprise.Solution.Data", "Enterprise.Solution.Data\Enterprise.Solution.Data.csproj", "{553F211E-6C0D-448D-ACF1-FA1C96D234BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Enterprise.Solution.Repositories", "Enterprise.Solution.Repositories\Enterprise.Solution.Repositories.csproj", "{EC6C9B53-957E-4306-82A4-85A869F17A16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Enterprise.Solution.Repository", "Enterprise.Solution.Repositories\Enterprise.Solution.Repository.csproj", "{EC6C9B53-957E-4306-82A4-85A869F17A16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Enterprise.Solution.Service", "Enterprise.Solution.Service\Enterprise.Solution.Service.csproj", "{14D0469A-72D6-4D28-900E-8100FE766FB3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Enterprise.Solution.Service", "Enterprise.Solution.Service\Enterprise.Solution.Service.csproj", "{14D0469A-72D6-4D28-900E-8100FE766FB3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - Web", "01 - Web", "{3A3F116C-A96B-4A6C-9F96-6F742F87D1E8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 - Service", "02 - Service", "{5BD5D96E-9E0F-427D-8386-3A66AB08C973}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03 - Repositories", "03 - Repositories", "{67E45CA3-1048-47CF-81DE-9DB5CDD32A4F}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03 - Repository", "03 - Repository", "{67E45CA3-1048-47CF-81DE-9DB5CDD32A4F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04 - Data", "04 - Data", "{191F99B9-11D3-484E-B6D2-079AAB17C7F9}"
 EndProject

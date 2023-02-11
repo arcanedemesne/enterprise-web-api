@@ -3,17 +3,17 @@
 namespace Enterprise.Solution.API.Profiles
 {
     /// <summary>
-    /// ItemProfile for automapper
+    /// BookProfile for automapper
     /// </summary>
-    public class ItemProfile : Profile
+    public class BookProfile : Profile
     {
         /// <summary>
         /// Constructor for creating mapping profiles 
         /// </summary>
-        public ItemProfile()
+        public BookProfile()
         {
-            CreateMap<Data.Entities.Item, Models.ItemDTO>();
-            CreateMap<Models.ItemDTO, Data.Entities.Item>();
+            CreateMap<Data.Entities.Book, Models.BookDTO>();
+            CreateMap<Models.BookDTO, Data.Entities.Book>();
         }
     }
 
