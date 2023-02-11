@@ -1,4 +1,4 @@
-﻿using Enterprise.Solution.Data.Entities;
+using Enterprise.Solution.Data.Entities;
 using Enterprise.Solution.Data.Helpers;
 using Enterprise.Solution.Repository.Base;
 using Microsoft.Extensions.Logging;
