@@ -1,4 +1,4 @@
-﻿using Enterprise.Solution.Service.Models.Authorization;
+using Enterprise.Solution.Service.Models.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -14,22 +14,12 @@ namespace Enterprise.Solution.API.Controllers
     public class AuthenticationController : BaseController<AuthenticationController>
     {
         /// <summary>
-        /// DTO for authentication requests
-        /// </summary>
-        public class AuthenticationRequestBody
-        {
-            public string? UserName { get; set; }
-            public string? Password { get; set; }
-        }
-
-        /// <summary>
         /// Method to attempt authentication for user
         /// </summary>
         /// <param name="authenticationRequestBody"></param>
         /// <returns></returns>
         [HttpPost("authenticate")]
-        public ActionResult<string> Authenticate(
-            AuthenticationRequestBody authenticationRequestBody)
+        public ActionResult<string> Authenticate(AuthenticationRequestBody authenticationRequestBody)
         {
             var user = ValidateUserCredentials(
                 authenticationRequestBody.UserName,

@@ -1,4 +1,4 @@
-﻿using Enterprise.Solution.API.Models;
+using Enterprise.Solution.API.Models;
 using Enterprise.Solution.Data.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;

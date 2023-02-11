@@ -88,7 +88,6 @@ builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
 //#endif
 
 
-
 // Add Database context
 builder.Services.AddDbContext<EnterpriseSolutionDbContext>(
     dbContextOptions =>
@@ -129,7 +128,6 @@ builder.Services.AddAuthentication("Bearer")
                 Encoding.ASCII.GetBytes(key))
         };
     });
-
 // Add Authorization
 builder.Services.AddAuthorization(options =>
 {

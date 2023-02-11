@@ -1,4 +1,4 @@
-﻿using Enterprise.Solution.Data.Entities;
+using Enterprise.Solution.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Enterprise.Solution.Data.DbContexts
