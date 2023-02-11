@@ -1,4 +1,4 @@
-﻿using Enterprise.Solution.Service.Models.Authorization;
+using Enterprise.Solution.Service.Models.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -11,37 +11,15 @@ namespace Enterprise.Solution.API.Controllers
     /// Controller for authenticating users to access the API
     /// </summary>
     [Route("api/authentication")]
-    public class AuthenticationController : ControllerBase
+    public class AuthenticationController : BaseController<AuthenticationController>
     {
-        private readonly IConfiguration _configuration;
-
-        /// <summary>
-        /// DTO for authentication requests
-        /// </summary>
-        public class AuthenticationRequestBody
-        {
-            public string? UserName { get; set; }
-            public string? Password { get; set; }
-        }
-
-        /// <summary>
-        /// Constructor for AuthenticationController
-        /// </summary>
-        /// <param name="configuration">Non-null IConfiguration</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public AuthenticationController(IConfiguration configuration)
-        {
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-        }
-
         /// <summary>
         /// Method to attempt authentication for user
         /// </summary>
         /// <param name="authenticationRequestBody"></param>
         /// <returns></returns>
         [HttpPost("authenticate")]
-        public ActionResult<string> Authenticate(
-            AuthenticationRequestBody authenticationRequestBody)
+        public ActionResult<string> Authenticate(AuthenticationRequestBody authenticationRequestBody)
         {
             var user = ValidateUserCredentials(
                 authenticationRequestBody.UserName,
@@ -52,7 +30,7 @@ namespace Enterprise.Solution.API.Controllers
                 return Unauthorized();
             }
 
-            string key = _configuration["Authentication:SecretForKey"] ?? string.Empty;
+            string key = Configuration["Authentication:SecretForKey"] ?? string.Empty;
             var securityKey = new SymmetricSecurityKey(
                 Encoding.ASCII.GetBytes(key));
             var signingCredentials = new SigningCredentials(
@@ -65,8 +43,8 @@ namespace Enterprise.Solution.API.Controllers
             claimsForToken.Add(new Claim("family_name", user.LastName.ToString()));
 
             var jwtSecurityToken = new JwtSecurityToken(
-                _configuration["Authentication:Issuer"],
-                _configuration["Authentication:Audience"],
+                Configuration["Authentication:Issuer"],
+                Configuration["Authentication:Audience"],
                 claimsForToken,
                 DateTime.UtcNow,
                 DateTime.UtcNow.AddHours(1),

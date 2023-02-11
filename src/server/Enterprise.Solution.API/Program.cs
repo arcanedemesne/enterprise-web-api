@@ -1,14 +1,14 @@
+using Enterprise.Solution.API.Helpers;
 using Enterprise.Solution.Data.DbContexts;
 using Enterprise.Solution.Repositories;
+using Enterprise.Solution.Repository.Base;
 using Enterprise.Solution.Service.Services;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using System;
 using System.Reflection;
 using System.Text;
 
@@ -21,7 +21,13 @@ Log.Logger = new LoggerConfiguration()
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog();
 
-// Add services to the container.
+// Add Mvc options to filter and handle cancellationTokens
+builder.Services.AddMvc(options =>
+{
+    options.Filters.Add<OperationCancelledExceptionFilter>();
+});
+
+// Add Controller options
 builder.Services.AddControllers(options =>
 {
     options.ReturnHttpNotAcceptable = true;
@@ -29,6 +35,7 @@ builder.Services.AddControllers(options =>
 .AddNewtonsoftJson()
 .AddXmlDataContractSerializerFormatters();
 
+// Add Cors options
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy",
@@ -80,8 +87,8 @@ builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
 //builder.Services.AddTransient<IMailService, CloudMailService>();
 //#endif
 
-Console.WriteLine($"ConnectionStrings:PostgreSql = {builder.Configuration["ConnectionStrings:PostgreSql"]}");
 
+// Add Database context
 builder.Services.AddDbContext<EnterpriseSolutionDbContext>(
     dbContextOptions =>
     dbContextOptions
@@ -89,11 +96,21 @@ builder.Services.AddDbContext<EnterpriseSolutionDbContext>(
         .EnableSensitiveDataLogging()
         .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 
-builder.Services.AddScoped<IItemRepository, ItemRepository>();
+// Register Dependency Injection
+builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+
+// Author DI
+builder.Services.AddScoped(typeof(IAuthorRepository), typeof(AuthorRepository));
+builder.Services.AddScoped<IAuthorService, AuthorService>();
+
+// Item DI
+builder.Services.AddScoped(typeof(IItemRepository), typeof(ItemRepository));
 builder.Services.AddScoped<IItemService, ItemService>();
 
+// Add AutoMapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+// Add Authentication
 var key = builder.Configuration["Authentication:SecretForKey"] ?? string.Empty;
 var issuer = builder.Configuration["Authentication:Issuer"];
 var audience = builder.Configuration["Authentication:Audience"];
@@ -111,6 +128,7 @@ builder.Services.AddAuthentication("Bearer")
                 Encoding.ASCII.GetBytes(key))
         };
     });
+// Add Authorization
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("MustBeAnAllen", policy =>
@@ -120,6 +138,7 @@ builder.Services.AddAuthorization(options =>
     });
 });
 
+// Add Versioning
 builder.Services.AddApiVersioning(setupActions =>
 {
     setupActions.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
@@ -127,8 +146,10 @@ builder.Services.AddApiVersioning(setupActions =>
     setupActions.ReportApiVersions = true;
 });
 
+// Build the app
 var app = builder.Build();
 
+// Get Database context and ensure that it has been created
 var scope = app.Services.CreateScope();
 EnterpriseSolutionDbContext dbcontext = scope.ServiceProvider.GetRequiredService<EnterpriseSolutionDbContext>();
 dbcontext.Database.EnsureCreated();
@@ -142,9 +163,9 @@ if (app.Environment.IsDevelopment())
 
 //app.UseHttpsRedirection();
 app.UseForwardedHeaders(new ForwardedHeadersOptions
- {
-     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
- });
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 app.UseRouting();
 

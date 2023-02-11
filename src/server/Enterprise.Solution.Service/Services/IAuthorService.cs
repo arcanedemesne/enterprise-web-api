@@ -1,14 +1,14 @@
-using Enterprise.Solution.Data.Entities;
+﻿using Enterprise.Solution.Data.Entities;
 using Enterprise.Solution.Data.Helpers;
 using Enterprise.Solution.Service.Base;
 
 namespace Enterprise.Solution.Service.Services
 {
-    public interface IItemService : IBaseService<Item>
+    public interface IAuthorService : IBaseService<Author>
     {
-        public Task<(IReadOnlyList<Item>, PaginationMetadata)> ListAllAsync(
+        public Task<(IReadOnlyList<Author>, PaginationMetadata)> ListAllAsync(
             string? filter,
-            string? search,
+            string? searchQuery,
             int pageNumber,
             int pageSize
         );
