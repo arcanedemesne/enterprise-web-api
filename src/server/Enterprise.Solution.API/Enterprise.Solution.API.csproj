@@ -33,7 +33,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\Enterprise.Solution.Data\Enterprise.Solution.Data.csproj" />
-    <ProjectReference Include="..\Enterprise.Solution.Repositories\Enterprise.Solution.Repositories.csproj" />
+    <ProjectReference Include="..\Enterprise.Solution.Repository\Enterprise.Solution.Repository.csproj" />
     <ProjectReference Include="..\Enterprise.Solution.Service\Enterprise.Solution.Service.csproj" />
   </ItemGroup>
 

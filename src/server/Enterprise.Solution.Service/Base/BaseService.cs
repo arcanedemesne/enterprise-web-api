@@ -1,9 +1,6 @@
-﻿using AutoMapper;
 using Enterprise.Solution.Data.Entities;
 using Enterprise.Solution.Data.Helpers;
-using Enterprise.Solution.Repositories;
 using Enterprise.Solution.Repository.Base;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace Enterprise.Solution.Service.Base
