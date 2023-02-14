@@ -10,6 +10,6 @@ namespace Enterprise.Solution.Repositories
     /// <typeparam name="T"></typeparam>
     public interface IItemRepository : IBaseRepository<Item>
     {
-        Task<(IReadOnlyList<Item>, PaginationMetadata)> ListAllAsync(string? filter, string? searchQuery, int pageNumber, int pageSize);
+        Task<EntityListWithPaginationMetadata<Item>> ListAllAsync(string? filter, string? searchQuery, int pageNumber, int pageSize);
     }
 }

@@ -22,7 +22,7 @@ namespace Enterprise.Solution.Repository.Base
             return await _dbContext.Set<T>().ToListAsync();
         }
 
-        public virtual async Task<(IReadOnlyList<T>, PaginationMetadata)> ListAllAsync(
+        public virtual async Task<EntityListWithPaginationMetadata<T>> ListAllAsync(
             int pageNumber = 1,
             int pageSize = 10)
         {
@@ -36,7 +36,7 @@ namespace Enterprise.Solution.Repository.Base
                 .Take(pageSize)
                 .ToListAsync();
 
-            return (collectionToReturn, paginationMetadata);
+            return new EntityListWithPaginationMetadata<T>(collectionToReturn, paginationMetadata);
         }
 
         public virtual async Task<bool> ExistsAsync(int id)
@@ -44,18 +44,9 @@ namespace Enterprise.Solution.Repository.Base
             return await _dbContext.Set<T>().AnyAsync(c => c.Id.Equals(id));
         }
 
-        public virtual async Task<T?> GetByIdAsync(int id, List<string>? include)
+        public virtual async Task<T?> GetByIdAsync(int id)
         {
-            var collection = _dbContext.Set<T>();
-
-            if (include != null)
-            {
-                for (var i = 0; i < include.Count; i++)
-                {
-                    collection.Include(include[i]);
-                }
-            }
-            return await collection.FirstOrDefaultAsync(a => a.Id == id);
+            return await _dbContext.Set<T>().FirstOrDefaultAsync(a => a.Id == id);
         }
 
 

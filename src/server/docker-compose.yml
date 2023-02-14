@@ -28,6 +28,13 @@ services:
     networks:
       - enterprise-solution-network
 
+  redisCache:
+    image: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - enterprise-solution-network
+        
   postgres:
     container_name: 'enterprise-solution-postgres'
     image: postgres

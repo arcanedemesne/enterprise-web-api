@@ -1,16 +1,19 @@
-using Enterprise.Solution.API.Helpers;
-using Enterprise.Solution.Data.DbContexts;
-using Enterprise.Solution.Repositories;
-using Enterprise.Solution.Repository.Base;
-using Enterprise.Solution.Service.Services;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+
 using Serilog;
 using System.Reflection;
 using System.Text;
+
+using Enterprise.Solution.API.Helpers;
+using Enterprise.Solution.Data.DbContexts;
+using Enterprise.Solution.Repositories;
+using Enterprise.Solution.Repository.Base;
+using Enterprise.Solution.Service.Services;
+using StackExchange.Redis;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
@@ -21,18 +24,16 @@ Log.Logger = new LoggerConfiguration()
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog();
 
-// Add Mvc options to filter and handle cancellationTokens
-builder.Services.AddMvc(options =>
-{
-    options.Filters.Add<OperationCancelledExceptionFilter>();
-});
-
 // Add Controller options
 builder.Services.AddControllers(options =>
 {
     options.ReturnHttpNotAcceptable = true;
 })
-.AddNewtonsoftJson()
+.AddNewtonsoftJson(x =>
+{
+    x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+    x.SerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
+})
 .AddXmlDataContractSerializerFormatters();
 
 // Add Cors options
@@ -87,16 +88,22 @@ builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
 //builder.Services.AddTransient<IMailService, CloudMailService>();
 //#endif
 
-
 // Add Database context
 builder.Services.AddDbContext<EnterpriseSolutionDbContext>(
     dbContextOptions =>
     dbContextOptions
-        .UseNpgsql(builder.Configuration["ConnectionStrings:PostgreSql"], x => x.MigrationsAssembly("Enterprise.Solution.Data"))
+        .UseNpgsql(builder.Configuration.GetConnectionString("PostgreSql"), x => x.MigrationsAssembly("Enterprise.Solution.Data"))
         .EnableSensitiveDataLogging()
         .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 
 // Register Dependency Injection
+builder.Services.AddStackExchangeRedisCache(cacheOptions =>
+{
+    cacheOptions.ConfigurationOptions = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("RedisCache"));
+    cacheOptions.ConfigurationOptions.AllowAdmin = true;
+});
+
+builder.Services.AddScoped(typeof(ICacheService), typeof(CacheService));
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 
 // Author DI

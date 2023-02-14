@@ -11,7 +11,13 @@ namespace Enterprise.Solution.Repositories
     {
         public AuthorRepository(EnterpriseSolutionDbContext dbContext, ILogger<BaseRepository<Author>> logger) : base(dbContext, logger) { }
 
-        public async Task<(IReadOnlyList<Author>, PaginationMetadata)> ListAllAsync(string? filter, string? searchQuery, int pageNumber, int pageSize)
+        public async Task<EntityListWithPaginationMetadata<Author>> ListAllAsync(
+            string? filter,
+            string? searchQuery,
+            int pageNumber,
+            int pageSize,
+            bool includeBooks
+        )
         {
             var collection = _dbContext.Authors as IQueryable<Author>;
 
@@ -35,14 +41,36 @@ namespace Enterprise.Solution.Repositories
             var totalAuthorCount = await collection.CountAsync();
             var paginationMetadata = new PaginationMetadata(totalAuthorCount, pageSize, pageNumber);
 
+            if (includeBooks)
+            {
+                collection = collection
+                    .Include(a => a.Books)
+                    .ThenInclude(b => b.Cover)
+                    .ThenInclude(c => c.Artists);
+            }
+
             var collectionToReturn = await collection
                 .OrderBy(a => a.LastName)
                 .ThenBy(a => a.FirstName)
                 .Skip(pageSize * (pageNumber - 1))
-                .Take(pageSize).ToListAsync();
+                .Take(pageSize)
+                .ToListAsync();
 
+            return new EntityListWithPaginationMetadata<Author>(collectionToReturn, paginationMetadata);
+        }
 
-            return (collectionToReturn, paginationMetadata);
+        public async Task<Author?> GetByIdAsync(int id, bool includeBooks)
+        {
+            if (includeBooks)
+            {
+                return await _dbContext.Authors
+                    .Include(a => a.Books)
+                    .ThenInclude(b => b.Cover)
+                    .ThenInclude(c => c.Artists)
+                    .FirstOrDefaultAsync(a => a.Id.Equals(id));
+            }
+
+            return await _dbContext.Authors.FirstOrDefaultAsync(a => a.Id.Equals(id));
         }
     }
 }

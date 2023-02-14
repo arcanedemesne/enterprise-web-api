@@ -3,16 +3,12 @@
     /// <summary>
     /// a DTO representing the response shape as an Item
     /// </summary>
-    public class ItemDTO
+    public class ItemDTO : BaseDTO
     {
-        /// <summary>
-        /// Id of the Item
-        /// </summary>
-        public int Id { get; set; }
         /// <summary>
         /// Name of the Item
         /// </summary>
-        public string Name { get; set; } = string.Empty;
+        public string? Name { get; set; }
         /// <summary>
         /// Description of the Item
         /// </summary>

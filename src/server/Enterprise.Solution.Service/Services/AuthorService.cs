@@ -20,19 +20,29 @@ namespace Enterprise.Solution.Service.Services
             _authorRepository = authorRepository ?? throw new ArgumentNullException(nameof(authorRepository));
         }
 
-        public async Task<(IReadOnlyList<Author>, PaginationMetadata)> ListAllAsync(
+        public async Task<EntityListWithPaginationMetadata<Author>> ListAllAsync(
             string? filter,
             string? search,
             int pageNumber,
-            int pageSize
+            int pageSize,
+            bool includeBooks
         )
         {
+            if (pageNumber < 1)
+            {
+                pageNumber = 1;
+            }
             if (pageSize > MaxPageSize)
             {
                 pageSize = MaxPageSize;
             }
 
-            return await _authorRepository.ListAllAsync(filter, search, pageNumber, pageSize);
+            return await _authorRepository.ListAllAsync(filter, search, pageNumber, pageSize, includeBooks);
+        }
+
+        public async Task<Author?> GetByIdAsync(int id, bool includeBooks)
+        {
+            return await _authorRepository.GetByIdAsync(id, includeBooks);
         }
     }
 }

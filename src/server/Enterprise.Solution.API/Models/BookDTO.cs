@@ -3,12 +3,8 @@
     /// <summary>
     /// a DTO representing the shape of a Book
     /// </summary>
-    public class BookDTO
+    public class BookDTO : BaseDTO
     {
-        /// <summary>
-        /// Id of the Book
-        /// </summary>
-        public int Id { get; set; }
         /// <summary>
         /// Title of the Book
         /// </summary>
@@ -25,5 +21,9 @@
         /// Id of the Author of the Book
         /// </summary>
         public int AuthorId { get; set; }
+        /// <summary>
+        /// The Cover of the Book
+        /// </summary>
+        public CoverDTO Cover { get; set; } = null!;
     }
 }

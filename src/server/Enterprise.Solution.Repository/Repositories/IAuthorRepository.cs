@@ -10,6 +10,14 @@ namespace Enterprise.Solution.Repositories
     /// <typeparam name="T"></typeparam>
     public interface IAuthorRepository : IBaseRepository<Author>
     {
-        public Task<(IReadOnlyList<Author>, PaginationMetadata)> ListAllAsync(string? filter, string? searchQuery, int pageNumber, int pageSize);
+        public Task<EntityListWithPaginationMetadata<Author>> ListAllAsync(
+            string? filter,
+            string? searchQuery,
+            int pageNumber,
+            int pageSize,
+            bool includeBooks
+        );
+
+        public Task<Author?> GetByIdAsync(int id, bool includeBooks);
     }
 }

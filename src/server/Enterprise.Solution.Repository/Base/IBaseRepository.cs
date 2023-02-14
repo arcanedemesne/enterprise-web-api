@@ -12,11 +12,11 @@ namespace Enterprise.Solution.Repository.Base
 
         Task<IReadOnlyList<T>> ListAllAsync();
 
-        Task<(IReadOnlyList<T>, PaginationMetadata)> ListAllAsync(int pageNumber, int pageSize);
+        Task<EntityListWithPaginationMetadata<T>> ListAllAsync(int pageNumber, int pageSize);
 
         //Task<IReadOnlyList<T>> ListAsync(ISpecification<T> spec);
 
-        Task<T?> GetByIdAsync(int id, List<string>? include = null!);
+        Task<T?> GetByIdAsync(int id);
 
         Task<bool> ExistsAsync(int id);
 

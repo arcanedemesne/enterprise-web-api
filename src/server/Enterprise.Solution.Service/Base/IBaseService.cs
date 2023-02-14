@@ -7,7 +7,7 @@ namespace Enterprise.Solution.Service.Base
     {
         Task<IReadOnlyList<T>> ListAllAsync();
 
-        Task<(IReadOnlyList<T>, PaginationMetadata)> ListAllAsync(int pageNumber, int pageSize);
+        Task<EntityListWithPaginationMetadata<T>> ListAllAsync(int pageNumber, int pageSize);
 
         Task<T?> GetByIdAsync(int id);
 

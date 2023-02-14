@@ -1,20 +1,24 @@
 using Enterprise.Solution.Data.Entities;
 using Enterprise.Solution.Data.Helpers;
 using Enterprise.Solution.Repository.Base;
+using Enterprise.Solution.Service.Services;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace Enterprise.Solution.Service.Base
 {
     public class BaseService<T> : IBaseService<T> where T : BaseEntity
     {
-        private readonly ILogger<IBaseService<T>> _logger;
-        private readonly IBaseRepository<T> _repository;
+        protected readonly ILogger<IBaseService<T>> _logger;
+        protected readonly IBaseRepository<T> _repository;
 
         protected readonly int MaxPageSize = 20;
 
-        public BaseService(ILogger<IBaseService<T>> logger, IBaseRepository<T> baseRepository)
+        public BaseService(
+            ILogger<IBaseService<T>> logger,
+            IBaseRepository<T> baseRepository)
         {
-
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _repository = baseRepository ?? throw new ArgumentNullException(nameof(baseRepository));
         }
@@ -23,7 +27,7 @@ namespace Enterprise.Solution.Service.Base
         {
             return await _repository.ListAllAsync();
         }
-        public async Task<(IReadOnlyList<T>, PaginationMetadata)> ListAllAsync(int pageNumber, int pageSize)
+        public async Task<EntityListWithPaginationMetadata<T>> ListAllAsync(int pageNumber, int pageSize)
         {
             if (pageNumber < 1)
             {
@@ -33,6 +37,7 @@ namespace Enterprise.Solution.Service.Base
             {
                 pageSize = MaxPageSize;
             }
+
             return await _repository.ListAllAsync(pageNumber, pageSize);
         }
 

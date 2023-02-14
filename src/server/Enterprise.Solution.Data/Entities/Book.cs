@@ -12,9 +12,8 @@ namespace Enterprise.Solution.Data.Entities
         [ForeignKey(nameof(Author))]
         public int AuthorId { get; set; }
 
-        //[ForeignKey(nameof(AuthorId))]
-        //public Author Author { get; set; } = null!
+        public Author Author { get; set; } = null!;
 
-        //public Cover Cover { get; set; }
+        public Cover Cover { get; set; } = null!;
     }
 }

@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Enterprise.Solution.API.Helpers;
+using Enterprise.Solution.Data.Entities;
 using Enterprise.Solution.Service.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +13,7 @@ namespace Enterprise.Solution.API.Controllers
     public class BaseController<T> : ControllerBase where T : BaseController<T>
     {
         private readonly IConfiguration? _configuration;
-        private readonly ILogger<T>? _logger; 
+        private readonly ILogger<T>? _logger;
         private readonly IMapper? _mapper;
         private readonly IAuthorService? _authorService;
         private readonly IItemService? _itemService;

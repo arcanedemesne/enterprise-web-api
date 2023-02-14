@@ -6,11 +6,14 @@ namespace Enterprise.Solution.Service.Services
 {
     public interface IAuthorService : IBaseService<Author>
     {
-        public Task<(IReadOnlyList<Author>, PaginationMetadata)> ListAllAsync(
+        public Task<EntityListWithPaginationMetadata<Author>> ListAllAsync(
             string? filter,
             string? searchQuery,
             int pageNumber,
-            int pageSize
+            int pageSize,
+            bool includeBooks
         );
+
+        public Task<Author?> GetByIdAsync(int id, bool includeBooks);
     }
 }

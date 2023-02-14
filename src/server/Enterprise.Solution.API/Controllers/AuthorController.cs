@@ -1,8 +1,11 @@
-﻿using Enterprise.Solution.API.Models;
+﻿using Enterprise.Solution.API.Helpers;
+using Enterprise.Solution.API.Models;
 using Enterprise.Solution.Data.Entities;
+using Enterprise.Solution.Service.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+
 using System.Text.Json;
 
 namespace Enterprise.Solution.API.Controllers
@@ -18,47 +21,51 @@ namespace Enterprise.Solution.API.Controllers
     public class AuthorController : BaseController<AuthorController>
     {
         /// <summary>
-        /// Get all/filter/search/page authors
+        /// List all/filter/search/page Authors
         /// </summary>
-        /// <param name="filter" type="string?">Nullable filter for name</param>
-        /// <param name="searchQuery" type="string?">Nullable searchQuery</param>
-        /// <param name="pageNumber" type="int">Non-null pageNumber</param>
-        /// <param name="pageSize" type="int">Non-null pageSize</param>
-        /// <returns></returns>
+        /// <param name="filter">Nullable filter for name</param>
+        /// <param name="search">Nullable search</param>
+        /// <param name="pageNumber">Non-null pageNumber</param>
+        /// <param name="pageSize">Non-null pageSize</param>
+        /// <param name="includeBooks">Nullable includeBooks</param>
+        /// <returns code="200">Authors</returns>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<IEnumerable<AuthorDTO>>> ListAllAsync(
             [FromQuery] string? filter,
-            string? searchQuery,
+            string? search,
             int pageNumber = 1,
-            int pageSize = 10
+            int pageSize = 10,
+            bool includeBooks = false
         )
         {
-            var (authors, paginationMetadata) = await AuthorService.ListAllAsync(filter, searchQuery, pageNumber, pageSize);
+            var response = await AuthorService.ListAllAsync(filter, search, pageNumber, pageSize, includeBooks);
 
-            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(response.PaginationMetadata));
 
-            return Ok(Mapper.Map<IEnumerable<AuthorDTO>>(authors));
+            return Ok(Mapper.Map<IReadOnlyList<AuthorDTO>>(response.Entities));
         }
 
         /// <summary>
-        /// Get an author by id
+        /// Get Author by Id
         /// </summary>
         /// <param name="id">Non-null id</param>
-        /// <param name="includeBooks">Nullable includeBooks</param>
-        /// <returns>An IActionResult</returns>
-        /// <response code="200">Returns the requested author</response>
+        /// <param name="includeBooks">Non-null includeBooks</param>
+        /// <returns code="200">Author</returns>
         [HttpGet("{id}", Name = "GetAuthor")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetByIdAsync(int id, bool? includeBooks = true)
+        public async Task<IActionResult> GetByIdAsync(int id, bool includeBooks = true)
         {
             var include = new List<string>();
             if (includeBooks.Equals(true))
             {
                 include.Add("Books");
             }
-            var author = await AuthorService.GetByIdAsync(id);
+            var author = await AuthorService.GetByIdAsync(id, includeBooks);
             if (author == null)
             {
                 Logger.LogInformation($"Author with id {id} not found.");
@@ -69,14 +76,14 @@ namespace Enterprise.Solution.API.Controllers
         }
 
         /// <summary>
-        /// Create an author
+        /// Create Author
         /// </summary>
         /// <param name="authorDTO">Non-null authorDTO</param>
-        /// <returns code="201">Returns the created author</returns>
+        /// <returns code="201">Created Author</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddAuthorAsync([FromBody] AuthorDTO authorDTO)
+        public async Task<IActionResult> AddAsync([FromBody] AuthorDTO authorDTO)
         {
             if (!ModelState.IsValid)
             {
@@ -97,16 +104,16 @@ namespace Enterprise.Solution.API.Controllers
         }
 
         /// <summary>
-        /// Update an author
+        /// Update Author
         /// </summary>
         /// <param name="id">Non-null id</param>
         /// <param name="authorDTO">Non-null authorDTO</param>
-        /// <returns></returns>
+        /// <returns code="204">No content</returns>
         [HttpPut("{id}")]
-        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateAuthorAsync(
+        public async Task<IActionResult> UpdateAsync(
             int id,
             [FromBody] AuthorDTO authorDTO
         )
@@ -119,7 +126,7 @@ namespace Enterprise.Solution.API.Controllers
             var authorExists = await AuthorService.ExistsAsync(id);
             if (!authorExists)
             {
-                //_logger.LogInformation($"Author with id {id} not found.");
+                Logger.LogInformation($"Author with id {id} not found.");
                 return NotFound();
             }
             if (!id.Equals(authorDTO.Id))
@@ -132,23 +139,23 @@ namespace Enterprise.Solution.API.Controllers
             {
                 Mapper.Map(authorDTO, author);
                 await AuthorService.UpdateAsync(author);
-                return NoContent();
+                return Accepted();
             }
 
             return BadRequest($"An error occured while trying to update author with id {id}.");
         }
 
         /// <summary>
-        /// Patch an author
+        /// Patch Author
         /// </summary>
         /// <param name="id">Non-null id</param>
         /// <param name="jsonPatchDocument">jsonPatchDocument</param>
-        /// <returns></returns>
+        /// <returns code="204">No content</returns>
         [HttpPatch("{id}")]
-        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> PatchAuthorAsync(
+        public async Task<IActionResult> PatchAsync(
             int id,
             [FromBody] JsonPatchDocument<AuthorDTO> jsonPatchDocument
             )
@@ -156,14 +163,14 @@ namespace Enterprise.Solution.API.Controllers
             var authorExists = await AuthorService.ExistsAsync(id);
             if (!authorExists)
             {
-                //_logger.LogInformation($"Author with id {id} not found.");
+                Logger.LogInformation($"Author with id {id} not found.");
                 return NotFound();
             }
 
             var author = await AuthorService.GetByIdAsync(id);
             if (author == null)
             {
-                //_logger.LogInformation($"Author with id {id} was not found.");
+                Logger.LogInformation($"Author with id {id} was not found.");
                 return NotFound();
             }
 
@@ -189,10 +196,10 @@ namespace Enterprise.Solution.API.Controllers
         }
 
         /// <summary>
-        /// Delete an author
+        /// Delete Author
         /// </summary>
         /// <param name="id">Non-null id</param>
-        /// <returns code="204">IActionResult</returns>
+        /// <returns code="204">No content</returns>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -200,13 +207,14 @@ namespace Enterprise.Solution.API.Controllers
         public async Task<IActionResult> DeleteAuthorAsync(int id)
         {
             var authorExists = await AuthorService.ExistsAsync(id);
-            if (authorExists == null)
+            if (!authorExists)
             {
-                //_logger.LogInformation($"Author with id {id} was not found.");
+                Logger.LogInformation($"Author with id {id} was not found.");
                 return NotFound();
             }
 
             await AuthorService.DeleteAsync(id);
+
             return NoContent();
         }
     }

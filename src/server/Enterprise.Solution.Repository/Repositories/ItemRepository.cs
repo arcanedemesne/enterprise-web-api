@@ -11,7 +11,7 @@ namespace Enterprise.Solution.Repositories
     {
         public ItemRepository(EnterpriseSolutionDbContext dbContext, ILogger<BaseRepository<Item>> logger) : base(dbContext, logger) { }
 
-        public async Task<(IReadOnlyList<Item>, PaginationMetadata)> ListAllAsync(string? filter, string? searchQuery, int pageNumber, int pageSize)
+        public async Task<EntityListWithPaginationMetadata<Item>> ListAllAsync(string? filter, string? searchQuery, int pageNumber, int pageSize)
         {
             var collection = _dbContext.Items as IQueryable<Item>;
 
@@ -39,7 +39,7 @@ namespace Enterprise.Solution.Repositories
                 .Take(pageSize).ToListAsync();
 
 
-            return (collectionToReturn, paginationMetadata);
+            return new EntityListWithPaginationMetadata<Item>(collectionToReturn, paginationMetadata);
         }
     }
 }

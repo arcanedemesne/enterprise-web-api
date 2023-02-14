@@ -1,5 +1,6 @@
 using Enterprise.Solution.API.Models;
 using Enterprise.Solution.Data.Entities;
+using Enterprise.Solution.Data.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -21,19 +22,22 @@ namespace Enterprise.Solution.API.Controllers
         /// <summary>
         /// Get all paged items
         /// </summary>
-        /// <param name="pageNumber" type="int">Non-null pageNumber</param>
-        /// <param name="pageSize" type="int">Non-null pageSize</param>
-        /// <returns></returns>
+        /// <param name="pageNumber">Non-null pageNumber</param>
+        /// <param name="pageSize">Non-null pageSize</param>
+        /// <returns code="200">Requested Items</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ItemDTO>>> GetItemsAsync(
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<ItemDTO>>> ListAllAsync(
             int pageNumber = 1,
             int pageSize = 10)
         {
-            var (items, paginationMetadata) = await ItemService.ListAllAsync(pageNumber, pageSize);
+            var response = await ItemService.ListAllAsync(pageNumber, pageSize);
 
-            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(response.PaginationMetadata));
 
-            return Ok(Mapper.Map<IEnumerable<ItemDTO>>(items));
+            return Ok(Mapper.Map<IReadOnlyList<ItemDTO>>(response.Entities));
         }
 
         /// <summary>
@@ -41,12 +45,12 @@ namespace Enterprise.Solution.API.Controllers
         /// </summary>
         /// <param name="id">Non-null id</param>
         /// <returns>An IActionResult</returns>
-        /// <response code="200">Returns the requested item</response>
-        [HttpGet("{id}", Name = "GetItemById")]
+        /// <response code="200">Requested Item</response>
+        [HttpGet("{id}", Name = "GetItem")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetItemByIdAsync(int id)
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
             var item = await ItemService.GetByIdAsync(id);
             if (item == null)
@@ -62,11 +66,11 @@ namespace Enterprise.Solution.API.Controllers
         /// Create an item
         /// </summary>
         /// <param name="itemDTO">Non-null itemDTO</param>
-        /// <returns code="201">Returns the created item</returns>
+        /// <returns code="201">Created Item</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddItemAsync(
+        public async Task<IActionResult> AddAsync(
             [FromBody] ItemDTO itemDTO)
         {
             if (!ModelState.IsValid)
@@ -80,7 +84,7 @@ namespace Enterprise.Solution.API.Controllers
 
             var createdItemDTO = Mapper.Map<ItemDTO>(item);
 
-            return CreatedAtRoute("GetItemById",
+            return CreatedAtRoute("GetItem",
                 new
                 {
                     id = createdItemDTO.Id,
@@ -92,12 +96,12 @@ namespace Enterprise.Solution.API.Controllers
         /// </summary>
         /// <param name="id">Non-null id</param>
         /// <param name="itemDTO">Non-null itemRequestDto</param>
-        /// <returns></returns>
+        /// <returns code="204">No Content</returns>
         [HttpPut("{id}")]
-        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateItemAsync(
+        public async Task<IActionResult> UpdateAsync(
             int id,
             [FromBody] ItemDTO itemDTO)
         {
@@ -134,9 +138,9 @@ namespace Enterprise.Solution.API.Controllers
         /// </summary>
         /// <param name="id">Non-null id</param>
         /// <param name="jsonPatchDocument">jsonPatchDocument</param>
-        /// <returns></returns>
+        /// <returns code="204">No Content</returns>
         [HttpPatch("{id}")]
-        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PatchItemAsync(
@@ -182,7 +186,7 @@ namespace Enterprise.Solution.API.Controllers
         /// Delete an item
         /// </summary>
         /// <param name="id">Non-null id</param>
-        /// <returns code="204">IActionResult</returns>
+        /// <returns code="204">No Content</returns>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

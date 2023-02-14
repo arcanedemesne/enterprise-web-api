@@ -6,7 +6,7 @@ namespace Enterprise.Solution.Service.Services
 {
     public interface IItemService : IBaseService<Item>
     {
-        public Task<(IReadOnlyList<Item>, PaginationMetadata)> ListAllAsync(
+        public Task<EntityListWithPaginationMetadata<Item>> ListAllAsync(
             string? filter,
             string? search,
             int pageNumber,
