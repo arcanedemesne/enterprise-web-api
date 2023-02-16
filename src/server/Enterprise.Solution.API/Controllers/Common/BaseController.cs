@@ -37,7 +37,7 @@ namespace Enterprise.Solution.API.Controllers.Common
         /// </summary>
         protected IAuthorService AuthorService => _authorService ?? HttpContext.RequestServices.GetRequiredService<IAuthorService>();
         /// <summary>
-        /// IItemService for reaching CRUD operations for books
+        /// IBookService for reaching CRUD operations for books
         /// </summary>
         protected IBookService BookService => _bookService ?? HttpContext.RequestServices.GetRequiredService<IBookService>();
         /// <summary>
