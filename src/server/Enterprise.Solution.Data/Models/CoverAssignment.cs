@@ -1,4 +1,4 @@
-﻿namespace Enterprise.Solution.Data.Entities
+﻿namespace Enterprise.Solution.Data.Models
 {
     public class CoverAssignment
     {

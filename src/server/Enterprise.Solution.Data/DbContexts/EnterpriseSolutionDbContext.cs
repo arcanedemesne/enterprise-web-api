@@ -1,4 +1,4 @@
-using Enterprise.Solution.Data.Entities;
+using Enterprise.Solution.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Enterprise.Solution.Data.DbContexts
@@ -11,9 +11,6 @@ namespace Enterprise.Solution.Data.DbContexts
         public DbSet<Book> Books { get; set; }
         public DbSet<Cover> Covers { get; set; }
         public DbSet<Artist> Artists { get; set; }
-        //public DbSet<AuthorByArtist> AuthorsByArtist { get; set; }
-
-        public DbSet<Item> Items { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

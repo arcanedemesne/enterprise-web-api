@@ -5,15 +5,15 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 using Serilog;
+using StackExchange.Redis;
 using System.Reflection;
 using System.Text;
 
-using Enterprise.Solution.API.Helpers;
 using Enterprise.Solution.Data.DbContexts;
 using Enterprise.Solution.Repositories;
 using Enterprise.Solution.Repository.Base;
 using Enterprise.Solution.Service.Services;
-using StackExchange.Redis;
+using Enterprise.Solution.Service.Services.Cache;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
@@ -32,7 +32,7 @@ builder.Services.AddControllers(options =>
 .AddNewtonsoftJson(x =>
 {
     x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-    x.SerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
+    //x.SerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
 })
 .AddXmlDataContractSerializerFormatters();
 
@@ -103,16 +103,24 @@ builder.Services.AddStackExchangeRedisCache(cacheOptions =>
     cacheOptions.ConfigurationOptions.AllowAdmin = true;
 });
 
+// Cache DI
 builder.Services.AddScoped(typeof(ICacheService), typeof(CacheService));
+
+// BaseRepository DI
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 
 // Author DI
 builder.Services.AddScoped(typeof(IAuthorRepository), typeof(AuthorRepository));
-builder.Services.AddScoped<IAuthorService, AuthorService>();
+builder.Services.AddScoped<IArtistService, ArtistService>();
 
-// Item DI
-builder.Services.AddScoped(typeof(IItemRepository), typeof(ItemRepository));
-builder.Services.AddScoped<IItemService, ItemService>();
+// Book DI
+builder.Services.AddScoped(typeof(IBookRepository), typeof(BookRepository));
+builder.Services.AddScoped<IBookService, BookService>();
+
+
+// Artist DI
+builder.Services.AddScoped(typeof(IArtistRepository), typeof(ArtistRepository));
+builder.Services.AddScoped<IArtistService, ArtistService>();
 
 // Add AutoMapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -136,6 +144,7 @@ builder.Services.AddAuthentication("Bearer")
         };
     });
 // Add Authorization
+// TODO: This requirement is only for initial development purposes
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("MustBeAnAllen", policy =>

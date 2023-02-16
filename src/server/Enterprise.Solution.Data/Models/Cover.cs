@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using Enterprise.Solution.Data.Models.Base;
 
-namespace Enterprise.Solution.Data.Entities
+namespace Enterprise.Solution.Data.Models
 {
     public class Cover : BaseEntity
     {

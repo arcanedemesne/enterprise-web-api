@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 
-namespace Enterprise.Solution.Service.Services
+namespace Enterprise.Solution.Service.Services.Cache
 {
     public class CacheService : ICacheService
     {

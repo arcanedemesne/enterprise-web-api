@@ -1,8 +1,12 @@
-﻿namespace Enterprise.Solution.API.Models
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Enterprise.Solution.API.Models
 {
     /// <summary>
     /// The BaseDTO
     /// </summary>
+    [Serializable]
+    [ExcludeFromCodeCoverage]
     public class BaseDTO
     {
         /// <summary>

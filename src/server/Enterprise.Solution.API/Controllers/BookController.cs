@@ -2,7 +2,6 @@
 using Enterprise.Solution.API.Helpers.QueryParams;
 using Enterprise.Solution.API.Models;
 using Enterprise.Solution.Data.Models;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -12,75 +11,75 @@ using System.Text.Json;
 namespace Enterprise.Solution.API.Controllers
 {
     /// <summary>
-    /// Author Controller
+    /// Book Controller
     /// </summary>
     [ApiController]
     [Authorize]
     [ApiVersion("1.0")]
     [Produces("application/json")]
-    [Route("api/v{version:apiVersion}/authors")]
-    public class AuthorController : BaseController<AuthorController>
+    [Route("api/v{version:apiVersion}/books")]
+    public class BookController : BaseController<BookController>
     {
         /// <summary>
-        /// List All Authors (SearchQuery for First/Last Name, Pagination, and collection expansion)
+        /// List All Books (SearchQuery for Title, Pagination, and collection expansion)
         /// </summary>
         /// <param name="queryParams">Not-null queryParams</param>
-        /// <returns code="200">Authors</returns>
+        /// <returns code="200">Books</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<AuthorDTO>>> ListAllAsync([FromQuery] AuthorPagedQueryParams queryParams)
+        public async Task<ActionResult<IEnumerable<BookDTO>>> ListAllAsync([FromQuery] BookPagedQueryParams queryParams)
         {
-            var response = await AuthorService.ListAllAsync(
+            var response = await BookService.ListAllAsync(
                 SanitizePageNumber(queryParams.PageNumber),
                 SanitizePageSize(queryParams.PageSize),
                 queryParams.SearchQuery,
-                queryParams.IncludeBooks ?? false,
-                queryParams.IncludeBooksWithCover ?? false,
-                queryParams.IncludeBooksWithCoverAndArtists ?? false);
+                queryParams.IncludeAuthor ?? false,
+                queryParams.IncludeCover ?? false,
+                queryParams.IncludeCoverAndArtists ?? false);
 
             Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(response.PaginationMetadata));
 
-            return Ok(Mapper.Map<IReadOnlyList<AuthorDTO>>(response.Entities));
+            return Ok(Mapper.Map<IReadOnlyList<BookDTO>>(response.Entities));
         }
 
         /// <summary>
-        /// Get Author by Id (collection expansion)
+        /// Get Book by Id (collection expansion)
         /// </summary>
         /// <param name="id">Non-null id</param>
         /// <param name="queryParams">Non-null queryParams</param>
-        /// <returns code="200">Author</returns>
-        [HttpGet("{id}", Name = "GetAuthor")]
+        /// <returns code="200">Book</returns>
+        [HttpGet("{id}", Name = "GetBook")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetByIdAsync(int id, AuthorQueryParams queryParams)
+        public async Task<IActionResult> GetByIdAsync(int id, BookQueryParams queryParams)
         {
-            var author = await AuthorService.GetByIdAsync(
+            var book = await BookService.GetByIdAsync(
                 id,
-                queryParams.IncludeBooks ?? false,
-                queryParams.IncludeBooksWithCover ?? false,
-                queryParams.IncludeBooksWithCoverAndArtists ?? false);
+                queryParams.IncludeAuthor ?? false,
+                queryParams.IncludeCover ?? false,
+                queryParams.IncludeCoverAndArtists ?? false);
 
-            if (author == null)
+            if (book == null)
             {
-                Logger.LogInformation($"Author with id {id} was not found.");
+                Logger.LogInformation($"Book with id {id} was not found.");
                 return NotFound();
             }
 
-            return Ok(Mapper.Map<AuthorDTO>(author));
+            return Ok(Mapper.Map<BookDTO>(book));
         }
 
         /// <summary>
-        /// Create Author
+        /// Create Book
         /// </summary>
-        /// <param name="authorDTO">Non-null authorDTO</param>
-        /// <returns code="201">Created Author</returns>
+        /// <param name="bookDTO">Non-null bookDTO</param>
+        /// <returns code="201">Created Book</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddAsync([FromBody] AuthorDTO authorDTO)
+        public async Task<IActionResult> AddAsync([FromBody] BookDTO bookDTO)
         {
             if (!ModelState.IsValid)
             {
@@ -88,24 +87,24 @@ namespace Enterprise.Solution.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            Author author = Mapper.Map<Author>(authorDTO);
+            Book book = Mapper.Map<Book>(bookDTO);
 
-            var createdAuthor = await AuthorService.AddAsync(author);
+            var createdBook = await BookService.AddAsync(book);
 
-            var createdAuthorDTO = Mapper.Map<AuthorDTO>(createdAuthor);
+            var createdBookDTO = Mapper.Map<BookDTO>(createdBook);
 
-            return CreatedAtRoute("GetAuthor",
+            return CreatedAtRoute("GetBook",
                 new
                 {
-                    id = createdAuthorDTO.Id,
-                }, createdAuthorDTO);
+                    id = createdBookDTO.Id,
+                }, createdBookDTO);
         }
 
         /// <summary>
-        /// Update Author
+        /// Update Book
         /// </summary>
         /// <param name="id">Non-null id</param>
-        /// <param name="authorDTO">Non-null authorDTO</param>
+        /// <param name="bookDTO">Non-null bookDTO</param>
         /// <returns code="204">No Content</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -113,7 +112,7 @@ namespace Enterprise.Solution.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdateAsync(
             int id,
-            [FromBody] AuthorDTO authorDTO
+            [FromBody] BookDTO bookDTO
         )
         {
             if (!ModelState.IsValid)
@@ -122,32 +121,32 @@ namespace Enterprise.Solution.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var authorExists = await AuthorService.ExistsAsync(id);
-            if (!authorExists)
+            var bookExists = await BookService.ExistsAsync(id);
+            if (!bookExists)
             {
-                Logger.LogInformation($"Author with id {id} not found.");
+                Logger.LogInformation($"Book with id {id} not found.");
                 return NotFound();
             }
-            if (!id.Equals(authorDTO.Id))
+            if (!id.Equals(bookDTO.Id))
             {
-                var message = $"Incorrect id for author with id {id}.";
+                var message = $"Incorrect id for book with id {id}.";
                 Logger.LogInformation(message);
                 return BadRequest(message);
             }
 
-            var author = await AuthorService.GetByIdAsync(id);
-            if (author != null)
+            var book = await BookService.GetByIdAsync(id);
+            if (book != null)
             {
-                Mapper.Map(authorDTO, author);
-                await AuthorService.UpdateAsync(author);
+                Mapper.Map(bookDTO, book);
+                await BookService.UpdateAsync(book);
                 return NoContent();
             }
 
-            return BadRequest($"An error occured while trying to update author with id {id}.");
+            return BadRequest($"An error occured while trying to update book with id {id}.");
         }
 
         /// <summary>
-        /// Patch Author
+        /// Patch Book
         /// </summary>
         /// <param name="id">Non-null id</param>
         /// <param name="jsonPatchDocument">Non-null jsonPatchDocument</param>
@@ -158,26 +157,26 @@ namespace Enterprise.Solution.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PatchAsync(
             int id,
-            [FromBody] JsonPatchDocument<AuthorDTO> jsonPatchDocument
+            [FromBody] JsonPatchDocument<BookDTO> jsonPatchDocument
             )
         {
-            var authorExists = await AuthorService.ExistsAsync(id);
-            if (!authorExists)
+            var bookExists = await BookService.ExistsAsync(id);
+            if (!bookExists)
             {
-                Logger.LogInformation($"Author with id {id} was not found.");
+                Logger.LogInformation($"Book with id {id} was not found.");
                 return NotFound();
             }
 
-            var author = await AuthorService.GetByIdAsync(id);
-            if (author == null)
+            var book = await BookService.GetByIdAsync(id);
+            if (book == null)
             {
-                Logger.LogInformation($"Author with id {id} was not found.");
+                Logger.LogInformation($"Book with id {id} was not found.");
                 return NotFound();
             }
 
-            var patchedAuthor = Mapper.Map<AuthorDTO>(author);
+            var patchedBook = Mapper.Map<BookDTO>(book);
 
-            jsonPatchDocument.ApplyTo(patchedAuthor, ModelState);
+            jsonPatchDocument.ApplyTo(patchedBook, ModelState);
 
             if (!ModelState.IsValid)
             {
@@ -185,21 +184,21 @@ namespace Enterprise.Solution.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (!TryValidateModel(patchedAuthor))
+            if (!TryValidateModel(patchedBook))
             {
                 Logger.LogInformation($"ModelState Patch is invalid.");
                 return BadRequest(ModelState);
             }
 
-            Mapper.Map(patchedAuthor, author);
+            Mapper.Map(patchedBook, book);
 
-            await AuthorService.UpdateAsync(author);
+            await BookService.UpdateAsync(book);
 
             return NoContent();
         }
 
         /// <summary>
-        /// Delete Author
+        /// Delete Book
         /// </summary>
         /// <param name="id">Non-null id</param>
         /// <returns code="204">No content</returns>
@@ -207,16 +206,16 @@ namespace Enterprise.Solution.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> DeleteAuthorAsync(int id)
+        public async Task<IActionResult> DeleteBookAsync(int id)
         {
-            var authorExists = await AuthorService.ExistsAsync(id);
-            if (!authorExists)
+            var bookExists = await BookService.ExistsAsync(id);
+            if (!bookExists)
             {
-                Logger.LogInformation($"Author with id {id} was not found.");
+                Logger.LogInformation($"Book with id {id} was not found.");
                 return NotFound();
             }
 
-            await AuthorService.DeleteAsync(id);
+            await BookService.DeleteAsync(id);
 
             return NoContent();
         }

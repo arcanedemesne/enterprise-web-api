@@ -1,5 +1,6 @@
-﻿using Enterprise.Solution.Data.Entities;
-using Enterprise.Solution.Data.Helpers;
+﻿using Enterprise.Solution.Data.Helpers;
+using Enterprise.Solution.Data.Models.Base;
+using System.Linq.Expressions;
 
 namespace Enterprise.Solution.Repository.Base
 {
@@ -9,7 +10,6 @@ namespace Enterprise.Solution.Repository.Base
     /// <typeparam name="T"></typeparam>
     public interface IBaseRepository<T> where T : BaseEntity
     {
-
         Task<IReadOnlyList<T>> ListAllAsync();
 
         Task<EntityListWithPaginationMetadata<T>> ListAllAsync(int pageNumber, int pageSize);

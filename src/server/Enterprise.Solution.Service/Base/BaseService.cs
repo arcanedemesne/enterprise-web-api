@@ -1,10 +1,8 @@
-using Enterprise.Solution.Data.Entities;
 using Enterprise.Solution.Data.Helpers;
+using Enterprise.Solution.Data.Models.Base;
 using Enterprise.Solution.Repository.Base;
-using Enterprise.Solution.Service.Services;
-using Microsoft.Extensions.Caching.Distributed;
+
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
 namespace Enterprise.Solution.Service.Base
 {
@@ -29,15 +27,6 @@ namespace Enterprise.Solution.Service.Base
         }
         public async Task<EntityListWithPaginationMetadata<T>> ListAllAsync(int pageNumber, int pageSize)
         {
-            if (pageNumber < 1)
-            {
-                pageNumber = 1;
-            }
-            if (pageSize > MaxPageSize)
-            {
-                pageSize = MaxPageSize;
-            }
-
             return await _repository.ListAllAsync(pageNumber, pageSize);
         }
 

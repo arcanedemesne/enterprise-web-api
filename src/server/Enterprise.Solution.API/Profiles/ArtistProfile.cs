@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Enterprise.Solution.Data.Models;
 
 namespace Enterprise.Solution.API.Profiles
 {
@@ -12,8 +13,8 @@ namespace Enterprise.Solution.API.Profiles
         /// </summary>
         public ArtistProfile()
         {
-            CreateMap<Data.Entities.Artist, Models.ArtistDTO>();
-            CreateMap<Models.ArtistDTO, Data.Entities.Artist>();
+            CreateMap<Artist, Models.ArtistDTO>();
+            CreateMap<Models.ArtistDTO, Artist>();
         }
     }
 

@@ -1,5 +1,5 @@
-﻿using Enterprise.Solution.Data.Entities;
-using Enterprise.Solution.Data.Helpers;
+﻿using Enterprise.Solution.Data.Helpers;
+using Enterprise.Solution.Data.Models.Base;
 
 namespace Enterprise.Solution.Service.Base
 {

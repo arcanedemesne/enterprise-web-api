@@ -1,27 +1,23 @@
 ﻿using Enterprise.Solution.Data.Models;
 using Enterprise.Solution.Data.Helpers;
-using Enterprise.Solution.Repository.Base;
+using Enterprise.Solution.Service.Base;
 
-namespace Enterprise.Solution.Repositories
+namespace Enterprise.Solution.Service.Services
 {
-    /// <summary>
-    /// Author Async Repository
-    /// </summary>
-    /// <typeparam name="Author"></typeparam>
-    public interface IAuthorRepository : IBaseRepository<Author>
+    public interface IAuthorService : IBaseService<Author>
     {
         public Task<EntityListWithPaginationMetadata<Author>> ListAllAsync(
             int pageNumber,
-            int pageSize,
+            int PageSize,
             string? searchQuery,
             bool includeBooks,
             bool includeBooksWithCover,
-            bool includeBooksWithCoverAndArtists);
+            bool includeBooksWithCoverAndAuthors);
 
         public Task<Author?> GetByIdAsync(
             int id,
             bool includeBooks,
             bool includeBooksWithCover,
-            bool includeBooksWithCoverAndArtists);
+            bool includeBooksWithCoverAndAuthors);
     }
 }

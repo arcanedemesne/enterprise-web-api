@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Enterprise.Solution.Data.Models;
 
 namespace Enterprise.Solution.API.Profiles
 {
@@ -12,8 +13,8 @@ namespace Enterprise.Solution.API.Profiles
         /// </summary>
         public BookProfile()
         {
-            CreateMap<Data.Entities.Book, Models.BookDTO>();
-            CreateMap<Models.BookDTO, Data.Entities.Book>();
+            CreateMap<Book, Models.BookDTO>();
+            CreateMap<Models.BookDTO, Book>();
         }
     }
 

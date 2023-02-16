@@ -1,5 +1,5 @@
-using Enterprise.Solution.Data.Entities;
 using Enterprise.Solution.Data.Helpers;
+using Enterprise.Solution.Data.Models;
 using Enterprise.Solution.Repositories;
 using Enterprise.Solution.Repository.Base;
 using Enterprise.Solution.Service.Base;
@@ -21,28 +21,33 @@ namespace Enterprise.Solution.Service.Services
         }
 
         public async Task<EntityListWithPaginationMetadata<Author>> ListAllAsync(
-            string? filter,
-            string? search,
             int pageNumber,
             int pageSize,
-            bool includeBooks
-        )
+            string? searchQuery,
+            bool includeBooks,
+            bool includeBooksWithCover,
+            bool includeBooksWithCoverAndArtists)
         {
-            if (pageNumber < 1)
-            {
-                pageNumber = 1;
-            }
-            if (pageSize > MaxPageSize)
-            {
-                pageSize = MaxPageSize;
-            }
-
-            return await _authorRepository.ListAllAsync(filter, search, pageNumber, pageSize, includeBooks);
+            return await _authorRepository.ListAllAsync(
+                pageNumber,
+                pageSize,
+                searchQuery,
+                includeBooks,
+                includeBooksWithCover,
+                includeBooksWithCoverAndArtists);
         }
 
-        public async Task<Author?> GetByIdAsync(int id, bool includeBooks)
+        public async Task<Author?> GetByIdAsync(
+            int id,
+            bool includeBooks,
+            bool includeBooksWithCover,
+            bool includeBooksWithCoverAndArtists)
         {
-            return await _authorRepository.GetByIdAsync(id, includeBooks);
+            return await _authorRepository.GetByIdAsync(
+                id,
+                includeBooks,
+                includeBooksWithCover,
+                includeBooksWithCoverAndArtists);
         }
     }
 }

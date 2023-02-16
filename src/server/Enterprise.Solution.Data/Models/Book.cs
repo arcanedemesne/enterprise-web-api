@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using Enterprise.Solution.Data.Models.Base;
 
-namespace Enterprise.Solution.Data.Entities
+namespace Enterprise.Solution.Data.Models
 {
     public class Book : BaseEntity
     {
-        public string? Title { get; set; }
+        public string Title { get; set; } = null!;
 
         public DateTime PublishDate { get; set; }
         public decimal BasePrice { get; set; }

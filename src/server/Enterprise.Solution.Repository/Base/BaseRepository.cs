@@ -1,8 +1,11 @@
 ﻿using Enterprise.Solution.Data.DbContexts;
-using Enterprise.Solution.Data.Entities;
 using Enterprise.Solution.Data.Helpers;
+using Enterprise.Solution.Data.Models.Base;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Linq;
+using System.Linq.Expressions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Enterprise.Solution.Repository.Base
 {
@@ -49,6 +52,7 @@ namespace Enterprise.Solution.Repository.Base
             return await _dbContext.Set<T>().FirstOrDefaultAsync(a => a.Id == id);
         }
 
+        //TODO: Determine how to do Bulk Import and Bulk Update/Patches
 
         public virtual async Task<T> AddAsync(T entity)
         {

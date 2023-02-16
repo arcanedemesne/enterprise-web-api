@@ -12,75 +12,75 @@ using System.Text.Json;
 namespace Enterprise.Solution.API.Controllers
 {
     /// <summary>
-    /// Author Controller
+    /// Artist Controller
     /// </summary>
     [ApiController]
     [Authorize]
     [ApiVersion("1.0")]
     [Produces("application/json")]
-    [Route("api/v{version:apiVersion}/authors")]
-    public class AuthorController : BaseController<AuthorController>
+    [Route("api/v{version:apiVersion}/artists")]
+    public class ArtistController : BaseController<ArtistController>
     {
         /// <summary>
-        /// List All Authors (SearchQuery for First/Last Name, Pagination, and collection expansion)
+        /// List All Artists (SearchQuery for First/Last Name, Pagination, and collection expansion)
         /// </summary>
         /// <param name="queryParams">Not-null queryParams</param>
-        /// <returns code="200">Authors</returns>
+        /// <returns code="200">Artists</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<AuthorDTO>>> ListAllAsync([FromQuery] AuthorPagedQueryParams queryParams)
+        public async Task<ActionResult<IEnumerable<ArtistDTO>>> ListAllAsync([FromQuery] ArtistPagedQueryParams queryParams)
         {
-            var response = await AuthorService.ListAllAsync(
+            var response = await ArtistService.ListAllAsync(
                 SanitizePageNumber(queryParams.PageNumber),
                 SanitizePageSize(queryParams.PageSize),
                 queryParams.SearchQuery,
-                queryParams.IncludeBooks ?? false,
-                queryParams.IncludeBooksWithCover ?? false,
-                queryParams.IncludeBooksWithCoverAndArtists ?? false);
+                queryParams.IncludeCovers ?? false,
+                queryParams.IncludeCoversWithBook ?? false,
+                queryParams.IncludeCoversWithBookAndAuthor ?? false);
 
             Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(response.PaginationMetadata));
 
-            return Ok(Mapper.Map<IReadOnlyList<AuthorDTO>>(response.Entities));
+            return Ok(Mapper.Map<IReadOnlyList<ArtistDTO>>(response.Entities));
         }
 
         /// <summary>
-        /// Get Author by Id (collection expansion)
+        /// Get Artist by Id (collection expansion)
         /// </summary>
         /// <param name="id">Non-null id</param>
         /// <param name="queryParams">Non-null queryParams</param>
-        /// <returns code="200">Author</returns>
-        [HttpGet("{id}", Name = "GetAuthor")]
+        /// <returns code="200">Artist</returns>
+        [HttpGet("{id}", Name = "GetArtist")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetByIdAsync(int id, AuthorQueryParams queryParams)
+        public async Task<IActionResult> GetByIdAsync(int id, ArtistQueryParams queryParams)
         {
-            var author = await AuthorService.GetByIdAsync(
+            var artist = await ArtistService.GetByIdAsync(
                 id,
-                queryParams.IncludeBooks ?? false,
-                queryParams.IncludeBooksWithCover ?? false,
-                queryParams.IncludeBooksWithCoverAndArtists ?? false);
+                queryParams.IncludeCovers ?? false,
+                queryParams.IncludeCoversWithBook ?? false,
+                queryParams.IncludeCoversWithBookAndAuthor ?? false);
 
-            if (author == null)
+            if (artist == null)
             {
-                Logger.LogInformation($"Author with id {id} was not found.");
+                Logger.LogInformation($"Artist with id {id} was not found.");
                 return NotFound();
             }
 
-            return Ok(Mapper.Map<AuthorDTO>(author));
+            return Ok(Mapper.Map<ArtistDTO>(artist));
         }
 
         /// <summary>
-        /// Create Author
+        /// Create Artist
         /// </summary>
-        /// <param name="authorDTO">Non-null authorDTO</param>
-        /// <returns code="201">Created Author</returns>
+        /// <param name="artistDTO">Non-null artistDTO</param>
+        /// <returns code="201">Created Artist</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddAsync([FromBody] AuthorDTO authorDTO)
+        public async Task<IActionResult> AddAsync([FromBody] ArtistDTO artistDTO)
         {
             if (!ModelState.IsValid)
             {
@@ -88,24 +88,24 @@ namespace Enterprise.Solution.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            Author author = Mapper.Map<Author>(authorDTO);
+            Artist artist = Mapper.Map<Artist>(artistDTO);
 
-            var createdAuthor = await AuthorService.AddAsync(author);
+            var createdArtist = await ArtistService.AddAsync(artist);
 
-            var createdAuthorDTO = Mapper.Map<AuthorDTO>(createdAuthor);
+            var createdArtistDTO = Mapper.Map<ArtistDTO>(createdArtist);
 
-            return CreatedAtRoute("GetAuthor",
+            return CreatedAtRoute("GetArtist",
                 new
                 {
-                    id = createdAuthorDTO.Id,
-                }, createdAuthorDTO);
+                    id = createdArtistDTO.Id,
+                }, createdArtistDTO);
         }
 
         /// <summary>
-        /// Update Author
+        /// Update Artist
         /// </summary>
         /// <param name="id">Non-null id</param>
-        /// <param name="authorDTO">Non-null authorDTO</param>
+        /// <param name="artistDTO">Non-null artistDTO</param>
         /// <returns code="204">No Content</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -113,7 +113,7 @@ namespace Enterprise.Solution.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdateAsync(
             int id,
-            [FromBody] AuthorDTO authorDTO
+            [FromBody] ArtistDTO artistDTO
         )
         {
             if (!ModelState.IsValid)
@@ -122,32 +122,32 @@ namespace Enterprise.Solution.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var authorExists = await AuthorService.ExistsAsync(id);
-            if (!authorExists)
+            var artistExists = await ArtistService.ExistsAsync(id);
+            if (!artistExists)
             {
-                Logger.LogInformation($"Author with id {id} not found.");
+                Logger.LogInformation($"Artist with id {id} not found.");
                 return NotFound();
             }
-            if (!id.Equals(authorDTO.Id))
+            if (!id.Equals(artistDTO.Id))
             {
-                var message = $"Incorrect id for author with id {id}.";
+                var message = $"Incorrect id for artist with id {id}.";
                 Logger.LogInformation(message);
                 return BadRequest(message);
             }
 
-            var author = await AuthorService.GetByIdAsync(id);
-            if (author != null)
+            var artist = await ArtistService.GetByIdAsync(id);
+            if (artist != null)
             {
-                Mapper.Map(authorDTO, author);
-                await AuthorService.UpdateAsync(author);
+                Mapper.Map(artistDTO, artist);
+                await ArtistService.UpdateAsync(artist);
                 return NoContent();
             }
 
-            return BadRequest($"An error occured while trying to update author with id {id}.");
+            return BadRequest($"An error occured while trying to update artist with id {id}.");
         }
 
         /// <summary>
-        /// Patch Author
+        /// Patch Artist
         /// </summary>
         /// <param name="id">Non-null id</param>
         /// <param name="jsonPatchDocument">Non-null jsonPatchDocument</param>
@@ -158,26 +158,26 @@ namespace Enterprise.Solution.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PatchAsync(
             int id,
-            [FromBody] JsonPatchDocument<AuthorDTO> jsonPatchDocument
+            [FromBody] JsonPatchDocument<ArtistDTO> jsonPatchDocument
             )
         {
-            var authorExists = await AuthorService.ExistsAsync(id);
-            if (!authorExists)
+            var artistExists = await ArtistService.ExistsAsync(id);
+            if (!artistExists)
             {
-                Logger.LogInformation($"Author with id {id} was not found.");
+                Logger.LogInformation($"Artist with id {id} was not found.");
                 return NotFound();
             }
 
-            var author = await AuthorService.GetByIdAsync(id);
-            if (author == null)
+            var artist = await ArtistService.GetByIdAsync(id);
+            if (artist == null)
             {
-                Logger.LogInformation($"Author with id {id} was not found.");
+                Logger.LogInformation($"Artist with id {id} was not found.");
                 return NotFound();
             }
 
-            var patchedAuthor = Mapper.Map<AuthorDTO>(author);
+            var patchedArtist = Mapper.Map<ArtistDTO>(artist);
 
-            jsonPatchDocument.ApplyTo(patchedAuthor, ModelState);
+            jsonPatchDocument.ApplyTo(patchedArtist, ModelState);
 
             if (!ModelState.IsValid)
             {
@@ -185,21 +185,21 @@ namespace Enterprise.Solution.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (!TryValidateModel(patchedAuthor))
+            if (!TryValidateModel(patchedArtist))
             {
                 Logger.LogInformation($"ModelState Patch is invalid.");
                 return BadRequest(ModelState);
             }
 
-            Mapper.Map(patchedAuthor, author);
+            Mapper.Map(patchedArtist, artist);
 
-            await AuthorService.UpdateAsync(author);
+            await ArtistService.UpdateAsync(artist);
 
             return NoContent();
         }
 
         /// <summary>
-        /// Delete Author
+        /// Delete Artist
         /// </summary>
         /// <param name="id">Non-null id</param>
         /// <returns code="204">No content</returns>
@@ -207,16 +207,16 @@ namespace Enterprise.Solution.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> DeleteAuthorAsync(int id)
+        public async Task<IActionResult> DeleteArtistAsync(int id)
         {
-            var authorExists = await AuthorService.ExistsAsync(id);
-            if (!authorExists)
+            var artistExists = await ArtistService.ExistsAsync(id);
+            if (!artistExists)
             {
-                Logger.LogInformation($"Author with id {id} was not found.");
+                Logger.LogInformation($"Artist with id {id} was not found.");
                 return NotFound();
             }
 
-            await AuthorService.DeleteAsync(id);
+            await ArtistService.DeleteAsync(id);
 
             return NoContent();
         }

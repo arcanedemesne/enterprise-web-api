@@ -1,8 +1,12 @@
-﻿namespace Enterprise.Solution.API.Models
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Enterprise.Solution.API.Models
 {
     /// <summary>
     /// A DTO representing the shape of a Cover
     /// </summary>
+    [Serializable]
+    [ExcludeFromCodeCoverage]
     public class CoverDTO : BaseDTO
     {
         /// <summary>
@@ -17,6 +21,10 @@
         /// Related BookId of the Cover
         /// </summary>
         public int BookId { get; set; }
+        /// <summary>
+        /// Related Book of the Cover
+        /// </summary>
+        public BookDTO Book { get; set; } = null!;
         /// <summary>
         /// Artists of the Cover
         /// </summary>

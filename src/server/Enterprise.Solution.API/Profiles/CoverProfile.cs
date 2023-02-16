@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Enterprise.Solution.Data.Models;
 
 namespace Enterprise.Solution.API.Profiles
 {
@@ -12,8 +13,8 @@ namespace Enterprise.Solution.API.Profiles
         /// </summary>
         public CoverProfile()
         {
-            CreateMap<Data.Entities.Cover, Models.CoverDTO>();
-            CreateMap<Models.CoverDTO, Data.Entities.Cover>();
+            CreateMap<Cover, Models.CoverDTO>();
+            CreateMap<Models.CoverDTO, Cover>();
         }
     }
 

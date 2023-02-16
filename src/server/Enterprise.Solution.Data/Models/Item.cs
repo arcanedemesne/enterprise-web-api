@@ -1,4 +1,6 @@
-namespace Enterprise.Solution.Data.Entities
+using Enterprise.Solution.Data.Models.Base;
+
+namespace Enterprise.Solution.Data.Models
 {
     public class Item : BaseEntity
     {

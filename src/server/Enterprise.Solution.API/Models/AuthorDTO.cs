@@ -1,10 +1,12 @@
-﻿using Enterprise.Solution.Data.Entities;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace Enterprise.Solution.API.Models
 {
     /// <summary>
     /// a DTO representing the shape of an Author
     /// </summary>
+    [Serializable]
+    [ExcludeFromCodeCoverage]
     public class AuthorDTO : BaseDTO
     {
         /// <summary>

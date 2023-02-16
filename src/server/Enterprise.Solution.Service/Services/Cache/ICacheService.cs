@@ -1,4 +1,4 @@
-﻿namespace Enterprise.Solution.Service.Services
+﻿namespace Enterprise.Solution.Service.Services.Cache
 {
     public interface ICacheService
     {

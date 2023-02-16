@@ -5,7 +5,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace Enterprise.Solution.API.Controllers
+//TODO: This is not finished yet
+namespace Enterprise.Solution.API.Controllers.Common
 {
     /// <summary>
     /// Controller for authenticating users to access the API
@@ -18,7 +19,13 @@ namespace Enterprise.Solution.API.Controllers
         /// </summary>
         public class AuthenticationRequestBody
         {
+            /// <summary>
+            /// UserName
+            /// </summary>
             public string? UserName { get; set; }
+            /// <summary>
+            /// Password
+            /// </summary>
             public string? Password { get; set; }
         }
 
@@ -64,6 +71,7 @@ namespace Enterprise.Solution.API.Controllers
             return Ok(tokenToReturn);
         }
 
+        //TODO: Create Service to login in via multiple ways
         private AuthorizedUser ValidateUserCredentials(string? userName, string? password)
         {
             return new AuthorizedUser(
