@@ -32,7 +32,6 @@ builder.Services.AddControllers(options =>
 .AddNewtonsoftJson(x =>
 {
     x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-    //x.SerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
 })
 .AddXmlDataContractSerializerFormatters();
 
@@ -111,7 +110,7 @@ builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 
 // Author DI
 builder.Services.AddScoped(typeof(IAuthorRepository), typeof(AuthorRepository));
-builder.Services.AddScoped<IArtistService, ArtistService>();
+builder.Services.AddScoped<IAuthorService, AuthorService>();
 
 // Book DI
 builder.Services.AddScoped(typeof(IBookRepository), typeof(BookRepository));
@@ -166,9 +165,18 @@ builder.Services.AddApiVersioning(setupActions =>
 var app = builder.Build();
 
 // Get Database context and ensure that it has been created
-var scope = app.Services.CreateScope();
-EnterpriseSolutionDbContext dbcontext = scope.ServiceProvider.GetRequiredService<EnterpriseSolutionDbContext>();
-dbcontext.Database.EnsureCreated();
+try
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        EnterpriseSolutionDbContext dbcontext = scope.ServiceProvider.GetRequiredService<EnterpriseSolutionDbContext>();
+        dbcontext.Database.EnsureCreated();
+    };
+}
+catch (Exception ex)
+{
+    app.Logger.LogWarning("failed to create databsae EnterpriseSolution");
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

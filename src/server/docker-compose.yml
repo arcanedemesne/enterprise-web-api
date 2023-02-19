@@ -1,7 +1,9 @@
-version: '3.8'
+version: '3.5'
 
 services:
+
   reverseproxy:
+    container_name: solution_proxy
     build:
       context: ./data/nginx
       dockerfile: Nginx.Dockerfile
@@ -14,11 +16,11 @@ services:
       - ./data/nginx/certs:/etc/nginx/certs
       - ./data/nginx/nginx.conf:/etc/nginx/nginx.conf
     networks:
-      - enterprise-solution-network
+      - solution-network
     
   api:
-    container_name: 'enterprise-solution-api'
-    image: 'enterprisesolutionapi:dev'
+    container_name: solution_api
+    image: enterprisesolutionapi:dev
     build:
       context: .
       dockerfile: Enterprise.Solution.API/Dockerfile
@@ -30,40 +32,79 @@ services:
     depends_on:
       - "reverseproxy"
       - "postgres"
+      - "redisCache"
+      - "keycloak"
     networks:
-      - enterprise-solution-network
+      - solution-network
 
+  keycloak:
+    container_name: solution_keycloak
+    image: jboss/keycloak
+    depends_on:
+      - "postgres"
+    environment:
+      DB_VENDOR: postgres
+      DB_ADDR: solution_postgres
+      DB_DATABASE: ${POSTGRESQL_DB:-keycloak}
+      DB_USER: ${POSTGRESQL_USER:-postgres}
+      DB_PASSWORD: ${POSTGRESQL_PASSWORD:-password}
+      KEYCLOAK_USER: keycloak
+      KEYCLOAK_PASSWORD: keycloak
+    ports:
+      - "28080:8080"
+    restart: unless-stopped
+    networks:
+      - solution-network
+     
+  postgres:
+    container_name: solution_postgres
+    image: postgres
+    environment:
+      #POSTGRES_DB: ${POSTGRESQL_DB:-keycloak}
+      POSTGRES_USER: ${POSTGRESQL_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD:-password}
+      PGDATA: /data/postgres
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+      # copy the sql script to create tables
+      - ./sql-scripts.sql:/docker-entrypoint-initdb.d/sql-scripts.sql
+    ports:
+      - "${POSTGRESQL_PORT:-5432}:5432"
+    networks:
+      - solution-network
+    restart: unless-stopped
+  
+  pgadmin:
+    container_name: solution_pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+       - pgadmin:/var/lib/pgadmin
+
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    networks:
+      - solution-network
+    restart: unless-stopped
+    
   redisCache:
+    container_name: solution_redisCache
     image: redis
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     networks:
-      - enterprise-solution-network
-        
-  postgres:
-    container_name: 'enterprise-solution-postgres'
-    image: postgres
-    restart: always
-    environment:
-      PGUSER: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: EnterpriseSolutionDatabase
-    expose:
-      - "5432"
-    user: postgres
-    ports:
-      - "5432:5432"
-    command: 'postgres'
-    networks:
-      - enterprise-solution-network
+      - solution-network
+    volumes:
+      - redis:/data
 
 networks:
-  enterprise-solution-network:
+  solution-network:
     driver: bridge
-    
-# docker-compose build
-# docker-compose up -d
-# docker-compose down
 
-# Browse to: http://localhost/swagger
+volumes:
+    postgres:
+    pgadmin:
+    redis:
