@@ -165,18 +165,10 @@ builder.Services.AddApiVersioning(setupActions =>
 var app = builder.Build();
 
 // Get Database context and ensure that it has been created
-try
-{
-    using (var scope = app.Services.CreateScope())
-    {
-        EnterpriseSolutionDbContext dbcontext = scope.ServiceProvider.GetRequiredService<EnterpriseSolutionDbContext>();
-        dbcontext.Database.EnsureCreated();
-    };
-}
-catch (Exception ex)
-{
-    app.Logger.LogWarning("failed to create databsae EnterpriseSolution");
-}
+var scope = app.Services.CreateScope();
+EnterpriseSolutionDbContext dbcontext = scope.ServiceProvider.GetRequiredService<EnterpriseSolutionDbContext>();
+dbcontext.Database.EnsureCreated();
+scope.Dispose();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

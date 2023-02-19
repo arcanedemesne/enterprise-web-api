@@ -60,7 +60,7 @@ services:
     container_name: solution_postgres
     image: postgres
     environment:
-      #POSTGRES_DB: ${POSTGRESQL_DB:-keycloak}
+      POSTGRES_DB: ${POSTGRESQL_DB:-keycloak}
       POSTGRES_USER: ${POSTGRESQL_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD:-password}
       PGDATA: /data/postgres
