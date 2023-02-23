@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -22,10 +24,15 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Host.UseSerilog();
+
+var host = builder.Host;
+var services = builder.Services;
+var configuration = builder.Configuration;
+
+host.UseSerilog();
 
 // Add Controller options
-builder.Services.AddControllers(options =>
+services.AddControllers(options =>
 {
     options.ReturnHttpNotAcceptable = true;
 })
@@ -35,22 +42,9 @@ builder.Services.AddControllers(options =>
 })
 .AddXmlDataContractSerializerFormatters();
 
-// Add Cors options
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("CorsPolicy",
-        builder => builder
-        .AllowAnyOrigin() //TODO: determine FE uri
-        .AllowAnyHeader() //TODO: determine allowed headers
-        .AllowAnyMethod() //TODO: determine if a method should be disallowed
-        //.WithMethods("GET", "PUT", "DELETE", "POST", "PATCH") //not really necessary when AllowAnyMethods is used.
-        );
-});
-
-
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(setupAction =>
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen(setupAction =>
 {
     var xmlCommentsFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var commentsFullPath = Path.Combine(AppContext.BaseDirectory, xmlCommentsFile);
@@ -79,16 +73,16 @@ builder.Services.AddSwaggerGen(setupAction =>
         }
     });
 });
-builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
+services.AddSingleton<FileExtensionContentTypeProvider>();
 
 //#if DEBUG
-//builder.Services.AddTransient<IMailService, LocalMailService>();
+//services.AddTransient<IMailService, LocalMailService>();
 //#else
-//builder.Services.AddTransient<IMailService, CloudMailService>();
+//services.AddTransient<IMailService, CloudMailService>();
 //#endif
 
 // Add Database context
-builder.Services.AddDbContext<EnterpriseSolutionDbContext>(
+services.AddDbContext<EnterpriseSolutionDbContext>(
     dbContextOptions =>
     dbContextOptions
         .UseNpgsql(builder.Configuration.GetConnectionString("PostgreSql"), x => x.MigrationsAssembly("Enterprise.Solution.Data"))
@@ -96,38 +90,74 @@ builder.Services.AddDbContext<EnterpriseSolutionDbContext>(
         .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 
 // Register Dependency Injection
-builder.Services.AddStackExchangeRedisCache(cacheOptions =>
+services.AddStackExchangeRedisCache(cacheOptions =>
 {
     cacheOptions.ConfigurationOptions = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("RedisCache"));
     cacheOptions.ConfigurationOptions.AllowAdmin = true;
 });
 
 // Cache DI
-builder.Services.AddScoped(typeof(ICacheService), typeof(CacheService));
+services.AddScoped(typeof(ICacheService), typeof(CacheService));
 
 // BaseRepository DI
-builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 
 // Author DI
-builder.Services.AddScoped(typeof(IAuthorRepository), typeof(AuthorRepository));
-builder.Services.AddScoped<IAuthorService, AuthorService>();
+services.AddScoped(typeof(IAuthorRepository), typeof(AuthorRepository));
+services.AddScoped<IAuthorService, AuthorService>();
 
 // Book DI
-builder.Services.AddScoped(typeof(IBookRepository), typeof(BookRepository));
-builder.Services.AddScoped<IBookService, BookService>();
+services.AddScoped(typeof(IBookRepository), typeof(BookRepository));
+services.AddScoped<IBookService, BookService>();
 
 
 // Artist DI
-builder.Services.AddScoped(typeof(IArtistRepository), typeof(ArtistRepository));
-builder.Services.AddScoped<IArtistService, ArtistService>();
+services.AddScoped(typeof(IArtistRepository), typeof(ArtistRepository));
+services.AddScoped<IArtistService, ArtistService>();
 
 // Add AutoMapper
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+// Configure Forwarded Headers Middleware to make it work under nginx load balancer
+services.Configure<ForwardedHeadersOptions>(options => { options.ForwardedHeaders = ForwardedHeaders.All; });
+
+// Configure HttpContextAccessor
+services.AddHttpContextAccessor();
+
+// Configure Cors (This policy is only for local dev)
+services.AddCors(options =>
+{
+    options.AddPolicy("CorsLocalDevPolicy",
+        builder => builder.SetIsOriginAllowed(hostName => true)
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
+});
+
+services.AddHttpClient();
+
+// Configure mvc routes
+services.Configure<RouteOptions>(options =>
+{
+    options.LowercaseUrls = true;
+    options.LowercaseQueryStrings = true;
+});
+
+// Configure API versioning
+services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.ReportApiVersions = true;
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new QueryStringApiVersionReader("api-version"),
+        new HeaderApiVersionReader("api-version")
+        );
+});
 // Add Authentication
-var key = builder.Configuration["Authentication:SecretForKey"] ?? string.Empty;
-var issuer = builder.Configuration["Authentication:Issuer"];
-var audience = builder.Configuration["Authentication:Audience"];
+var key = builder.Configuration["AuthenticationOld:SecretForKey"] ?? string.Empty;
+var issuer = builder.Configuration["AuthenticationIld:Issuer"];
+var audience = builder.Configuration["AuthenticationOld:Audience"];
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer(options =>
     {
@@ -153,16 +183,11 @@ builder.Services.AddAuthorization(options =>
     });
 });
 
-// Add Versioning
-builder.Services.AddApiVersioning(setupActions =>
-{
-    setupActions.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
-    setupActions.AssumeDefaultVersionWhenUnspecified = true;
-    setupActions.ReportApiVersions = true;
-});
 
 // Build the app
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 // Get Database context and ensure that it has been created
 var scope = app.Services.CreateScope();
@@ -178,10 +203,6 @@ if (app.Environment.IsDevelopment())
 }
 
 //app.UseHttpsRedirection();
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
 
 app.UseRouting();
 
