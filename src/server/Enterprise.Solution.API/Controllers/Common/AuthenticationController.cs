@@ -46,7 +46,10 @@ namespace Enterprise.Solution.API.Controllers.Common
                 return Unauthorized();
             }
 
-            string key = Configuration["Authentication:SecretForKey"] ?? string.Empty;
+            string issuer = Configuration.GetSection("Authentication")["Schemes:Swagger:ClaimsIssuer"]!;
+            string audience = Configuration.GetSection("Authentication")["Schemes:Swagger:Audience"]!;
+            string key = Configuration.GetSection("Authentication")["Schemes:Swagger:SecretForKey"]!;
+
             var securityKey = new SymmetricSecurityKey(
                 Encoding.ASCII.GetBytes(key));
             var signingCredentials = new SigningCredentials(
@@ -55,12 +58,13 @@ namespace Enterprise.Solution.API.Controllers.Common
 
             var claimsForToken = new List<Claim>();
             claimsForToken.Add(new Claim("sub", user.UserId.ToString()));
+            claimsForToken.Add(new Claim("user_name", user.UserName.ToString()));
             claimsForToken.Add(new Claim("given_name", user.FirstName.ToString()));
             claimsForToken.Add(new Claim("family_name", user.LastName.ToString()));
 
             var jwtSecurityToken = new JwtSecurityToken(
-                Configuration["Authentication:Issuer"],
-                Configuration["Authentication:Audience"],
+                issuer,
+                audience,
                 claimsForToken,
                 DateTime.UtcNow,
                 DateTime.UtcNow.AddHours(1),
@@ -76,7 +80,7 @@ namespace Enterprise.Solution.API.Controllers.Common
         {
             return new AuthorizedUser(
                 1,
-                userName ?? "",
+                userName ?? "jennifer.allen",
                 "Jennifer",
                 "Allen");
         }

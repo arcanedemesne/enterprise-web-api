@@ -37,6 +37,16 @@ services:
     networks:
       - solution-network
 
+  mailhog:
+    image: mailhog/mailhog
+    container_name: solution_mailhog
+    restart: "always"
+    ports:
+      - "1025:1025" # smtp server
+      - "8025:8025" # web ui
+    networks:
+      - solution-network
+      
   keycloak:
     container_name: solution_keycloak
     image: quay.io/keycloak/keycloak
