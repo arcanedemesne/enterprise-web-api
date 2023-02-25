@@ -36,8 +36,10 @@
   
   <ItemGroup>
     <ProjectReference Include="..\Enterprise.Solution.Data\Enterprise.Solution.Data.csproj" />
+    <ProjectReference Include="..\Enterprise.Solution.Email\Enterprise.Solution.Email.csproj" />
     <ProjectReference Include="..\Enterprise.Solution.Repository\Enterprise.Solution.Repository.csproj" />
     <ProjectReference Include="..\Enterprise.Solution.Service\Enterprise.Solution.Service.csproj" />
+    <ProjectReference Include="..\Enterprise.Solution.Shared\Enterprise.Solution.Shared.csproj" />
   </ItemGroup>
 
 </Project>

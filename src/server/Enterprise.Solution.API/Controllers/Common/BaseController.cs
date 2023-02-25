@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
-
-using Enterprise.Solution.API.Helpers.QueryParams;
-using Enterprise.Solution.Service.Services;
-
 using Microsoft.AspNetCore.Mvc;
+
+using Enterprise.Solution.Email.Service;
+using Enterprise.Solution.Service.Services;
 
 namespace Enterprise.Solution.API.Controllers.Common
 {
@@ -16,6 +15,7 @@ namespace Enterprise.Solution.API.Controllers.Common
         private readonly IConfiguration? _configuration;
         private readonly ILogger<T>? _logger;
         private readonly IMapper? _mapper;
+        private readonly IEmailService? _emailService;
         private readonly IAuthorService? _authorService;
         private readonly IBookService? _bookService;
         private readonly IArtistService? _artistService;
@@ -32,6 +32,10 @@ namespace Enterprise.Solution.API.Controllers.Common
         /// IMapper for auto mapping between dtos and models inside controllers
         /// </summary>
         protected IMapper Mapper => _mapper ?? HttpContext.RequestServices.GetRequiredService<IMapper>();
+        /// <summary>
+        /// IEmailService for emailing 
+        /// </summary>
+        protected IEmailService EmailService => _emailService ?? HttpContext.RequestServices.GetRequiredService<IEmailService>();
         /// <summary>
         /// IAuthorService for reaching CRUD operations for authors
         /// </summary>

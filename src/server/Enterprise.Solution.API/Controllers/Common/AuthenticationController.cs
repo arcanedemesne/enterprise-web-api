@@ -1,3 +1,4 @@
+using Enterprise.Solution.Email.Service;
 using Enterprise.Solution.Service.Models.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -15,31 +16,13 @@ namespace Enterprise.Solution.API.Controllers.Common
     public class AuthenticationController : BaseController<AuthenticationController>
     {
         /// <summary>
-        /// DTO for authentication requests
-        /// </summary>
-        public class AuthenticationRequestBody
-        {
-            /// <summary>
-            /// UserName
-            /// </summary>
-            public string? UserName { get; set; }
-            /// <summary>
-            /// Password
-            /// </summary>
-            public string? Password { get; set; }
-        }
-
-        /// <summary>
         /// Method to attempt authentication for user
         /// </summary>
-        /// <param name="authenticationRequestBody"></param>
         /// <returns></returns>
         [HttpPost("authenticate")]
-        public ActionResult<string> Authenticate(AuthenticationRequestBody authenticationRequestBody)
+        public async Task<IActionResult> AuthenticateAsync()
         {
-            var user = ValidateUserCredentials(
-                authenticationRequestBody.UserName,
-                authenticationRequestBody.Password);
+            var user = ValidateUserCredentials();
 
             if (user == null)
             {
@@ -72,15 +55,22 @@ namespace Enterprise.Solution.API.Controllers.Common
 
             var tokenToReturn = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
 
+            await EmailService.SendAsync(new System.Net.Mail.MailMessage(
+                "authentication-controller@domain.local",
+                "admin@domain.local",
+                "Token created",
+                $"Token created: {tokenToReturn}"
+            ));
+
             return Ok(tokenToReturn);
         }
 
         //TODO: Create Service to login in via multiple ways
-        private AuthorizedUser ValidateUserCredentials(string? userName, string? password)
+        private AuthorizedUser ValidateUserCredentials()
         {
             return new AuthorizedUser(
                 1,
-                userName ?? "jennifer.allen",
+                "jennifer.allen",
                 "Jennifer",
                 "Allen");
         }

@@ -26,6 +26,9 @@ services:
       dockerfile: Enterprise.Solution.API/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - SolutionApi_SolutionSettings__Cache__Host=redisCache
+      - SolutionApi_SolutionSettings__Database__Host=postgres
+      - SolutionApi_SolutionSettings__MailSettings__Host=mailhog
     expose:
       - "5000"
     restart: always
