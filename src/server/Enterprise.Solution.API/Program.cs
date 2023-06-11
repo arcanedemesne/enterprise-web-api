@@ -20,6 +20,7 @@ using Enterprise.Solution.Service.Services;
 using Enterprise.Solution.Service.Services.Cache;
 using Enterprise.Solution.Shared;
 using Enterprise.Solution.Email.Service;
+using Org.BouncyCastle.Cms;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
@@ -57,45 +58,81 @@ services.AddControllers(options =>
 })
 .AddXmlDataContractSerializerFormatters();
 
-// Add Authentication
-builder.Services
-.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddKeycloak(options =>
-{
-    //Use default signin scheme
-    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    //Keycloak server
-    options.Realm = configuration.GetSection("Authentication")["Schemes:Keycloak:ServerRealm"];
-    //Keycloak client ID
-    options.ClientId = configuration.GetSection("Authentication")["Schemes:Keycloak:ClientId"]!;
-    //Keycloak client secret
-    options.ClientSecret = configuration.GetSection("Authentication")["Schemes:Keycloak:ClientSecret"]!;
-    //Keycloak .wellknown config origin to fetch config
-    options.UserInformationEndpoint = configuration.GetSection("Authentication")["Schemes:Keycloak:Metadata"]!;
-    //Require keycloak to use SSL
-    options.Scope.Add("openid");
-    options.Scope.Add("profile");
-    //Save the token
-    options.SaveTokens = true;
-    //Token response type, will sometimes need to be changed to IdToken, depending on config.
-    options.AccessType = AspNet.Security.OAuth.Keycloak.KeycloakAuthenticationAccessType.Confidential;
-    //SameSite is needed for Chrome/Firefox, as they will give http error 500 back, if not set to unspecified.
-    options.CorrelationCookie.SameSite = SameSiteMode.Unspecified;
+services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
-    options.Version = new Version(20, 0);
-})
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+services.AddSwaggerGen(setupAction =>
+{
+    var xmlCommentsFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var commentsFullPath = Path.Combine(AppContext.BaseDirectory, xmlCommentsFile);
+
+    setupAction.IncludeXmlComments(commentsFullPath);
+
+    setupAction.AddSecurityDefinition("EnterpriseSolutionBearerAuth", new OpenApiSecurityScheme()
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = JwtBearerDefaults.AuthenticationScheme,
+        Description = "Input a valid token to access this API"
+    });
+
+    setupAction.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "EnterpriseSolutionBearerAuth"
+                }
+            }, new List<string>()
+        }
+    });
+});
+
+// Add Authentication
+services
+.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//.AddKeycloak(options =>
+//{
+//    //Use default signin scheme
+//    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+//    //Keycloak server
+//    options.Realm = currentSubPlatformSettings.Authentication.Schemes.Keycloak.ServerRealm;
+//    //Keycloak client ID
+//    options.ClientId = currentSubPlatformSettings.Authentication.Schemes.Keycloak.ClientId;
+//    //Keycloak client secret
+//    options.ClientSecret = currentSubPlatformSettings.Authentication.Schemes.Keycloak.ClientSecret;
+//    //Keycloak .wellknown config origin to fetch config
+//    options.UserInformationEndpoint = currentSubPlatformSettings.Authentication.Schemes.Keycloak.Metadata;
+//    //Require keycloak to use SSL
+//    options.Scope.Add("openid");
+//    options.Scope.Add("profile");
+//    //Save the token
+//    options.SaveTokens = true;
+//    //Token response type, will sometimes need to be changed to IdToken, depending on config.
+//    options.AccessType = AspNet.Security.OAuth.Keycloak.KeycloakAuthenticationAccessType.Confidential;
+//    //SameSite is needed for Chrome/Firefox, as they will give http error 500 back, if not set to unspecified.
+//    options.CorrelationCookie.SameSite = SameSiteMode.Unspecified;
+
+//    options.Version = new Version(20, 0);
+//})
 .AddJwtBearer(options =>
 {
+    // options.MetadataAddress = currentSubPlatformSettings.Authentication.Schemes.Keycloak.Metadata;
+    // options.Authority = currentSubPlatformSettings.Authentication.Schemes.Keycloak.ServerRealm;
+    // options.Audience = currentSubPlatformSettings.Authentication.Schemes.Keycloak.Audience;
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = configuration.GetSection("Authentication")["Schemes:Swagger:ClaimsIssuer"],
-        ValidAudience = configuration.GetSection("Authentication")["Schemes:Swagger:Audience"],
+        ValidIssuer = currentSubPlatformSettings.Authentication.Schemes.Swagger.ClaimsIssuer,
+        ValidAudience = currentSubPlatformSettings.Authentication.Schemes.Swagger.Audience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-            configuration.GetSection("Authentication")["Schemes:Swagger:SecretForKey"]!))
+            currentSubPlatformSettings.Authentication.Schemes.Swagger.SecretForKey)),
     };
 });
 
@@ -110,36 +147,6 @@ builder.Services.AddAuthorization(options =>
     });
 });
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-services.AddEndpointsApiExplorer();
-services.AddSwaggerGen(setupAction =>
-{
-    var xmlCommentsFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var commentsFullPath = Path.Combine(AppContext.BaseDirectory, xmlCommentsFile);
-
-    setupAction.IncludeXmlComments(commentsFullPath);
-
-    setupAction.AddSecurityDefinition("Swagger", new OpenApiSecurityScheme()
-    {
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-        Description = "Input a valid token to access this API"
-    });
-
-    setupAction.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Swagger"
-                }
-            }, new List<string>()
-        }
-    });
-});
 services.AddSingleton<FileExtensionContentTypeProvider>();
 
 // Add Database context
@@ -171,10 +178,13 @@ services.AddScoped<IAuthorService, AuthorService>();
 services.AddScoped(typeof(IBookRepository), typeof(BookRepository));
 services.AddScoped<IBookService, BookService>();
 
-
 // Artist DI
 services.AddScoped(typeof(IArtistRepository), typeof(ArtistRepository));
 services.AddScoped<IArtistService, ArtistService>();
+
+// EmailSubscription DI
+services.AddScoped(typeof(IEmailSubscriptionRepository), typeof(EmailSubscriptionRepository));
+services.AddScoped<IEmailSubscriptionService, EmailSubscriptionService>();
 
 // Add AutoMapper
 services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -214,8 +224,7 @@ services.Configure<RouteOptions>(options =>
     options.LowercaseQueryStrings = true;
 });
 
-// Configure API versioning
-services.AddApiVersioning(options =>
+var apiVersioningBuilder = services.AddApiVersioning(options =>
 {
     options.DefaultApiVersion = new ApiVersion(1, 0);
     options.ReportApiVersions = true;

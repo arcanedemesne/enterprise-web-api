@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 using Enterprise.Solution.Email.Service;
 using Enterprise.Solution.Service.Services;
+using Enterprise.Solution.Shared;
 
 namespace Enterprise.Solution.API.Controllers.Common
 {
@@ -12,18 +15,42 @@ namespace Enterprise.Solution.API.Controllers.Common
     /// <typeparam name="T"></typeparam>
     public class BaseController<T> : ControllerBase where T : BaseController<T>
     {
-        private readonly IConfiguration? _configuration;
+        /// <summary>
+        /// SolutionSettings from the appsettings.json file
+        /// </summary>
+        protected SolutionSettings _solutionSettings;
+
+        /// <summary>
+        /// IMediator for mediting api requests, validation, and service actions
+        /// </summary>
+        protected readonly IMediator _mediator;
+
+        /// <summary>
+        /// ILogger for logging
+        /// </summary>
         private readonly ILogger<T>? _logger;
+
+        /// <summary>
+        /// IMapper for mapping entities and dtos
+        /// </summary>
         private readonly IMapper? _mapper;
+
+        /// <summary>
+        /// Constructor for the BaseController with MediatR
+        /// </summary>
+        /// <param name="solutionSettings"></param>
+        /// <param name="mediator"></param>
+        public BaseController(IOptions<SolutionSettings> solutionSettings, IMediator mediator)
+        {
+            _solutionSettings = solutionSettings.Value;
+            _mediator = mediator;
+        }
+
         private readonly IEmailService? _emailService;
         private readonly IAuthorService? _authorService;
         private readonly IBookService? _bookService;
         private readonly IArtistService? _artistService;
 
-        /// <summary>
-        /// IConfiguration for reaching configuration values inside controllers
-        /// </summary>
-        protected IConfiguration Configuration => _configuration ?? HttpContext.RequestServices.GetRequiredService<IConfiguration>();
         /// <summary>
         /// ILogger<typeparamref name="T"/> for logging inside controllers
         /// </summary>
@@ -48,37 +75,5 @@ namespace Enterprise.Solution.API.Controllers.Common
         /// IArtistService for reaching CRUD operations for artists
         /// </summary>
         protected IArtistService ArtistService => _artistService ?? HttpContext.RequestServices.GetRequiredService<IArtistService>();
-
-
-        private readonly int DEFAULT_PAGE_SIZE = 10;
-        private readonly int MAX_PAGE_SIZE = 20;
-
-        /// <summary>
-        /// Make sure pageNumber is reset if not provided or invalid
-        /// </summary>
-        /// <param name="pageNumber"></param>
-        protected int SanitizePageNumber(int? pageNumber)
-        {
-            if (!pageNumber.HasValue || pageNumber.Value <= 0)
-            {
-                return 1;
-            }
-
-            return pageNumber.Value;
-        }
-
-        /// <summary>
-        /// Make sure pageSize is reset if not provided or invalid
-        /// </summary>
-        /// <param name="pageSize"></param>
-        protected int SanitizePageSize(int? pageSize)
-        {
-            if (!pageSize.HasValue || pageSize.Value <= 0 || pageSize.Value > MAX_PAGE_SIZE)
-            {
-                return DEFAULT_PAGE_SIZE;
-            }
-
-            return pageSize.Value;
-        }
     }
 }

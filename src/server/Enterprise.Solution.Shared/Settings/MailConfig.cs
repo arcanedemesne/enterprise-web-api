@@ -21,7 +21,7 @@ namespace Enterprise.Solution.Shared.Settings
     public class MailConfig
     {
         public enum MailProvider { Default = 0, MailKit}
-        public string Host { get; set; }
+        public string Host { get; set; } = null!;
         public ushort Port { get; set; }
         public bool UseAuthentication { get; set; }
         public string? Username { get; set; }

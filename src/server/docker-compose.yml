@@ -58,7 +58,7 @@ services:
     command: 
       - start-dev --http-relative-path=/auth
     environment:
-      KEYCLOAK_CREATE_ADMIN_USER: true
+      KEYCLOAK_CREATE_ADMIN_USER: "true"
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
       KEYCLOAK_DB: postgres

@@ -11,6 +11,7 @@ namespace Enterprise.Solution.Data.DbContexts
         public DbSet<Book> Books { get; set; }
         public DbSet<Cover> Covers { get; set; }
         public DbSet<Artist> Artists { get; set; }
+        public DbSet<EmailSubscription> EmailSubscriptions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -75,6 +76,16 @@ namespace Enterprise.Solution.Data.DbContexts
                     j.HasKey(t => new { t.ArtistId, t.CoverId });
                     j.HasData(someCoverAssigments);
                 });
+
+            var emailSubscriptionList = new EmailSubscription[] {
+                new EmailSubscription { Id = 1, FirstName = "Rhoda", LastName = "Lerman", EmailAddress = "Rhoda.Lerman@domain.local" },
+                new EmailSubscription { Id = 2, FirstName = "Ruth", LastName = "Ozeki", EmailAddress = "Ruth.Ozeki@domain.local" },
+                new EmailSubscription { Id = 3, FirstName = "Sofia", LastName = "Segovia", EmailAddress = "Sofia.Segovia@domain.local" },
+                new EmailSubscription { Id = 4, FirstName = "Ursula K.", LastName = "LeGuin", EmailAddress = "Ursula.K.LeGuin@domain.local" },
+                new EmailSubscription { Id = 5, FirstName = "Hugh", LastName = "Howey", EmailAddress = "Hugh.Howey@domain.local" },
+                new EmailSubscription { Id = 6, FirstName = "Isabelle", LastName = "Allende", EmailAddress = "Isabelle.Allende@domain.local" }
+            };
+            modelBuilder.Entity<EmailSubscription>().HasData(emailSubscriptionList);
         }
     }
 }

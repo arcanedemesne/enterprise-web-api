@@ -1,13 +1,18 @@
-﻿using Enterprise.Solution.API.Controllers.Common;
-using Enterprise.Solution.API.Helpers.QueryParams;
-using Enterprise.Solution.API.Models;
-using Enterprise.Solution.Data.Models;
-
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.Extensions.Options;
 using System.Text.Json;
+
+using Enterprise.Solution.API.Application.Commands;
+using Enterprise.Solution.API.Application.Queries;
+using Enterprise.Solution.API.Controllers.Common;
+using Enterprise.Solution.API.Models;
+using Enterprise.Solution.Data.Models;
+using Enterprise.Solution.Service.QueryParams;
+using Enterprise.Solution.Shared;
+using Enterprise.Solution.Shared.Exceptions;
 
 namespace Enterprise.Solution.API.Controllers
 {
@@ -22,132 +27,113 @@ namespace Enterprise.Solution.API.Controllers
     public class ArtistController : BaseController<ArtistController>
     {
         /// <summary>
-        /// List All Artists (SearchQuery for First/Last Name, Pagination, and collection expansion)
+        /// Constructor
         /// </summary>
-        /// <param name="queryParams">Not-null queryParams</param>
-        /// <returns code="200">Artists</returns>
+        /// <param name="solutionSettings"></param>
+        /// <param name="mediator"></param>
+        public ArtistController(IOptions<SolutionSettings> solutionSettings, IMediator mediator) : base(solutionSettings, mediator) { }
+
+        /// <summary>
+        /// List All Artists
+        /// </summary>
+        /// <returns code="200">List of Artists</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<ArtistDTO>>> ListAllAsync([FromQuery] ArtistPagedQueryParams queryParams)
+        public async Task<ActionResult<IEnumerable<ArtistDTO>>> ListAllAsync([FromQuery] ArtistPagedQueryParams queryParams, CancellationToken cancellationToken)
         {
-            var response = await ArtistService.ListAllAsync(
-                SanitizePageNumber(queryParams.PageNumber),
-                SanitizePageSize(queryParams.PageSize),
-                queryParams.SearchQuery,
-                queryParams.IncludeCovers ?? false,
-                queryParams.IncludeCoversWithBook ?? false,
-                queryParams.IncludeCoversWithBookAndAuthor ?? false);
-
-            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(response.PaginationMetadata));
-
-            return Ok(Mapper.Map<IReadOnlyList<ArtistDTO>>(response.Entities));
+            try
+            {
+                var response = await base._mediator!.Send(new ListAllArtistsQuery(queryParams), cancellationToken);
+                Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(response!.PaginationMetadata));
+                return Ok(Mapper.Map<IReadOnlyList<ArtistDTO>>(response.Entities));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         /// <summary>
-        /// Get Artist by Id (collection expansion)
+        /// Get an Artist by Id
         /// </summary>
         /// <param name="id">Non-null id</param>
-        /// <param name="queryParams">Non-null queryParams</param>
-        /// <returns code="200">Artist</returns>
-        [HttpGet("{id}", Name = "GetArtist")]
+        /// <returns code="200">Found Artist</returns>
+        [HttpGet("{id}", Name = $"Get{nameof(Artist)}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetByIdAsync(int id, ArtistQueryParams queryParams)
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var artist = await ArtistService.GetByIdAsync(
-                id,
-                queryParams.IncludeCovers ?? false,
-                queryParams.IncludeCoversWithBook ?? false,
-                queryParams.IncludeCoversWithBookAndAuthor ?? false);
-
-            if (artist == null)
+            try
             {
-                Logger.LogInformation($"Artist with id {id} was not found.");
-                return NotFound();
+                var dto = await base._mediator!.Send(new GetArtistByIdQuery(id));
+                return Ok(dto);
             }
-
-            return Ok(Mapper.Map<ArtistDTO>(artist));
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex);
+            }
         }
 
         /// <summary>
-        /// Create Artist
+        /// Create an Artist
         /// </summary>
-        /// <param name="artistDTO">Non-null artistDTO</param>
+        /// <param name="dto">Non-null artistDTO</param>
         /// <returns code="201">Created Artist</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddAsync([FromBody] ArtistDTO artistDTO)
+        public async Task<IActionResult> AddAsync([FromBody] ArtistDTO dto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                Logger.LogInformation($"ModelState is invalid.");
-                return BadRequest(ModelState);
+                var response = await _mediator.Send(new AddArtistCommand(ModelState, dto));
+                return CreatedAtRoute($"Get{nameof(Artist)}", new { id = response.Id }, response);
             }
-
-            Artist artist = Mapper.Map<Artist>(artistDTO);
-
-            var createdArtist = await ArtistService.AddAsync(artist);
-
-            var createdArtistDTO = Mapper.Map<ArtistDTO>(createdArtist);
-
-            return CreatedAtRoute("GetArtist",
-                new
-                {
-                    id = createdArtistDTO.Id,
-                }, createdArtistDTO);
+            catch (NotCreatedException ex)
+            {
+                return NotFound(ex);
+            }
+            catch (InvalidModelException ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         /// <summary>
-        /// Update Artist
+        /// Update an Artist
         /// </summary>
         /// <param name="id">Non-null id</param>
-        /// <param name="artistDTO">Non-null artistDTO</param>
+        /// <param name="dto">Non-null dto</param>
         /// <returns code="204">No Content</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateAsync(
-            int id,
-            [FromBody] ArtistDTO artistDTO
-        )
+        public async Task<IActionResult> UpdateAsync(int id, [FromBody] ArtistDTO dto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                Logger.LogInformation($"ModelState is invalid.");
-                return BadRequest(ModelState);
-            }
-
-            var artistExists = await ArtistService.ExistsAsync(id);
-            if (!artistExists)
-            {
-                Logger.LogInformation($"Artist with id {id} not found.");
-                return NotFound();
-            }
-            if (!id.Equals(artistDTO.Id))
-            {
-                var message = $"Incorrect id for artist with id {id}.";
-                Logger.LogInformation(message);
-                return BadRequest(message);
-            }
-
-            var artist = await ArtistService.GetByIdAsync(id);
-            if (artist != null)
-            {
-                Mapper.Map(artistDTO, artist);
-                await ArtistService.UpdateAsync(artist);
+                await _mediator.Send(new UpdateArtistCommand(id, ModelState, dto));
                 return NoContent();
             }
-
-            return BadRequest($"An error occured while trying to update artist with id {id}.");
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex);
+            }
+            catch (NotUpdatedException ex)
+            {
+                return BadRequest(ex);
+            }
+            catch (InvalidModelException ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         /// <summary>
-        /// Patch Artist
+        /// Patch an Artist
         /// </summary>
         /// <param name="id">Non-null id</param>
         /// <param name="jsonPatchDocument">Non-null jsonPatchDocument</param>
@@ -156,50 +142,31 @@ namespace Enterprise.Solution.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> PatchAsync(
-            int id,
-            [FromBody] JsonPatchDocument<ArtistDTO> jsonPatchDocument
-            )
+        public async Task<IActionResult> PatchAsync(int id, [FromBody] JsonPatchDocument<ArtistDTO> jsonPatchDocument)
         {
-            var artistExists = await ArtistService.ExistsAsync(id);
-            if (!artistExists)
+            try
             {
-                Logger.LogInformation($"Artist with id {id} was not found.");
-                return NotFound();
+                await _mediator.Send(new PatchArtistCommand(id, ModelState,
+                    new Func<object, bool>((object patchResult) => TryValidateModel(patchResult)),
+                    jsonPatchDocument));
+                return NoContent();
             }
-
-            var artist = await ArtistService.GetByIdAsync(id);
-            if (artist == null)
+            catch (NotFoundException ex)
             {
-                Logger.LogInformation($"Artist with id {id} was not found.");
-                return NotFound();
+                return NotFound(ex);
             }
-
-            var patchedArtist = Mapper.Map<ArtistDTO>(artist);
-
-            jsonPatchDocument.ApplyTo(patchedArtist, ModelState);
-
-            if (!ModelState.IsValid)
+            catch (NotPatchedException ex)
             {
-                Logger.LogInformation($"ModelState is invalid.");
-                return BadRequest(ModelState);
+                return BadRequest(ex);
             }
-
-            if (!TryValidateModel(patchedArtist))
+            catch (InvalidModelException ex)
             {
-                Logger.LogInformation($"ModelState Patch is invalid.");
-                return BadRequest(ModelState);
+                return BadRequest(ex);
             }
-
-            Mapper.Map(patchedArtist, artist);
-
-            await ArtistService.UpdateAsync(artist);
-
-            return NoContent();
         }
 
         /// <summary>
-        /// Delete Artist
+        /// Delete an Artist
         /// </summary>
         /// <param name="id">Non-null id</param>
         /// <returns code="204">No content</returns>
@@ -207,18 +174,21 @@ namespace Enterprise.Solution.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> DeleteArtistAsync(int id)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
-            var artistExists = await ArtistService.ExistsAsync(id);
-            if (!artistExists)
+            try
             {
-                Logger.LogInformation($"Artist with id {id} was not found.");
-                return NotFound();
+                await _mediator.Send(new DeleteArtistCommand(id));
+                return NoContent();
             }
-
-            await ArtistService.DeleteAsync(id);
-
-            return NoContent();
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex);
+            }
+            catch (NotDeletedException ex)
+            {
+                return BadRequest(ex);
+            }
         }
     }
 }

@@ -6,6 +6,8 @@ namespace Enterprise.Solution.Shared
     [ExcludeFromCodeCoverage]
     public class SolutionSettings
     {
+        public AuthenticationConfig Authentication { get; set; } = new AuthenticationConfig();
+
         public DatabaseConfig Database { get; set; } = new DatabaseConfig();
 
         public CacheConfig Cache { get; set; } = new CacheConfig();

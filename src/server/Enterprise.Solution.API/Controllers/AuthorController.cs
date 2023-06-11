@@ -1,13 +1,18 @@
-﻿using Enterprise.Solution.API.Controllers.Common;
-using Enterprise.Solution.API.Helpers.QueryParams;
-using Enterprise.Solution.API.Models;
-using Enterprise.Solution.Data.Models;
-
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.Extensions.Options;
 using System.Text.Json;
+
+using Enterprise.Solution.API.Application.Commands;
+using Enterprise.Solution.API.Application.Queries;
+using Enterprise.Solution.API.Controllers.Common;
+using Enterprise.Solution.API.Models;
+using Enterprise.Solution.Data.Models;
+using Enterprise.Solution.Service.QueryParams;
+using Enterprise.Solution.Shared;
+using Enterprise.Solution.Shared.Exceptions;
 
 namespace Enterprise.Solution.API.Controllers
 {
@@ -22,132 +27,113 @@ namespace Enterprise.Solution.API.Controllers
     public class AuthorController : BaseController<AuthorController>
     {
         /// <summary>
-        /// List All Authors (SearchQuery for First/Last Name, Pagination, and collection expansion)
+        /// Constructor
         /// </summary>
-        /// <param name="queryParams">Not-null queryParams</param>
-        /// <returns code="200">Authors</returns>
+        /// <param name="solutionSettings"></param>
+        /// <param name="mediator"></param>
+        public AuthorController(IOptions<SolutionSettings> solutionSettings, IMediator mediator) : base(solutionSettings, mediator) { }
+
+        /// <summary>
+        /// List All Authors
+        /// </summary>
+        /// <returns code="200">List of Authors</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<AuthorDTO>>> ListAllAsync([FromQuery] AuthorPagedQueryParams queryParams)
+        public async Task<ActionResult<IEnumerable<AuthorDTO>>> ListAllAsync([FromQuery] AuthorPagedQueryParams queryParams, CancellationToken cancellationToken)
         {
-            var response = await AuthorService.ListAllAsync(
-                SanitizePageNumber(queryParams.PageNumber),
-                SanitizePageSize(queryParams.PageSize),
-                queryParams.SearchQuery,
-                queryParams.IncludeBooks ?? false,
-                queryParams.IncludeBooksWithCover ?? false,
-                queryParams.IncludeBooksWithCoverAndArtists ?? false);
-
-            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(response.PaginationMetadata));
-
-            return Ok(Mapper.Map<IReadOnlyList<AuthorDTO>>(response.Entities));
+            try
+            {
+                var response = await base._mediator!.Send(new ListAllAuthorsQuery(queryParams), cancellationToken);
+                Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(response!.PaginationMetadata));
+                return Ok(Mapper.Map<IReadOnlyList<AuthorDTO>>(response.Entities));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         /// <summary>
-        /// Get Author by Id (collection expansion)
+        /// Get an Author by Id
         /// </summary>
         /// <param name="id">Non-null id</param>
-        /// <param name="queryParams">Non-null queryParams</param>
-        /// <returns code="200">Author</returns>
-        [HttpGet("{id}", Name = "GetAuthor")]
+        /// <returns code="200">Found Author</returns>
+        [HttpGet("{id}", Name = $"Get{nameof(Author)}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetByIdAsync(int id, AuthorQueryParams queryParams)
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var author = await AuthorService.GetByIdAsync(
-                id,
-                queryParams.IncludeBooks ?? false,
-                queryParams.IncludeBooksWithCover ?? false,
-                queryParams.IncludeBooksWithCoverAndArtists ?? false);
-
-            if (author == null)
+            try
             {
-                Logger.LogInformation($"Author with id {id} was not found.");
-                return NotFound();
+                var dto = await base._mediator!.Send(new GetAuthorByIdQuery(id));
+                return Ok(dto);
             }
-
-            return Ok(Mapper.Map<AuthorDTO>(author));
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex);
+            }
         }
 
         /// <summary>
-        /// Create Author
+        /// Create an Author
         /// </summary>
-        /// <param name="authorDTO">Non-null authorDTO</param>
+        /// <param name="dto">Non-null authorDTO</param>
         /// <returns code="201">Created Author</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddAsync([FromBody] AuthorDTO authorDTO)
+        public async Task<IActionResult> AddAsync([FromBody] AuthorDTO dto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                Logger.LogInformation($"ModelState is invalid.");
-                return BadRequest(ModelState);
+                var response = await _mediator.Send(new AddAuthorCommand(ModelState, dto));
+                return CreatedAtRoute($"Get{nameof(Author)}", new { id = response.Id }, response);
             }
-
-            Author author = Mapper.Map<Author>(authorDTO);
-
-            var createdAuthor = await AuthorService.AddAsync(author);
-
-            var createdAuthorDTO = Mapper.Map<AuthorDTO>(createdAuthor);
-
-            return CreatedAtRoute("GetAuthor",
-                new
-                {
-                    id = createdAuthorDTO.Id,
-                }, createdAuthorDTO);
+            catch (NotCreatedException ex)
+            {
+                return NotFound(ex);
+            }
+            catch (InvalidModelException ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         /// <summary>
-        /// Update Author
+        /// Update an Author
         /// </summary>
         /// <param name="id">Non-null id</param>
-        /// <param name="authorDTO">Non-null authorDTO</param>
+        /// <param name="dto">Non-null dto</param>
         /// <returns code="204">No Content</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateAsync(
-            int id,
-            [FromBody] AuthorDTO authorDTO
-        )
+        public async Task<IActionResult> UpdateAsync(int id, [FromBody] AuthorDTO dto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                Logger.LogInformation($"ModelState is invalid.");
-                return BadRequest(ModelState);
-            }
-
-            var authorExists = await AuthorService.ExistsAsync(id);
-            if (!authorExists)
-            {
-                Logger.LogInformation($"Author with id {id} not found.");
-                return NotFound();
-            }
-            if (!id.Equals(authorDTO.Id))
-            {
-                var message = $"Incorrect id for author with id {id}.";
-                Logger.LogInformation(message);
-                return BadRequest(message);
-            }
-
-            var author = await AuthorService.GetByIdAsync(id);
-            if (author != null)
-            {
-                Mapper.Map(authorDTO, author);
-                await AuthorService.UpdateAsync(author);
+                await _mediator.Send(new UpdateAuthorCommand(id, ModelState, dto));
                 return NoContent();
             }
-
-            return BadRequest($"An error occured while trying to update author with id {id}.");
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex);
+            }
+            catch (NotUpdatedException ex)
+            {
+                return BadRequest(ex);
+            }
+            catch (InvalidModelException ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         /// <summary>
-        /// Patch Author
+        /// Patch an Author
         /// </summary>
         /// <param name="id">Non-null id</param>
         /// <param name="jsonPatchDocument">Non-null jsonPatchDocument</param>
@@ -156,50 +142,31 @@ namespace Enterprise.Solution.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> PatchAsync(
-            int id,
-            [FromBody] JsonPatchDocument<AuthorDTO> jsonPatchDocument
-            )
+        public async Task<IActionResult> PatchAsync(int id, [FromBody] JsonPatchDocument<AuthorDTO> jsonPatchDocument)
         {
-            var authorExists = await AuthorService.ExistsAsync(id);
-            if (!authorExists)
+            try
             {
-                Logger.LogInformation($"Author with id {id} was not found.");
-                return NotFound();
+                await _mediator.Send(new PatchAuthorCommand(id, ModelState,
+                    new Func<object, bool>((object patchResult) => TryValidateModel(patchResult)),
+                    jsonPatchDocument));
+                return NoContent();
             }
-
-            var author = await AuthorService.GetByIdAsync(id);
-            if (author == null)
+            catch (NotFoundException ex)
             {
-                Logger.LogInformation($"Author with id {id} was not found.");
-                return NotFound();
+                return NotFound(ex);
             }
-
-            var patchedAuthor = Mapper.Map<AuthorDTO>(author);
-
-            jsonPatchDocument.ApplyTo(patchedAuthor, ModelState);
-
-            if (!ModelState.IsValid)
+            catch (NotPatchedException ex)
             {
-                Logger.LogInformation($"ModelState is invalid.");
-                return BadRequest(ModelState);
+                return BadRequest(ex);
             }
-
-            if (!TryValidateModel(patchedAuthor))
+            catch (InvalidModelException ex)
             {
-                Logger.LogInformation($"ModelState Patch is invalid.");
-                return BadRequest(ModelState);
+                return BadRequest(ex);
             }
-
-            Mapper.Map(patchedAuthor, author);
-
-            await AuthorService.UpdateAsync(author);
-
-            return NoContent();
         }
 
         /// <summary>
-        /// Delete Author
+        /// Delete an Author
         /// </summary>
         /// <param name="id">Non-null id</param>
         /// <returns code="204">No content</returns>
@@ -207,18 +174,21 @@ namespace Enterprise.Solution.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> DeleteAuthorAsync(int id)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
-            var authorExists = await AuthorService.ExistsAsync(id);
-            if (!authorExists)
+            try
             {
-                Logger.LogInformation($"Author with id {id} was not found.");
-                return NotFound();
+                await _mediator.Send(new DeleteAuthorCommand(id));
+                return NoContent();
             }
-
-            await AuthorService.DeleteAsync(id);
-
-            return NoContent();
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex);
+            }
+            catch (NotDeletedException ex)
+            {
+                return BadRequest(ex);
+            }
         }
     }
 }

@@ -1,12 +1,18 @@
-﻿using Enterprise.Solution.API.Controllers.Common;
-using Enterprise.Solution.API.Helpers.QueryParams;
-using Enterprise.Solution.API.Models;
-using Enterprise.Solution.Data.Models;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.Extensions.Options;
 using System.Text.Json;
+
+using Enterprise.Solution.API.Application.Commands;
+using Enterprise.Solution.API.Application.Queries;
+using Enterprise.Solution.API.Controllers.Common;
+using Enterprise.Solution.API.Models;
+using Enterprise.Solution.Data.Models;
+using Enterprise.Solution.Service.QueryParams;
+using Enterprise.Solution.Shared;
+using Enterprise.Solution.Shared.Exceptions;
 
 namespace Enterprise.Solution.API.Controllers
 {
@@ -21,132 +27,113 @@ namespace Enterprise.Solution.API.Controllers
     public class BookController : BaseController<BookController>
     {
         /// <summary>
-        /// List All Books (SearchQuery for Title, Pagination, and collection expansion)
+        /// Constructor
         /// </summary>
-        /// <param name="queryParams">Not-null queryParams</param>
-        /// <returns code="200">Books</returns>
+        /// <param name="solutionSettings"></param>
+        /// <param name="mediator"></param>
+        public BookController(IOptions<SolutionSettings> solutionSettings, IMediator mediator) : base(solutionSettings, mediator) { }
+
+        /// <summary>
+        /// List All Books
+        /// </summary>
+        /// <returns code="200">List of Books</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<BookDTO>>> ListAllAsync([FromQuery] BookPagedQueryParams queryParams)
+        public async Task<ActionResult<IEnumerable<BookDTO>>> ListAllAsync([FromQuery] BookPagedQueryParams queryParams, CancellationToken cancellationToken)
         {
-            var response = await BookService.ListAllAsync(
-                SanitizePageNumber(queryParams.PageNumber),
-                SanitizePageSize(queryParams.PageSize),
-                queryParams.SearchQuery,
-                queryParams.IncludeAuthor ?? false,
-                queryParams.IncludeCover ?? false,
-                queryParams.IncludeCoverAndArtists ?? false);
-
-            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(response.PaginationMetadata));
-
-            return Ok(Mapper.Map<IReadOnlyList<BookDTO>>(response.Entities));
+            try
+            {
+                var response = await base._mediator!.Send(new ListAllBooksQuery(queryParams), cancellationToken);
+                Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(response!.PaginationMetadata));
+                return Ok(Mapper.Map<IReadOnlyList<BookDTO>>(response.Entities));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         /// <summary>
-        /// Get Book by Id (collection expansion)
+        /// Get an Book by Id
         /// </summary>
         /// <param name="id">Non-null id</param>
-        /// <param name="queryParams">Non-null queryParams</param>
-        /// <returns code="200">Book</returns>
-        [HttpGet("{id}", Name = "GetBook")]
+        /// <returns code="200">Found Book</returns>
+        [HttpGet("{id}", Name = $"Get{nameof(Book)}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetByIdAsync(int id, BookQueryParams queryParams)
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var book = await BookService.GetByIdAsync(
-                id,
-                queryParams.IncludeAuthor ?? false,
-                queryParams.IncludeCover ?? false,
-                queryParams.IncludeCoverAndArtists ?? false);
-
-            if (book == null)
+            try
             {
-                Logger.LogInformation($"Book with id {id} was not found.");
-                return NotFound();
+                var dto = await base._mediator!.Send(new GetBookByIdQuery(id));
+                return Ok(dto);
             }
-
-            return Ok(Mapper.Map<BookDTO>(book));
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex);
+            }
         }
 
         /// <summary>
-        /// Create Book
+        /// Create an Book
         /// </summary>
-        /// <param name="bookDTO">Non-null bookDTO</param>
+        /// <param name="dto">Non-null bookDTO</param>
         /// <returns code="201">Created Book</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddAsync([FromBody] BookDTO bookDTO)
+        public async Task<IActionResult> AddAsync([FromBody] BookDTO dto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                Logger.LogInformation($"ModelState is invalid.");
-                return BadRequest(ModelState);
+                var response = await _mediator.Send(new AddBookCommand(ModelState, dto));
+                return CreatedAtRoute($"Get{nameof(Book)}", new { id = response.Id }, response);
             }
-
-            Book book = Mapper.Map<Book>(bookDTO);
-
-            var createdBook = await BookService.AddAsync(book);
-
-            var createdBookDTO = Mapper.Map<BookDTO>(createdBook);
-
-            return CreatedAtRoute("GetBook",
-                new
-                {
-                    id = createdBookDTO.Id,
-                }, createdBookDTO);
+            catch (NotCreatedException ex)
+            {
+                return NotFound(ex);
+            }
+            catch (InvalidModelException ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         /// <summary>
-        /// Update Book
+        /// Update an Book
         /// </summary>
         /// <param name="id">Non-null id</param>
-        /// <param name="bookDTO">Non-null bookDTO</param>
+        /// <param name="dto">Non-null dto</param>
         /// <returns code="204">No Content</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateAsync(
-            int id,
-            [FromBody] BookDTO bookDTO
-        )
+        public async Task<IActionResult> UpdateAsync(int id, [FromBody] BookDTO dto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                Logger.LogInformation($"ModelState is invalid.");
-                return BadRequest(ModelState);
-            }
-
-            var bookExists = await BookService.ExistsAsync(id);
-            if (!bookExists)
-            {
-                Logger.LogInformation($"Book with id {id} not found.");
-                return NotFound();
-            }
-            if (!id.Equals(bookDTO.Id))
-            {
-                var message = $"Incorrect id for book with id {id}.";
-                Logger.LogInformation(message);
-                return BadRequest(message);
-            }
-
-            var book = await BookService.GetByIdAsync(id);
-            if (book != null)
-            {
-                Mapper.Map(bookDTO, book);
-                await BookService.UpdateAsync(book);
+                await _mediator.Send(new UpdateBookCommand(id, ModelState, dto));
                 return NoContent();
             }
-
-            return BadRequest($"An error occured while trying to update book with id {id}.");
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex);
+            }
+            catch (NotUpdatedException ex)
+            {
+                return BadRequest(ex);
+            }
+            catch (InvalidModelException ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         /// <summary>
-        /// Patch Book
+        /// Patch an Book
         /// </summary>
         /// <param name="id">Non-null id</param>
         /// <param name="jsonPatchDocument">Non-null jsonPatchDocument</param>
@@ -155,50 +142,31 @@ namespace Enterprise.Solution.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> PatchAsync(
-            int id,
-            [FromBody] JsonPatchDocument<BookDTO> jsonPatchDocument
-            )
+        public async Task<IActionResult> PatchAsync(int id, [FromBody] JsonPatchDocument<BookDTO> jsonPatchDocument)
         {
-            var bookExists = await BookService.ExistsAsync(id);
-            if (!bookExists)
+            try
             {
-                Logger.LogInformation($"Book with id {id} was not found.");
-                return NotFound();
+                await _mediator.Send(new PatchBookCommand(id, ModelState,
+                    new Func<object, bool>((object patchResult) => TryValidateModel(patchResult)),
+                    jsonPatchDocument));
+                return NoContent();
             }
-
-            var book = await BookService.GetByIdAsync(id);
-            if (book == null)
+            catch (NotFoundException ex)
             {
-                Logger.LogInformation($"Book with id {id} was not found.");
-                return NotFound();
+                return NotFound(ex);
             }
-
-            var patchedBook = Mapper.Map<BookDTO>(book);
-
-            jsonPatchDocument.ApplyTo(patchedBook, ModelState);
-
-            if (!ModelState.IsValid)
+            catch (NotPatchedException ex)
             {
-                Logger.LogInformation($"ModelState is invalid.");
-                return BadRequest(ModelState);
+                return BadRequest(ex);
             }
-
-            if (!TryValidateModel(patchedBook))
+            catch (InvalidModelException ex)
             {
-                Logger.LogInformation($"ModelState Patch is invalid.");
-                return BadRequest(ModelState);
+                return BadRequest(ex);
             }
-
-            Mapper.Map(patchedBook, book);
-
-            await BookService.UpdateAsync(book);
-
-            return NoContent();
         }
 
         /// <summary>
-        /// Delete Book
+        /// Delete an Book
         /// </summary>
         /// <param name="id">Non-null id</param>
         /// <returns code="204">No content</returns>
@@ -206,18 +174,21 @@ namespace Enterprise.Solution.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> DeleteBookAsync(int id)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
-            var bookExists = await BookService.ExistsAsync(id);
-            if (!bookExists)
+            try
             {
-                Logger.LogInformation($"Book with id {id} was not found.");
-                return NotFound();
+                await _mediator.Send(new DeleteBookCommand(id));
+                return NoContent();
             }
-
-            await BookService.DeleteAsync(id);
-
-            return NoContent();
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex);
+            }
+            catch (NotDeletedException ex)
+            {
+                return BadRequest(ex);
+            }
         }
     }
 }

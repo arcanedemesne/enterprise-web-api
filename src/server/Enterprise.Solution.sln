@@ -20,9 +20,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04 - Data", "04 - Data", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "05 - IsolatedProjects", "05 - IsolatedProjects", "{FB858523-8A50-4F51-9C1A-A02C851B4BB4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Enterprise.Solution.Email", "Enterprise.Solution.Email\Enterprise.Solution.Email.csproj", "{B2E6D22B-8359-4B26-B9C8-2D61ABD0F42C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Enterprise.Solution.Email", "Enterprise.Solution.Email\Enterprise.Solution.Email.csproj", "{B2E6D22B-8359-4B26-B9C8-2D61ABD0F42C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Enterprise.Solution.Shared", "Enterprise.Solution.Shared\Enterprise.Solution.Shared.csproj", "{9A5068E9-98A6-4936-9F2B-975378D76558}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Enterprise.Solution.Shared", "Enterprise.Solution.Shared\Enterprise.Solution.Shared.csproj", "{9A5068E9-98A6-4936-9F2B-975378D76558}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{26E2AA4D-C425-4012-8BFC-ACE0D6013F0D}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
