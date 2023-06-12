@@ -1,11 +1,9 @@
-﻿using Enterprise.Solution.Data.DbContexts;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+
+using Enterprise.Solution.Data.DbContexts;
 using Enterprise.Solution.Data.Helpers;
 using Enterprise.Solution.Data.Models.Base;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using System.Linq;
-using System.Linq.Expressions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Enterprise.Solution.Repository.Base
 {
@@ -40,6 +38,14 @@ namespace Enterprise.Solution.Repository.Base
                 .ToListAsync();
 
             return new EntityListWithPaginationMetadata<T>(collectionToReturn, paginationMetadata);
+        }
+
+        public virtual async Task<EntityListWithPaginationMetadata<T>> ListAllAsync(
+            int pageNumber = 1,
+            int pageSize = 10,
+            string? searchQuery = null)
+        {
+            throw new NotImplementedException();
         }
 
         public virtual async Task<bool> ExistsAsync(int id)

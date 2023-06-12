@@ -18,6 +18,6 @@ namespace Enterprise.Solution.Shared.Exceptions
         {
         }
 
-        public InvalidModelException(RequestType requestType) : base($"ModelState {requestType} is invalid.") { }
+        public InvalidModelException(Type entityType, RequestType requestType) : base($"An entity of type {nameof(entityType)} attempting to be {requestType}ed has an invalid ModelState.") { }
     }
 }

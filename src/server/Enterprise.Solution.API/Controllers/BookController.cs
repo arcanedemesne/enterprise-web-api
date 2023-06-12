@@ -91,7 +91,7 @@ namespace Enterprise.Solution.API.Controllers
                 var response = await _mediator.Send(new AddBookCommand(ModelState, dto));
                 return CreatedAtRoute($"Get{nameof(Book)}", new { id = response.Id }, response);
             }
-            catch (NotCreatedException ex)
+            catch (NotAddedException ex)
             {
                 return NotFound(ex);
             }

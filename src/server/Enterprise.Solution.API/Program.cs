@@ -20,7 +20,6 @@ using Enterprise.Solution.Service.Services;
 using Enterprise.Solution.Service.Services.Cache;
 using Enterprise.Solution.Shared;
 using Enterprise.Solution.Email.Service;
-using Org.BouncyCastle.Cms;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
@@ -224,14 +223,15 @@ services.Configure<RouteOptions>(options =>
     options.LowercaseQueryStrings = true;
 });
 
-var apiVersioningBuilder = services.AddApiVersioning(options =>
+services.AddApiVersioning(options =>
 {
     options.DefaultApiVersion = new ApiVersion(1, 0);
     options.ReportApiVersions = true;
+    options.UseApiBehavior = true;
     options.AssumeDefaultVersionWhenUnspecified = true;
     options.ApiVersionReader = ApiVersionReader.Combine(
-        new QueryStringApiVersionReader("api-version"),
-        new HeaderApiVersionReader("api-version")
+        new QueryStringApiVersionReader("apiVersion"),
+        new HeaderApiVersionReader("apiVersion")
         );
 });
 

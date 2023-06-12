@@ -8,16 +8,16 @@
         /// <summary>
         /// SearchQuery
         /// </summary>
-        public string? SearchQuery {  get; set; } = null;
+        public string? SearchQuery { get; set; } = null;
 
         /// <summary>
         /// PageNumber
         /// </summary>
-        public int? PageNumber { get; set; } = null;
+        public int? PageNumber { get; set; }
 
         /// <summary>
         /// PageSize
         /// </summary>
-        public int? PageSize { get; set; } = null;
+        public int? PageSize { get; set; }
     }
 }
