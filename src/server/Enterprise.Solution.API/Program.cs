@@ -20,6 +20,8 @@ using Enterprise.Solution.Service.Services;
 using Enterprise.Solution.Service.Services.Cache;
 using Enterprise.Solution.Shared;
 using Enterprise.Solution.Email.Service;
+using Microsoft.IdentityModel.Logging;
+using System.Net;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
@@ -27,8 +29,9 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.File("logs/enterprise.solution.api.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
-
 var builder = WebApplication.CreateBuilder(args);
+IdentityModelEventSource.ShowPII = true;
+ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
 var host = builder.Host;
 var services = builder.Services;
@@ -92,35 +95,11 @@ services.AddSwaggerGen(setupAction =>
 // Add Authentication
 services
 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//.AddKeycloak(options =>
-//{
-//    //Use default signin scheme
-//    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-//    //Keycloak server
-//    options.Realm = currentSubPlatformSettings.Authentication.Schemes.Keycloak.ServerRealm;
-//    //Keycloak client ID
-//    options.ClientId = currentSubPlatformSettings.Authentication.Schemes.Keycloak.ClientId;
-//    //Keycloak client secret
-//    options.ClientSecret = currentSubPlatformSettings.Authentication.Schemes.Keycloak.ClientSecret;
-//    //Keycloak .wellknown config origin to fetch config
-//    options.UserInformationEndpoint = currentSubPlatformSettings.Authentication.Schemes.Keycloak.Metadata;
-//    //Require keycloak to use SSL
-//    options.Scope.Add("openid");
-//    options.Scope.Add("profile");
-//    //Save the token
-//    options.SaveTokens = true;
-//    //Token response type, will sometimes need to be changed to IdToken, depending on config.
-//    options.AccessType = AspNet.Security.OAuth.Keycloak.KeycloakAuthenticationAccessType.Confidential;
-//    //SameSite is needed for Chrome/Firefox, as they will give http error 500 back, if not set to unspecified.
-//    options.CorrelationCookie.SameSite = SameSiteMode.Unspecified;
-
-//    options.Version = new Version(20, 0);
-//})
 .AddJwtBearer(options =>
 {
-    // options.MetadataAddress = currentSubPlatformSettings.Authentication.Schemes.Keycloak.Metadata;
-    // options.Authority = currentSubPlatformSettings.Authentication.Schemes.Keycloak.ServerRealm;
-    // options.Audience = currentSubPlatformSettings.Authentication.Schemes.Keycloak.Audience;
+    options.MetadataAddress = currentSubPlatformSettings.Authentication.Schemes.Keycloak.MetadataAddress;
+    options.Authority = currentSubPlatformSettings.Authentication.Schemes.Keycloak.Authority;
+    options.Audience = currentSubPlatformSettings.Authentication.Schemes.Keycloak.Audience;
 
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -128,22 +107,24 @@ services
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = currentSubPlatformSettings.Authentication.Schemes.Swagger.ClaimsIssuer,
-        ValidAudience = currentSubPlatformSettings.Authentication.Schemes.Swagger.Audience,
+        ValidIssuer = currentSubPlatformSettings.Authentication.Schemes.Keycloak.ClientId,
+        ValidAudience = currentSubPlatformSettings.Authentication.Schemes.Keycloak.Audience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-            currentSubPlatformSettings.Authentication.Schemes.Swagger.SecretForKey)),
+            currentSubPlatformSettings.Authentication.Schemes.Keycloak.ClientSecret)),
     };
+
+    options.RequireHttpsMetadata = false;
 });
 
 // Add Authorization
-// TODO: This requirement is only for initial development purposes
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("MustBeAnAllen", policy =>
-    {
-        policy.RequireAuthenticatedUser();
-        policy.RequireClaim("family_name", "Allen");
-    });
+   options.AddPolicy("MustBeFromKeycloak", policy =>
+   {
+       policy.RequireAuthenticatedUser();
+       policy.RequireClaim("audience", currentSubPlatformSettings.Authentication.Schemes.Keycloak.Audience);
+       policy.RequireClaim("authority", currentSubPlatformSettings.Authentication.Schemes.Keycloak.Authority);
+   });
 });
 
 services.AddSingleton<FileExtensionContentTypeProvider>();

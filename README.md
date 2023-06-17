@@ -13,9 +13,12 @@ This is a demo project to implement the lastest techiniques and best practices i
 ## Development Environment Setup
 ###Prerequisites
 
-1. Install Visual Studio 2022 or later & .NET Core 7 SDK or later
-2. Run Poweshell Scripts in [src/server/] in order, this will install openssl and nginx certificates, and docker desktop
-3. Inside [src/server/] Run docker-compose build, and then docker-compose up. Everything should just start running :)
+1. Install Visual Studio 2022 or later (https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022)
+2. Install .NET Core 7 SDK or later (https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
+2. Install openssl (https://slproweb.com/products/Win32OpenSSL.html)
+3. Install Docker Desktop (https://www.docker.com/products/docker-desktop/)
+4. Run the Power Shell script 'setup-dev-certs.ps1' in [src/server/] in order, this will install the nginx certificates
+5. Inside [src/server/] Run docker-compose build, and then docker-compose up. Everything should just start running :)
    [Note: make sure Docker Desktop is Running]
 
 

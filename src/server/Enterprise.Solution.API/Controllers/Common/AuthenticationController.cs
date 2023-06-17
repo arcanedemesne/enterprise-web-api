@@ -57,9 +57,10 @@ namespace Enterprise.Solution.API.Controllers.Common
                 return Unauthorized();
             }
 
-            string issuer = base._solutionSettings.Authentication.Schemes.Swagger.ClaimsIssuer;
-            string audience = base._solutionSettings.Authentication.Schemes.Swagger.Audience;
-            string clientSecret = base._solutionSettings.Authentication.Schemes.Swagger.SecretForKey;
+            string audience = base._solutionSettings.Authentication.Schemes.Keycloak.Audience;
+            string authority = base._solutionSettings.Authentication.Schemes.Keycloak.Authority;
+            string clientId = base._solutionSettings.Authentication.Schemes.Keycloak.ClientId;
+            string clientSecret = base._solutionSettings.Authentication.Schemes.Keycloak.ClientSecret;
 
             var securityKey = new SymmetricSecurityKey(
                 Encoding.ASCII.GetBytes(clientSecret));
@@ -72,14 +73,17 @@ namespace Enterprise.Solution.API.Controllers.Common
             claimsForToken.Add(new Claim("user_name", user.UserName.ToString()));
             claimsForToken.Add(new Claim("given_name", user.FirstName.ToString()));
             claimsForToken.Add(new Claim("family_name", user.LastName.ToString()));
+            claimsForToken.Add(new Claim("audience", audience));
+            claimsForToken.Add(new Claim("authoriy", authority));
 
             var jwtSecurityToken = new JwtSecurityToken(
-                issuer,
+                clientId,
                 audience,
                 claimsForToken,
                 DateTime.UtcNow,
                 DateTime.UtcNow.AddHours(1),
-                signingCredentials);
+                signingCredentials
+                );
 
             var tokenToReturn = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
 
@@ -98,9 +102,9 @@ namespace Enterprise.Solution.API.Controllers.Common
         {
             return new AuthorizedUser(
                 1,
-                "jennifer.allen",
-                "Jennifer",
-                "Allen");
+                "network-api-user@domain.local",
+                "Network",
+                "API User");
         }
     }
 }
