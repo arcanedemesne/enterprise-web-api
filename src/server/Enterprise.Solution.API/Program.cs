@@ -103,29 +103,30 @@ services
 
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
         ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = currentSubPlatformSettings.Authentication.Schemes.Keycloak.ClientId,
+        ValidateAudience = true,
         ValidAudience = currentSubPlatformSettings.Authentication.Schemes.Keycloak.Audience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-            currentSubPlatformSettings.Authentication.Schemes.Keycloak.ClientSecret)),
+        ValidateIssuer = true,
+        ValidIssuer = currentSubPlatformSettings.Authentication.Schemes.Keycloak.ClientId,
+        //ValidateIssuerSigningKey = true,
+        //IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+        //    currentSubPlatformSettings.Authentication.Schemes.Keycloak.ClientSecret)),
     };
 
     options.RequireHttpsMetadata = false;
+    options.IncludeErrorDetails = true;
 });
 
 // Add Authorization
-builder.Services.AddAuthorization(options =>
-{
-   options.AddPolicy("MustBeFromKeycloak", policy =>
-   {
-       policy.RequireAuthenticatedUser();
-       policy.RequireClaim("audience", currentSubPlatformSettings.Authentication.Schemes.Keycloak.Audience);
-       policy.RequireClaim("authority", currentSubPlatformSettings.Authentication.Schemes.Keycloak.Authority);
-   });
-});
+//builder.Services.AddAuthorization(options =>
+//{
+//   options.AddPolicy("MustBeFromKeycloak", policy =>
+//   {
+//       policy.RequireAuthenticatedUser();
+//       policy.RequireClaim("audience", currentSubPlatformSettings.Authentication.Schemes.Keycloak.Audience);
+//       policy.RequireClaim("authority", currentSubPlatformSettings.Authentication.Schemes.Keycloak.Authority);
+//   });
+//});
 
 services.AddSingleton<FileExtensionContentTypeProvider>();
 

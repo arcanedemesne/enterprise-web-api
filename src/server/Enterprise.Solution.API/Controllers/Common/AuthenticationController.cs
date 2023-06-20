@@ -1,3 +1,4 @@
+using Enterprise.Solution.API.Models;
 using Enterprise.Solution.Email.Service;
 using Enterprise.Solution.Service.Models.Authorization;
 using Enterprise.Solution.Shared;
@@ -5,6 +6,8 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -34,11 +37,50 @@ namespace Enterprise.Solution.API.Controllers.Common
             /// <summary>
             /// UserName
             /// </summary>
-            public string? UserName { get; set; }
+            public string? Username { get; set; }
             /// <summary>
             /// Password
             /// </summary>
             public string? Password { get; set; }
+        }
+
+        /// <summary>
+        /// Keycloak Response
+        /// </summary>
+        public class KeycloakResponse
+        {
+            /// <summary>
+            /// access_token
+            /// </summary>
+            public string access_token { get; set; } = null!;
+            /// <summary>
+            /// expires_in
+            /// </summary>
+            public string expires_in { get; set; } = null!;
+            /// <summary>
+            /// refresh_expires_in
+            /// </summary>
+            public string refresh_expires_in { get; set; } = null!;
+            /// <summary>
+            /// refresh_token
+            /// </summary>
+            public string refresh_token { get; set; } = null!;
+            /// <summary>
+            /// token_type
+            /// </summary>
+            public string token_type { get; set; } = null!;
+            /// <summary>
+            /// id_token
+            /// </summary>
+            public string id_token { get; set; } = null!;
+            /// <summary>
+            /// session_state
+            /// </summary>
+            public string session_state { get; set; } = null!;
+            /// <summary>
+            /// scope
+            /// </summary>
+            public string scope { get; set; } = null!;
         }
 
         /// <summary>
@@ -48,63 +90,84 @@ namespace Enterprise.Solution.API.Controllers.Common
         [HttpPost("api/authenticate")]
         public async Task<IActionResult> AuthenticateAsync(AuthenticationRequestBody authenticationRequestBody)
         {
-            var user = ValidateUserCredentials(
-                authenticationRequestBody.UserName,
-                authenticationRequestBody.Password);
+            var clientId = base._solutionSettings.Authentication.Schemes.Keycloak.ClientId;
+            var clientSecret = base._solutionSettings.Authentication.Schemes.Keycloak.ClientSecret;
 
-            if (user == null)
+            string endPoint = base._solutionSettings.Authentication.Schemes.Keycloak.TokenExchange;
+            var client = new HttpClient();
+
+            var data = new[]
             {
-                return Unauthorized();
-            }
+                new KeyValuePair<string, string>("client_id", clientId),
+                new KeyValuePair<string, string>("grant_type", "password"),
+                new KeyValuePair<string, string>("client_secret", clientSecret),
+                new KeyValuePair<string, string>("scope", "openid"),
+                new KeyValuePair<string, string>("username", authenticationRequestBody.Username!),
+                new KeyValuePair<string, string>("password", authenticationRequestBody.Password!),
+            };
+            var response = await client.PostAsync(endPoint, new FormUrlEncodedContent(data));
 
-            string audience = base._solutionSettings.Authentication.Schemes.Keycloak.Audience;
-            string authority = base._solutionSettings.Authentication.Schemes.Keycloak.Authority;
-            string clientId = base._solutionSettings.Authentication.Schemes.Keycloak.ClientId;
-            string clientSecret = base._solutionSettings.Authentication.Schemes.Keycloak.ClientSecret;
+            if (response.IsSuccessStatusCode)
+            {
+                var content = JsonConvert.DeserializeObject<KeycloakResponse>(response.Content.ReadAsStringAsync().Result);
+                //var id_token = content?.id_token;
+                //JwtSecurityToken jwtSecurityToken = new JwtSecurityToken(id_token);
 
-            var securityKey = new SymmetricSecurityKey(
-                Encoding.ASCII.GetBytes(clientSecret));
-            var signingCredentials = new SigningCredentials(
-                securityKey,
-                SecurityAlgorithms.HmacSha256);
+                //var token_username = GetClaimFromToken(jwtSecurityToken, "preferred_username")?.Value;
+                //var token_full_name = GetClaimFromToken(jwtSecurityToken, "name")?.Value;
+                //var token_given_name = GetClaimFromToken(jwtSecurityToken, "given_name")?.Value;
+                //var token_family_name = GetClaimFromToken(jwtSecurityToken, "family_name")?.Value;
+                //var token_email_address = GetClaimFromToken(jwtSecurityToken, "email")?.Value;
+                //var token_expiry = GetClaimFromToken(jwtSecurityToken, "exp")?.Value;
+                //var email_verified = GetClaimFromToken(jwtSecurityToken, "email_verified")?.Value;
 
-            var claimsForToken = new List<Claim>();
-            claimsForToken.Add(new Claim("sub", user.UserId.ToString()));
-            claimsForToken.Add(new Claim("user_name", user.UserName.ToString()));
-            claimsForToken.Add(new Claim("given_name", user.FirstName.ToString()));
-            claimsForToken.Add(new Claim("family_name", user.LastName.ToString()));
-            claimsForToken.Add(new Claim("audience", audience));
-            claimsForToken.Add(new Claim("authoriy", authority));
+                //var securityKey = new SymmetricSecurityKey(
+                //    Encoding.ASCII.GetBytes(clientSecret));
+                //var signingCredentials = new SigningCredentials(
+                //    securityKey,
+                //    SecurityAlgorithms.HmacSha256);
 
-            var jwtSecurityToken = new JwtSecurityToken(
-                clientId,
-                audience,
-                claimsForToken,
-                DateTime.UtcNow,
-                DateTime.UtcNow.AddHours(1),
-                signingCredentials
-                );
+                //var claimsForToken = new List<Claim>() {
+                //    new Claim("username", token_username!),
+                //    new Claim("full_name", token_full_name!),
+                //    new Claim("given_name", token_given_name!),
+                //    new Claim("family_name", token_family_name!),
+                //    new Claim("email_address", token_email_address!),
+                //    new Claim("email_verified", email_verified!),
+                //    new Claim("expiry_date", token_expiry!),
+                //};
 
-            var tokenToReturn = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+                //var finalJwtSecurityToken = new JwtSecurityToken(
+                //    clientId,
+                //    audience,
+                //    claimsForToken,
+                //    DateTime.UtcNow,
+                //    DateTime.UtcNow.AddHours(1),
+                //    signingCredentials
+                //    );
 
-            await EmailService.SendAsync(new System.Net.Mail.MailMessage(
-                "authentication-controller@domain.local",
-                "admin@domain.local",
-                "Token created",
-                $"Token created: {tokenToReturn}"
-            ));
+                //await EmailService.SendAsync(new System.Net.Mail.MailMessage(
+                //    "authentication-controller@domain.local",
+                //    "admin@domain.local",
+                //    "Token created",
+                //    $"Token created: {jwtSecurityToken}"
+                //));
 
-            return Ok(tokenToReturn);
+                return Ok(content);
+            }                    
+
+            return BadRequest(response.ReasonPhrase);
         }
 
-        //TODO: Create Service to login in via multiple ways
-        private AuthorizedUser ValidateUserCredentials(string? userName, string? password)
+        /// <summary>
+        /// Get Property from Id Token
+        /// </summary>
+        /// <param name="jwtSecurityToken"></param>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
+        private Claim? GetClaimFromToken(JwtSecurityToken jwtSecurityToken, string propertyName)
         {
-            return new AuthorizedUser(
-                1,
-                "network-api-user@domain.local",
-                "Network",
-                "API User");
+            return jwtSecurityToken.Claims.FirstOrDefault(c => c.Type!.Equals(propertyName));
         }
     }
 }
