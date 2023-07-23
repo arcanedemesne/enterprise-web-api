@@ -2,7 +2,7 @@ import Sheet from "@mui/joy/Sheet";
 import Typography from "@mui/joy/Typography";
 import Link from "@mui/joy/Link";
 
-import { getMetadata, logout } from "../../auth/user";
+import { getMetadata, signOut } from "../../auth/user";
 import * as Layout from "../../layouts";
 import NavigationBar from "../../components/NavigationBar";
 
@@ -36,7 +36,7 @@ const Dashboard = () => {
           <Typography level="body2">
             Welcome, <b>{getMetadata()?.full_name}</b>
           </Typography>
-          <Link onClick={logout}>Sign out</Link>
+          <Link onClick={signOut}>Sign out</Link>
         </Sheet>
       </Layout.Main>
     </>

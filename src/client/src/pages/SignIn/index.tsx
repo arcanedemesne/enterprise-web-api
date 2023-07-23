@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import Button from "@mui/joy/Button";
 import Link from "@mui/joy/Link";
@@ -13,6 +14,8 @@ const dashboardUrl: string = "/dashboard";
 let redirectUrl: string = "";
 
 const SignIn = () => {
+  const navigate = useNavigate();
+
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>("jennifer.allen");
   const [password, setPassword] = useState<string | null>("H@$43m15oN3");
@@ -24,8 +27,7 @@ const SignIn = () => {
         password,
       } as ISignInProps)) as UserMetadata | undefined;
       if (metadata?.email_verified === "true") {
-        window.location.href =
-          redirectUrl.length > 0 ? redirectUrl : dashboardUrl;
+        navigate(redirectUrl.length > 0 ? redirectUrl : dashboardUrl);
       }
     } catch (error: any) {
       setErrorMessage(error.statusText);

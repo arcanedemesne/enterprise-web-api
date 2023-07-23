@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
@@ -88,8 +89,11 @@ namespace Enterprise.Solution.API.Controllers.Common
         /// </summary>
         /// <returns></returns>
         [HttpPost("authenticate")]
-        public async Task<IActionResult> AuthenticateAsync(AuthenticationRequestBody authenticationRequestBody)
+        public async Task<IActionResult> AuthenticateAsync()
         {
+            Request.Headers.TryGetValue("X-UserName", out var UserName);
+            Request.Headers.TryGetValue("X-Password", out var Password);
+
             var clientId = base._solutionSettings.Authentication.Schemes.Keycloak.ClientId;
             var clientSecret = base._solutionSettings.Authentication.Schemes.Keycloak.ClientSecret;
             var audience = base._solutionSettings.Authentication.Schemes.Keycloak.Audience;
@@ -100,11 +104,11 @@ namespace Enterprise.Solution.API.Controllers.Common
             var data = new[]
             {
                 new KeyValuePair<string, string>("client_id", clientId),
-                new KeyValuePair<string, string>("grant_type", "password"),
                 new KeyValuePair<string, string>("client_secret", clientSecret),
+                new KeyValuePair<string, string>("grant_type", "password"),
                 new KeyValuePair<string, string>("scope", "openid"),
-                new KeyValuePair<string, string>("username", authenticationRequestBody.UserName!),
-                new KeyValuePair<string, string>("password", authenticationRequestBody.Password!),
+                new KeyValuePair<string, string>("username", UserName!),
+                new KeyValuePair<string, string>("password", Password!),
             };
             var response = await client.PostAsync(endPoint, new FormUrlEncodedContent(data));
 
@@ -169,8 +173,62 @@ namespace Enterprise.Solution.API.Controllers.Common
             var data = new[]
             {
                 new KeyValuePair<string, string>("client_id", clientId),
-                new KeyValuePair<string, string>("grant_type", "password"),
                 new KeyValuePair<string, string>("client_secret", clientSecret),
+                new KeyValuePair<string, string>("grant_type", "password"),
+                new KeyValuePair<string, string>("scope", "openid"),
+                new KeyValuePair<string, string>("username", "swagger.user"),
+                new KeyValuePair<string, string>("password", "swagger"),
+            };
+            var response = await client.PostAsync(endPoint, new FormUrlEncodedContent(data));
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = JsonConvert.DeserializeObject<KeycloakResponse>(response.Content.ReadAsStringAsync().Result);
+
+                await EmailService.SendAsync(new System.Net.Mail.MailMessage(
+                    "authentication-controller@domain.local",
+                    "admin@domain.local",
+                    "Swagger Token created",
+                    $"Access Token created: {content?.access_token}"
+                ));
+
+                return Ok(content?.access_token);
+            }
+
+            return BadRequest(response.ReasonPhrase);
+        }
+
+        /// <summary>
+        /// Method to attempt authentication for swagger
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("access-token")]
+        public async Task<IActionResult> RequestAccessTokenAsync()
+        {
+            Request.Headers.TryGetValue("X-IdToken", out var token);
+            var handler = new JwtSecurityTokenHandler();
+            var jwtSecurityToken = handler.ReadJwtToken(token);
+
+            //var token_username = GetClaimFromToken(jwtSecurityToken, "preferred_username")?.Value;
+            //var token_full_name = GetClaimFromToken(jwtSecurityToken, "name")?.Value;
+            //var token_given_name = GetClaimFromToken(jwtSecurityToken, "given_name")?.Value;
+            //var token_family_name = GetClaimFromToken(jwtSecurityToken, "family_name")?.Value;
+            //var token_email_address = GetClaimFromToken(jwtSecurityToken, "email")?.Value;
+            //var token_expiry = GetClaimFromToken(jwtSecurityToken, "exp")?.Value;
+            //var email_verified = GetClaimFromToken(jwtSecurityToken, "email_verified")?.Value;
+
+            var clientId = base._solutionSettings.Authentication.Schemes.Keycloak.ClientId;
+            var clientSecret = base._solutionSettings.Authentication.Schemes.Keycloak.ClientSecret;
+            var audience = base._solutionSettings.Authentication.Schemes.Keycloak.Audience;
+
+            string endPoint = base._solutionSettings.Authentication.Schemes.Keycloak.TokenExchange;
+            var client = new HttpClient();
+
+            var data = new[]
+            {
+                new KeyValuePair<string, string>("client_id", clientId),
+                new KeyValuePair<string, string>("client_secret", clientSecret),
+                new KeyValuePair<string, string>("grant_type", "password"),
                 new KeyValuePair<string, string>("scope", "openid"),
                 new KeyValuePair<string, string>("username", "swagger.user"),
                 new KeyValuePair<string, string>("password", "swagger"),

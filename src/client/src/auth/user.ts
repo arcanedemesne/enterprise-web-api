@@ -1,4 +1,4 @@
-import axios from "axios";
+import * as httpRequest from "../utilities/httpRequest";
 import { getItem, setItem } from "../utilities/localStorage";
 
 export interface UserMetadata {
@@ -34,7 +34,7 @@ export const isUserLoggedIn = (): boolean => {
   const metadata = getMetadata();
   const id_token = getIdToken();
   return metadata?.email_verified === "true" && !!id_token;
-}
+};
 
 export interface ISignInProps {
   userName: string;
@@ -44,13 +44,13 @@ export const signIn = async ({ userName, password }: ISignInProps) => {
   // TODO: encode and place username and password in headers instead of body
   let userMetadata = undefined;
   try {
-    userMetadata = await axios({
-      url: `https://localhost:32768/api/authentication/authenticate?UserName=${userName}&Password=${password}`,
-      method: "POST",
+    userMetadata = await httpRequest.POST({
+      controller: "authentication",
+      endpoint: "authenticate",
       headers: {
-          //authorization: "your token comes here",
-      },
-    });
+        "X-UserName": userName,
+        "X-Password": password,
+      }});
   } catch (error) {
     throw new Response("", {
       status: 400,
@@ -67,10 +67,10 @@ export const signIn = async ({ userName, password }: ISignInProps) => {
   }
 };
 
-export const logout = (): void => {
-    setMetadata(null);
-    setIdToken(null);
-    window.location.href = "sign-in";
+export const signOut = (): void => {
+  setMetadata(null);
+  setIdToken(null);
+  window.location.href = "/sign-in";
 };
 
 export interface ISignUpProps {
@@ -80,6 +80,12 @@ export interface ISignUpProps {
   emailAddress: string;
   password: string;
 }
-export const create = ({ firstName, lastName, userName, emailAddress, password }: ISignUpProps): void => {
+export const create = ({
+  firstName,
+  lastName,
+  userName,
+  emailAddress,
+  password,
+}: ISignUpProps): void => {
   // TODO: create API endpoint to sign up
 };
