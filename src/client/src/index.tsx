@@ -13,14 +13,16 @@ import Root, {
 } from "./routes/root";
 import reportWebVitals from "./reportWebVitals";
 
-import ErrorPage from "./ErrorPage";
-
-import Index from "./routes/index";
-
-import Login from "./pages/login";
-
 import App from "./App";
-import Dashboard from "./pages/dashboard";
+import SplashPage from "./pages/SplashPage";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
+
+import Dashboard from "./pages/Dashboard";
+
+/* TEST */
+import Index from "./routes";
+import ErrorPage from "./ErrorPage";
 
 import Contact, {
   loader as contactLoader,
@@ -30,9 +32,11 @@ import Contact, {
 import EditContact, { action as editAction } from "./routes/edit";
 
 import { action as destroyAction } from "./routes/destroy";
+/* END TEST */
+
 import { isUserLoggedIn } from "./auth/user";
 
-const loginRoute = "/login";
+const signInRoute = "/sign-in";
 const RequireAuth = ({ children, redirectTo }: any) => {
   let isAuthenticated = isUserLoggedIn();
   return isAuthenticated ? children : <Navigate to={redirectTo} />;
@@ -44,18 +48,22 @@ const router = createBrowserRouter([
     element: <App />,
     errorElement: <ErrorPage />,
     children: [
-      { index: true, element: <Index /> },
+      { index: true, element: <SplashPage /> },
       {
         path: "dashboard",
         element: (
-          <RequireAuth redirectTo={loginRoute}>
+          <RequireAuth redirectTo={signInRoute}>
             <Dashboard />
           </RequireAuth>
         ),
       },
       {
-        path: "login",
-        element: <Login />,
+        path: "sign-in",
+        element: <SignIn />,
+      },
+      {
+        path: "sign-up",
+        element: <SignUp />,
       },
     ],
   },

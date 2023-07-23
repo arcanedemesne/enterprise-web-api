@@ -36,12 +36,16 @@ export const isUserLoggedIn = (): boolean => {
   return metadata?.email_verified === "true" && !!id_token;
 }
 
-export const login = async ({ username, password }: any) => {
+export interface ISignInProps {
+  userName: string;
+  password: string;
+}
+export const signIn = async ({ userName, password }: ISignInProps) => {
   // TODO: encode and place username and password in headers instead of body
   let userMetadata = undefined;
   try {
     userMetadata = await axios({
-      url: `https://localhost:32768/api/authentication/authenticate?Username=${username}&Password=${password}`,
+      url: `https://localhost:32768/api/authentication/authenticate?UserName=${userName}&Password=${password}`,
       method: "POST",
       headers: {
           //authorization: "your token comes here",
@@ -50,7 +54,7 @@ export const login = async ({ username, password }: any) => {
   } catch (error) {
     throw new Response("", {
       status: 400,
-      statusText: "Invalid username or password",
+      statusText: "Invalid Email/User Name and/or Password",
     });
   } finally {
     if (userMetadata && userMetadata.data) {
@@ -66,5 +70,16 @@ export const login = async ({ username, password }: any) => {
 export const logout = (): void => {
     setMetadata(null);
     setIdToken(null);
-    window.location.href = "login";
+    window.location.href = "sign-in";
+};
+
+export interface ISignUpProps {
+  firstName: string;
+  lastName: string;
+  userName: string;
+  emailAddress: string;
+  password: string;
+}
+export const create = ({ firstName, lastName, userName, emailAddress, password }: ISignUpProps): void => {
+  // TODO: create API endpoint to sign up
 };

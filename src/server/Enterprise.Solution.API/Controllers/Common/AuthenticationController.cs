@@ -37,7 +37,7 @@ namespace Enterprise.Solution.API.Controllers.Common
             /// <summary>
             /// UserName
             /// </summary>
-            public string? Username { get; set; }
+            public string? UserName { get; set; }
             /// <summary>
             /// Password
             /// </summary>
@@ -103,7 +103,7 @@ namespace Enterprise.Solution.API.Controllers.Common
                 new KeyValuePair<string, string>("grant_type", "password"),
                 new KeyValuePair<string, string>("client_secret", clientSecret),
                 new KeyValuePair<string, string>("scope", "openid"),
-                new KeyValuePair<string, string>("username", authenticationRequestBody.Username!),
+                new KeyValuePair<string, string>("username", authenticationRequestBody.UserName!),
                 new KeyValuePair<string, string>("password", authenticationRequestBody.Password!),
             };
             var response = await client.PostAsync(endPoint, new FormUrlEncodedContent(data));
