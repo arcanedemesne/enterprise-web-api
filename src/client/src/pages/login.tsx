@@ -4,12 +4,12 @@ import {
   login,
   UserMetadata,
 }
-from "./user";
+from "../auth/user";
 
 const dashboardUrl: string = "/dashboard";
 let redirectUrl: string = "";
 
-const LoginPage = () => {
+const Login = () => {
   
   const onLogin = async ({ username, password }: any) => {
     try {
@@ -68,4 +68,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default Login;

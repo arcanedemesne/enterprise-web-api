@@ -1,44 +1,66 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import React from "react";
+import ReactDOM from "react-dom/client";
 
 import {
   createBrowserRouter,
+  Navigate,
   RouterProvider,
 } from "react-router-dom";
 
-import './index.css';
-import Root,
-{
+import Root, {
   loader as rootLoader,
   action as rootAction,
 } from "./routes/root";
-import reportWebVitals from './reportWebVitals';
+import reportWebVitals from "./reportWebVitals";
 
 import ErrorPage from "./ErrorPage";
 
 import Index from "./routes/index";
 
-import LoginPage from "./auth/loginPage";
+import Login from "./pages/login";
 
-import Dashboard, {
-  loader as dashboardLoader,
-} from './routes/dashboard';
+import App from "./App";
+import Dashboard from "./pages/dashboard";
 
 import Contact, {
   loader as contactLoader,
   action as contactAction,
 } from "./routes/contact";
 
-import EditContact, {
-  action as editAction,
-} from "./routes/edit";
+import EditContact, { action as editAction } from "./routes/edit";
 
 import { action as destroyAction } from "./routes/destroy";
+import { isUserLoggedIn } from "./auth/user";
 
+const loginRoute = "/login";
+const RequireAuth = ({ children, redirectTo }: any) => {
+  let isAuthenticated = isUserLoggedIn();
+  return isAuthenticated ? children : <Navigate to={redirectTo} />;
+};
 
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <App />,
+    errorElement: <ErrorPage />,
+    children: [
+      { index: true, element: <Index /> },
+      {
+        path: "dashboard",
+        element: (
+          <RequireAuth redirectTo={loginRoute}>
+            <Dashboard />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: "login",
+        element: <Login />,
+      },
+    ],
+  },
+  {
+    path: "/test",
     element: <Root />,
     errorElement: <ErrorPage />,
     loader: rootLoader,
@@ -69,19 +91,10 @@ const router = createBrowserRouter([
       },
     ],
   },
-  {
-    path: "login", 
-    element: <LoginPage />,
-  },
-  {
-    path: "dashboard", 
-    element: <Dashboard />,
-    loader: dashboardLoader,
-  },
 ]);
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+  document.getElementById("root") as HTMLElement
 );
 root.render(
   <React.StrictMode>

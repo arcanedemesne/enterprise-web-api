@@ -12,6 +12,9 @@ import {
 import { getContacts, createContact } from "../contacts";
 import { Contact } from "./contact";
 
+
+import './root.css';
+
 export function loader({ request }: any) {
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
@@ -39,7 +42,7 @@ export default function Root() {
   }, [q]);
 
   return (
-    <>
+    <div id="test-root">
       <div id="sidebar">
         <h1>React Router Contacts</h1>
         <div>
@@ -113,6 +116,6 @@ export default function Root() {
       }>
         <Outlet />
       </div>
-    </>
+    </div>
   );
 }
