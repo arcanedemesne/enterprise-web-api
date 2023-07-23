@@ -23,7 +23,7 @@ const LoginPage = () => {
     }
   };
 
-  const [errorMessage, setErrorMessage] = useState<string>("jennifer.allen");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [username, setUserName] = useState<string>("jennifer.allen");
   const [password, setPassword] = useState<string>("H@$43m15oN3");
 

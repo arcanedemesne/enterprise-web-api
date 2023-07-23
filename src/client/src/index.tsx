@@ -20,15 +20,21 @@ import Index from "./routes/index";
 
 import LoginPage from "./auth/loginPage";
 
+import Dashboard, {
+  loader as dashboardLoader,
+} from './routes/dashboard';
+
 import Contact, {
   loader as contactLoader,
   action as contactAction,
 } from "./routes/contact";
+
 import EditContact, {
   action as editAction,
 } from "./routes/edit";
+
 import { action as destroyAction } from "./routes/destroy";
-import Dashboard from './routes/dashboard';
+
 
 const router = createBrowserRouter([
   {
@@ -70,6 +76,7 @@ const router = createBrowserRouter([
   {
     path: "dashboard", 
     element: <Dashboard />,
+    loader: dashboardLoader,
   },
 ]);
 

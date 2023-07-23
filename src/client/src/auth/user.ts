@@ -13,22 +13,28 @@ export interface UserMetadata {
 }
 
 const userMetadataKey = "userMetadataKey";
-export const getMetadata = (): UserMetadata | undefined=> {
-  return getItem(userMetadataKey) as UserMetadata | undefined;
+export const getMetadata = (): UserMetadata | null => {
+  return getItem(userMetadataKey) as UserMetadata | null;
 };
 
-export const setMetadata = (metadata: any): void => {
+export const setMetadata = (metadata: any | null): void => {
   setItem(userMetadataKey, metadata);
 };
 
 const idTokenKey = "idTokenKey";
-export const getIdToken = (): UserMetadata | undefined=> {
-  return getItem(idTokenKey) as UserMetadata | undefined;
+export const getIdToken = (): string | null => {
+  return getItem(idTokenKey) as string | null;
 };
 
-export const setIdToken = (id_token: string): void => {
+export const setIdToken = (id_token: string | null): void => {
   setItem(idTokenKey, id_token);
 };
+
+export const isUserLoggedIn = (): boolean => {
+  const metadata = getMetadata();
+  const id_token = getIdToken();
+  return metadata?.email_verified === "true" && !!id_token;
+}
 
 export const login = async ({ username, password }: any) => {
   // TODO: encode and place username and password in headers instead of body
@@ -58,5 +64,7 @@ export const login = async ({ username, password }: any) => {
 };
 
 export const logout = (): void => {
-  // TODO: logout user
+    setMetadata(null);
+    setIdToken(null);
+    window.location.href = "login";
 };
