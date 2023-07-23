@@ -15,6 +15,11 @@ import Root,
 import reportWebVitals from './reportWebVitals';
 
 import ErrorPage from "./ErrorPage";
+
+import Index from "./routes/index";
+
+import LoginPage from "./auth/loginPage";
+
 import Contact, {
   loader as contactLoader,
   action as contactAction,
@@ -23,7 +28,7 @@ import EditContact, {
   action as editAction,
 } from "./routes/edit";
 import { action as destroyAction } from "./routes/destroy";
-import Index from "./routes/index";
+import Dashboard from './routes/dashboard';
 
 const router = createBrowserRouter([
   {
@@ -58,6 +63,14 @@ const router = createBrowserRouter([
       },
     ],
   },
+  {
+    path: "login", 
+    element: <LoginPage />,
+  },
+  {
+    path: "dashboard", 
+    element: <Dashboard />,
+  },
 ]);
 
 const root = ReactDOM.createRoot(
@@ -65,6 +78,7 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
+    {/* <Navbar keycloak={keycloak} /> */}
     <RouterProvider router={router} />
   </React.StrictMode>
 );

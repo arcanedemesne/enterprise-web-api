@@ -19,7 +19,7 @@ namespace Enterprise.Solution.API.Controllers.Common
     /// <summary>
     /// Controller for authenticating users to access the API
     /// </summary>
-    [Route("authentication")]
+    [Route("api/authentication")]
     public class AuthenticationController : BaseController<AuthenticationController>
     {
         /// <summary>
@@ -87,11 +87,12 @@ namespace Enterprise.Solution.API.Controllers.Common
         /// Method to attempt authentication for user
         /// </summary>
         /// <returns></returns>
-        [HttpPost("api/authenticate")]
+        [HttpPost("authenticate")]
         public async Task<IActionResult> AuthenticateAsync(AuthenticationRequestBody authenticationRequestBody)
         {
             var clientId = base._solutionSettings.Authentication.Schemes.Keycloak.ClientId;
             var clientSecret = base._solutionSettings.Authentication.Schemes.Keycloak.ClientSecret;
+            var audience = base._solutionSettings.Authentication.Schemes.Keycloak.Audience;
 
             string endPoint = base._solutionSettings.Authentication.Schemes.Keycloak.TokenExchange;
             var client = new HttpClient();
@@ -110,51 +111,85 @@ namespace Enterprise.Solution.API.Controllers.Common
             if (response.IsSuccessStatusCode)
             {
                 var content = JsonConvert.DeserializeObject<KeycloakResponse>(response.Content.ReadAsStringAsync().Result);
-                //var id_token = content?.id_token;
-                //JwtSecurityToken jwtSecurityToken = new JwtSecurityToken(id_token);
+                var id_token = content?.id_token;
+                JwtSecurityToken jwtSecurityToken = new JwtSecurityToken(id_token);
 
-                //var token_username = GetClaimFromToken(jwtSecurityToken, "preferred_username")?.Value;
-                //var token_full_name = GetClaimFromToken(jwtSecurityToken, "name")?.Value;
-                //var token_given_name = GetClaimFromToken(jwtSecurityToken, "given_name")?.Value;
-                //var token_family_name = GetClaimFromToken(jwtSecurityToken, "family_name")?.Value;
-                //var token_email_address = GetClaimFromToken(jwtSecurityToken, "email")?.Value;
-                //var token_expiry = GetClaimFromToken(jwtSecurityToken, "exp")?.Value;
-                //var email_verified = GetClaimFromToken(jwtSecurityToken, "email_verified")?.Value;
+                var token_username = GetClaimFromToken(jwtSecurityToken, "preferred_username")?.Value;
+                var token_full_name = GetClaimFromToken(jwtSecurityToken, "name")?.Value;
+                var token_given_name = GetClaimFromToken(jwtSecurityToken, "given_name")?.Value;
+                var token_family_name = GetClaimFromToken(jwtSecurityToken, "family_name")?.Value;
+                var token_email_address = GetClaimFromToken(jwtSecurityToken, "email")?.Value;
+                var token_expiry = GetClaimFromToken(jwtSecurityToken, "exp")?.Value;
+                var email_verified = GetClaimFromToken(jwtSecurityToken, "email_verified")?.Value;
 
-                //var securityKey = new SymmetricSecurityKey(
-                //    Encoding.ASCII.GetBytes(clientSecret));
-                //var signingCredentials = new SigningCredentials(
-                //    securityKey,
-                //    SecurityAlgorithms.HmacSha256);
+                var claimsForToken = new List<Claim>() {
+                    new Claim("username", token_username!),
+                    new Claim("full_name", token_full_name!),
+                    new Claim("given_name", token_given_name!),
+                    new Claim("family_name", token_family_name!),
+                    new Claim("email_address", token_email_address!),
+                    new Claim("email_verified", email_verified!),
+                    new Claim("expiry_date", token_expiry!),
+                };
 
-                //var claimsForToken = new List<Claim>() {
-                //    new Claim("username", token_username!),
-                //    new Claim("full_name", token_full_name!),
-                //    new Claim("given_name", token_given_name!),
-                //    new Claim("family_name", token_family_name!),
-                //    new Claim("email_address", token_email_address!),
-                //    new Claim("email_verified", email_verified!),
-                //    new Claim("expiry_date", token_expiry!),
-                //};
+                var finalJwtSecurityToken = new JwtSecurityToken(
+                    clientId,
+                    audience,
+                    claimsForToken,
+                    DateTime.UtcNow,
+                    DateTime.UtcNow.AddHours(1));
 
-                //var finalJwtSecurityToken = new JwtSecurityToken(
-                //    clientId,
-                //    audience,
-                //    claimsForToken,
-                //    DateTime.UtcNow,
-                //    DateTime.UtcNow.AddHours(1),
-                //    signingCredentials
-                //    );
+                await EmailService.SendAsync(new System.Net.Mail.MailMessage(
+                    "authentication-controller@domain.local",
+                    "admin@domain.local",
+                    "User Token created",
+                    $"Id Token created: {finalJwtSecurityToken}"
+                ));
 
-                //await EmailService.SendAsync(new System.Net.Mail.MailMessage(
-                //    "authentication-controller@domain.local",
-                //    "admin@domain.local",
-                //    "Token created",
-                //    $"Token created: {jwtSecurityToken}"
-                //));
-
-                return Ok(content);
+                return Ok(finalJwtSecurityToken);
             }                    
+
+            return BadRequest(response.ReasonPhrase);
+        }
+
+        /// <summary>
+        /// Method to attempt authentication for swagger
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("authenticate-swagger")]
+        public async Task<IActionResult> AuthenticateSwaggerAsync()
+        {
+            var clientId = base._solutionSettings.Authentication.Schemes.Keycloak.ClientId;
+            var clientSecret = base._solutionSettings.Authentication.Schemes.Keycloak.ClientSecret;
+            var audience = base._solutionSettings.Authentication.Schemes.Keycloak.Audience;
+
+            string endPoint = base._solutionSettings.Authentication.Schemes.Keycloak.TokenExchange;
+            var client = new HttpClient();
+
+            var data = new[]
+            {
+                new KeyValuePair<string, string>("client_id", clientId),
+                new KeyValuePair<string, string>("grant_type", "password"),
+                new KeyValuePair<string, string>("client_secret", clientSecret),
+                new KeyValuePair<string, string>("scope", "openid"),
+                new KeyValuePair<string, string>("username", "swagger.user"),
+                new KeyValuePair<string, string>("password", "swagger"),
+            };
+            var response = await client.PostAsync(endPoint, new FormUrlEncodedContent(data));
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = JsonConvert.DeserializeObject<KeycloakResponse>(response.Content.ReadAsStringAsync().Result);
+
+                await EmailService.SendAsync(new System.Net.Mail.MailMessage(
+                    "authentication-controller@domain.local",
+                    "admin@domain.local",
+                    "Swagger Token created",
+                    $"Access Token created: {content?.access_token}"
+                ));
+
+                return Ok(content?.access_token);
+            }
 
             return BadRequest(response.ReasonPhrase);
         }
