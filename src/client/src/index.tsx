@@ -36,7 +36,7 @@ import { action as destroyAction } from "./routes/destroy";
 
 import { isUserLoggedIn } from "./auth/user";
 
-const signInRoute = "/sign-in";
+export const signInRoute = "/sign-in";
 const RequireAuth = ({ children, redirectTo }: any) => {
   let isAuthenticated = isUserLoggedIn();
   return isAuthenticated ? children : <Navigate to={redirectTo} />;

@@ -1,3 +1,4 @@
+import { signInRoute } from "..";
 import * as httpRequest from "../utilities/httpRequest";
 import { getItem, setItem } from "../utilities/localStorage";
 
@@ -48,16 +49,24 @@ export const setRefreshToken = (refresh_token: string | null): void => {
   setItem(refreshTokenKey, refresh_token);
 };
 
+const overrideSessionTime = 2 * 60 * 60 * 1000; // 2 hours
 export const isUserLoggedIn = (): boolean => {
   const metadata = getMetadata();
   const id_token = getIdToken();
   const refresh_token = getRefreshToken();
+  setTimeout(() => { TimeCheckAuth() }, overrideSessionTime);
   return (
     !!metadata?.email_verified &&
     !!id_token &&
     !!refresh_token &&
     Date.now() < metadata?.expiry_date!
   );
+};
+
+const TimeCheckAuth = () => {
+  if (!isUserLoggedIn()) {
+    window.location.href = signInRoute;
+  }
 };
 
 export interface ISignInProps {
@@ -118,7 +127,7 @@ const convertToUserMetadata = (metadata: any): UserMetadata => {
     last_name: metadata.family_name,
     email_address: metadata.email,
     email_verified: metadata.email_verified,
-    expiry_date: Date.now() + metadata.exp,
+    expiry_date: Date.now() + overrideSessionTime, // metadata.exp, [override and set to 2 hrs from now]
   } as UserMetadata;
 };
 
