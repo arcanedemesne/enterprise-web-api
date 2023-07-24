@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Enterprise.Solution.Email.Service;
 using Enterprise.Solution.Service.Services;
 using Enterprise.Solution.Shared;
+using Enterprise.Solution.Service.Services.Cache;
 
 namespace Enterprise.Solution.API.Controllers.Common
 {
@@ -36,6 +37,11 @@ namespace Enterprise.Solution.API.Controllers.Common
         private readonly IMapper? _mapper;
 
         /// <summary>
+        /// ICacheService for caching data
+        /// </summary>
+        private readonly ICacheService _cacheService;
+
+        /// <summary>
         /// Constructor for the BaseController with MediatR
         /// </summary>
         /// <param name="solutionSettings"></param>
@@ -59,6 +65,10 @@ namespace Enterprise.Solution.API.Controllers.Common
         /// IMapper for auto mapping between dtos and models inside controllers
         /// </summary>
         protected IMapper Mapper => _mapper ?? HttpContext.RequestServices.GetRequiredService<IMapper>();
+        /// <summary>
+        /// ICacheService for caching data
+        /// </summary>
+        protected ICacheService CacheService => _cacheService ?? HttpContext.RequestServices.GetRequiredService<ICacheService>();
         /// <summary>
         /// IEmailService for emailing 
         /// </summary>

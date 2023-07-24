@@ -26,7 +26,7 @@ const SignIn = () => {
         userName,
         password,
       } as ISignInProps)) as UserMetadata | undefined;
-      if (metadata?.email_verified === "true") {
+      if (metadata?.email_verified) {
         navigate(redirectUrl.length > 0 ? redirectUrl : dashboardUrl);
       }
     } catch (error: any) {

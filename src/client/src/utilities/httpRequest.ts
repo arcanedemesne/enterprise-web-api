@@ -1,14 +1,15 @@
 import axios from "axios";
-import { getIdToken } from "../auth/user";
+import { getAccessToken } from "../auth/user";
 
-const apiRoute = "https://localhost:32768/api";
+const apiServer = "localhost:32768";
+const apiRoute = `https://${apiServer}/api`;
 
-export const GET = async ({ controller, endpoint }: any) => {
+export const GET = async ({ controller, endpoint, headers }: any) => {
   return await axios({
     url: `${apiRoute}/${controller}/${endpoint}`,
     method: "GET",
-    headers: {
-      "Bearer": `Token ${getIdToken()}`,
+    headers: headers ?? {
+      Authorization: `Bearer ${getAccessToken()}`,
     }
   });
 };
@@ -18,8 +19,40 @@ export const POST = async ({ controller, endpoint, data, headers }: any) => {
     url: `${apiRoute}/${controller}/${endpoint}`,
     method: "POST",
     headers: headers ?? {
-      "Bearer": `Token ${getIdToken()}`,
+      Authorization: `Bearer ${getAccessToken()}`,
     },
     data
+  });
+};
+
+export const PUT = async ({ controller, endpoint, data, headers }: any) => {
+  return await axios({
+    url: `${apiRoute}/${controller}/${endpoint}`,
+    method: "PUT",
+    headers: headers ?? {
+      Authorization: `Bearer ${getAccessToken()}`,
+    },
+    data
+  });
+};
+
+export const PATCH = async ({ controller, endpoint, data, headers }: any) => {
+  return await axios({
+    url: `${apiRoute}/${controller}/${endpoint}`,
+    method: "PATCH",
+    headers: headers ?? {
+      Authorization: `Bearer ${getAccessToken()}`,
+    },
+    data
+  });
+};
+
+export const DELETE = async ({ controller, endpoint, headers }: any) => {
+  return await axios({
+    url: `${apiRoute}/${controller}/${endpoint}`,
+    method: "DELETE",
+    headers: headers ?? {
+      Authorization: `Bearer ${getAccessToken()}`,
+    },
   });
 };

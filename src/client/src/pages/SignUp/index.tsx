@@ -33,7 +33,7 @@ const SignUp = () => {
         emailAddress,
         password,
       } as ISignUpProps)) as UserMetadata | undefined;
-      if (metadata?.email_verified === "true") {
+      if (metadata?.email_address) {
         navigate(redirectUrl.length > 0 ? redirectUrl : dashboardUrl);
       }
     } catch (error: any) {
