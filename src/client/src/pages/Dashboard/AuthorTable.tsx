@@ -38,7 +38,7 @@ const AuthorTable = () => {
   const rows = authors.map((x: any) => {
     return {
       id: x.id,
-      values: [x.id, x.fullName, x.books.length],
+      values: [x.id, x.firstName, x.lastName, x.books.length],
     };
   });
   const tableData = {
@@ -48,7 +48,10 @@ const AuthorTable = () => {
         label: "Id",
       },
       {
-        label: "Author",
+        label: "First Name",
+      },
+      {
+        label: "last Name",
       },
       {
         label: "Book Count",

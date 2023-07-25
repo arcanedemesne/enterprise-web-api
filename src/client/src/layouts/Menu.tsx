@@ -15,7 +15,6 @@ const Menu = ({
   const [buttonElement, setButtonElement] =
     React.useState<HTMLButtonElement | null>(null);
   const [isOpen, setOpen] = React.useState(false);
-  const buttonRef = React.useRef<HTMLButtonElement>(null);
   const menuActions = React.useRef<MenuActions>(null);
   const preventReopen = React.useRef(false);
 
@@ -51,7 +50,6 @@ const Menu = ({
 
   const close = () => {
     setOpen(false);
-    buttonRef.current!.focus();
   };
 
   return (

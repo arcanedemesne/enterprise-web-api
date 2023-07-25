@@ -74,7 +74,7 @@ export const saveUserMetadata = (userMetadata: any) => {
   }
 }
 
-const checkSessionTime = 10 * 60 * 1000; // check every 10 mins
+const checkSessionTime = 30 * 1000; // check every 30 secs
 const TimeCheckAuth = () => {
   if (!isSignedIn()) {
     window.location.href = signInRoute;
@@ -93,7 +93,7 @@ export const signIn = async ({ userName, password }: ISignInProps) => {
   } catch (error) {
     throw new Response("", {
       status: 400,
-      statusText: "Invalid Email/User Name and/or Password",
+      statusText: "Invalid UserName and/or Password",
     });
   } finally {
     setInterval(() => { TimeCheckAuth() }, checkSessionTime);

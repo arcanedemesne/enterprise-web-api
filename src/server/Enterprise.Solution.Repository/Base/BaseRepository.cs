@@ -27,15 +27,15 @@ namespace Enterprise.Solution.Repository.Base
         public virtual async Task<EntityListWithPaginationMetadata<T>> ListAllAsync(
             int pageNumber = 1,
             int pageSize = 10,
-            string? orderBy = null)
+            string orderBy = "Id ASC")
         {
             var collection = _dbContext.Set<T>() as IQueryable<T>;
 
             var totalItemCount = await collection.CountAsync();
-            var paginationMetadata = new PaginationMetadata(totalItemCount, pageSize, pageNumber);
+            var paginationMetadata = new PaginationMetadata(totalItemCount, pageSize, pageNumber, orderBy);
 
             var collectionToReturn = await collection
-                .OrderBy(orderBy ?? "Id ASC")
+                .OrderBy(orderBy)
                 .Skip(pageSize * (pageNumber - 1))
                 .Take(pageSize)
                 .ToListAsync();

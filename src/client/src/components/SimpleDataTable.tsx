@@ -38,7 +38,7 @@ const SimpleDataTable = ({
   };
 
   const handleChangePageSize = async (pageSize: number | null) => {
-    await setCurrentPageNumberAndPageSize(pagination.CurrentPage, pageSize);
+    await setCurrentPageNumberAndPageSize(1, pageSize);
   };
 
   const getLabelDisplayedRowsTo = () => {

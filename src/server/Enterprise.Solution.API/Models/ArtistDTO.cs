@@ -20,9 +20,9 @@ namespace Enterprise.Solution.API.Models
         public string? LastName { get; set; }
 
         /// <summary>
-        /// Calculated Full Name of the Author
+        /// Full Name of the Author
         /// </summary>
-        public string FullName => $"{FirstName} {LastName}";
+        public string? FullName { get; set; }
 
         /// <summary>
         /// Covers made by Artist

@@ -22,6 +22,8 @@ namespace Enterprise.Solution.Repositories
             bool includeCoversWithBook,
             bool includeCoversWithBookAndAuthor)
         {
+            if (orderBy == null) orderBy = "firstName asc, lastName asc";
+            
             var collection = _dbContext.Artists as IQueryable<Artist>;
 
             if (!String.IsNullOrWhiteSpace(searchQuery))
@@ -34,7 +36,7 @@ namespace Enterprise.Solution.Repositories
             }
 
             var totalArtistCount = await collection.CountAsync();
-            var paginationMetadata = new PaginationMetadata(totalArtistCount, pageSize, pageNumber);
+            var paginationMetadata = new PaginationMetadata(totalArtistCount, pageSize, pageNumber, orderBy);
 
             if (includeCovers)
             {
@@ -56,7 +58,7 @@ namespace Enterprise.Solution.Repositories
             }
 
             var collectionToReturn = await collection
-                .OrderBy(orderBy ?? "FirstName ASC, LastName ASC")
+                .OrderBy(orderBy)
                 .Skip(pageSize * (pageNumber - 1))
                 .Take(pageSize)
                 .ToListAsync();

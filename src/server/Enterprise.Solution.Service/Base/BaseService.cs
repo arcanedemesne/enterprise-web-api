@@ -11,7 +11,7 @@ namespace Enterprise.Solution.Service.Base
         protected readonly ILogger<IBaseService<T>> _logger;
         protected readonly IBaseRepository<T> _repository;
 
-        protected readonly int MaxPageSize = 20;
+        protected readonly int MaxPageSize = 25;
 
         public BaseService(
             ILogger<IBaseService<T>> logger,

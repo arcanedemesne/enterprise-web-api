@@ -24,6 +24,7 @@ const NavigationBar = () => {
           alignItems: "center",
           gap: 1.5,
         }}
+        onClick={() => window.location.href = "/"}
       >
         <IconButton
           variant="outlined"
@@ -40,7 +41,7 @@ const NavigationBar = () => {
         >
           <GroupRoundedIcon />
         </IconButton>
-        <Typography component="h1" fontWeight="xl">
+        <Typography component="h1" fontWeight="xl" sx={{ cursor: "pointer" }}>
           Application Name
         </Typography>
       </Box>
@@ -79,18 +80,26 @@ const NavigationBar = () => {
           }
           menus={[
             {
-              label: "Email",
-              href: "/joy-ui/getting-started/templates/email/",
-            },
-            {
-              label: "Team",
+              label: "Dashboard",
               active: true,
-              href: "/joy-ui/getting-started/templates/team/",
+              href: "/dashboard",
               "aria-current": "page",
             },
             {
-              label: "Files",
-              href: "/joy-ui/getting-started/templates/files/",
+              label: "Subscriptions",
+              href: "/subscriptions",
+            },
+            {
+              label: "Authors",
+              href: "/authors",
+            },
+            {
+              label: "Books",
+              href: "/books",
+            },
+            {
+              label: "Artists",
+              href: "/artists",
             },
           ]}
         />

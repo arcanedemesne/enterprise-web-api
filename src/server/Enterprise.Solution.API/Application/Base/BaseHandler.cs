@@ -15,7 +15,7 @@ namespace Enterprise.Solution.API.Application
     public class BaseHandler<THandler> where THandler : BaseHandler<THandler>
     {
         private readonly int DEFAULT_PAGE_SIZE = 10;
-        private readonly int MAX_PAGE_SIZE = 20;
+        private readonly int MAX_PAGE_SIZE = 25;
 
         /// <summary>
         /// SolutionSettings from the appsettings.json file

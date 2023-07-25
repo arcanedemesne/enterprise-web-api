@@ -19,8 +19,10 @@ namespace Enterprise.Solution.Repositories
             string? orderBy,
             string? searchQuery)
         {
-            var collection = _dbContext.EmailSubscriptions as IQueryable<EmailSubscription>;
+            if (orderBy == null) orderBy = "firstName asc, lastName asc";
 
+            var collection = _dbContext.EmailSubscriptions as IQueryable<EmailSubscription>;
+            
             if (!String.IsNullOrWhiteSpace(searchQuery))
             {
                 searchQuery = searchQuery.Trim();
@@ -32,10 +34,10 @@ namespace Enterprise.Solution.Repositories
             }
 
             var totalAuthorCount = await collection.CountAsync();
-            var paginationMetadata = new PaginationMetadata(totalAuthorCount, pageSize, pageNumber);
+            var paginationMetadata = new PaginationMetadata(totalAuthorCount, pageSize, pageNumber, orderBy);
 
             var collectionToReturn = await collection
-                .OrderBy(orderBy ?? "FirstName ASC, LastName ASC")
+                .OrderBy(orderBy)
                 .Skip(pageSize * (pageNumber - 1))
                 .Take(pageSize)
                 .ToListAsync();
