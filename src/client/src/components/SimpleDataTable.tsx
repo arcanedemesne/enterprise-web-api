@@ -30,35 +30,20 @@ const SimpleDataTable = ({
   caption,
   data,
   pagination,
+  setCurrentPageNumberAndPageSize,
   ...props
 }: any) => {
-  const setCurrentPage = (pageNumber: number) => {
-    console.info("changing to page # " + pageNumber);
+  const handleChangeCurrentPage = async (currentPage: number) => {
+    await setCurrentPageNumberAndPageSize(currentPage, pagination.PageSize);
   };
 
-  const setPageSize = (pageSize: number) => {
-    console.info("changing page size to " + pageSize);
-  };
-
-  const handleChangeCurrentPage = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-  };
-
-  const handleChangePageSize = (event: any, newValue: number | null) => {
-    setPageSize(parseInt(newValue!.toString(), 10));
-    setCurrentPage(0);
+  const handleChangePageSize = async (pageSize: number | null) => {
+    await setCurrentPageNumberAndPageSize(pagination.CurrentPage, pageSize);
   };
 
   const getLabelDisplayedRowsTo = () => {
-    if (data.rows.length === -1) {
-      return (pagination.CurrentPage + 1) * pagination.PageSize;
-    }
-    return pagination.PageSize === -1
-      ? data.rows.length
-      : Math.min(
-          data.rows.length,
-          (pagination.CurrentPage + 1) * pagination.PageSize
-        );
+    const to = pagination.CurrentPage * pagination.PageSize;
+    return to > pagination.TotalItemCount ? pagination.TotalItemCount : to;
   };
 
   return (
@@ -84,33 +69,34 @@ const SimpleDataTable = ({
           {title}
         </Typography>
       </Box>
-      {data.rows.length === 0 ? (
-        <CircularProgress />
-      ) : (
-        <Table aria-label="basic table" {...props}>
-          <caption>{caption}</caption>
-          <thead>
+      <Table aria-label="basic table" {...props}>
+        <caption>{caption}</caption>
+        <thead>
+          <tr>
+            {data.headers.length > 0 &&
+              data.headers.map((h: any) => (
+                <th
+                  style={{ width: h.width ?? "auto" }}
+                  key={createUniqueKey(10)}
+                >
+                  {h.label}
+                </th>
+              ))}
+          </tr>
+        </thead>
+
+        {data.rows.length === 0 ? (
+          <tbody>
             <tr>
-              {data.headers.length > 0 &&
-                data.headers.map((h: any) => (
-                  <th
-                    style={{ width: h.width ?? "auto" }}
-                    key={createUniqueKey(10)}
-                  >
-                    {h.label}
-                  </th>
-                ))}
+              <td colSpan={data.headers.length} align="center" style={{padding: 10}}>
+                <CircularProgress />
+              </td>
             </tr>
-          </thead>
+          </tbody>
+        ) : (
           <tbody>
             {data.rows.length > 0 &&
-              data.rows
-                .slice(
-                  (pagination.CurrentPage - 1) * pagination.PageSize,
-                  (pagination.CurrentPage - 1) * pagination.PageSize +
-                    pagination.PageSize
-                )
-                .map((row: any) => (
+              data.rows.map((row: any) => (
                   <tr key={createUniqueKey(10)}>
                     {row.values.map((value: any) => (
                       <td key={createUniqueKey(10)}>{value}</td>
@@ -118,77 +104,73 @@ const SimpleDataTable = ({
                   </tr>
                 ))}
           </tbody>
-          <tfoot>
-            <tr>
-              <td colSpan={data.headers.length}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 2,
-                    justifyContent: "flex-end",
-                  }}
-                >
-                  <FormControl orientation="horizontal" size="sm">
-                    <FormLabel>Rows per page:</FormLabel>
-                    <Select
-                      onChange={handleChangePageSize}
-                      value={pagination.PageSize}
-                    >
-                      <Option value={5}>5</Option>
-                      <Option value={10}>10</Option>
-                      <Option value={25}>25</Option>
-                    </Select>
-                  </FormControl>
-                  <Typography textAlign="center" sx={{ minWidth: 80 }}>
-                    {labelDisplayedRows({
-                      from:
-                        data.rows.length === 0
-                          ? 0
-                          : (pagination.CurrentPage - 1) * pagination.PageSize +
-                            1,
-                      to: getLabelDisplayedRowsTo(),
-                      count: data.rows.length === -1 ? -1 : data.rows.length,
-                    })}
-                  </Typography>
-                  <Box sx={{ display: "flex", gap: 1 }}>
-                    <IconButton
-                      size="sm"
-                      color="neutral"
-                      variant="outlined"
-                      disabled={pagination.CurrentPage === 1}
-                      onClick={() =>
-                        handleChangeCurrentPage(pagination.CurrentPage - 1)
-                      }
-                      sx={{ bgcolor: "background.surface" }}
-                    >
-                      <KeyboardArrowLeftIcon />
-                    </IconButton>
-                    <IconButton
-                      size="sm"
-                      color="neutral"
-                      variant="outlined"
-                      disabled={
-                        data.rows.length !== -1
-                          ? (pagination.CurrentPage - 1) >=
-                            Math.ceil(data.rows.length / pagination.PageSize) -
-                              1
-                          : false
-                      }
-                      onClick={() =>
-                        handleChangeCurrentPage(pagination.CurrentPage + 1)
-                      }
-                      sx={{ bgcolor: "background.surface" }}
-                    >
-                      <KeyboardArrowRightIcon />
-                    </IconButton>
-                  </Box>
+        )}
+        <tfoot>
+          <tr>
+            <td colSpan={data.headers.length}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                  justifyContent: "flex-end",
+                }}
+              >
+                <FormControl orientation="horizontal" size="sm">
+                  <FormLabel>Rows per page:</FormLabel>
+                  <Select
+                    onChange={async (event: any, pageSize: number | null) => { await handleChangePageSize(pageSize); }}
+                    value={pagination.PageSize}
+                  >
+                    <Option value={5}>5</Option>
+                    <Option value={10}>10</Option>
+                    <Option value={25}>25</Option>
+                  </Select>
+                </FormControl>
+                <Typography textAlign="center" sx={{ minWidth: 80 }}>
+                  {labelDisplayedRows({
+                    from:
+                      data.rows.length === 0
+                        ? 0
+                        : (pagination.CurrentPage - 1) * pagination.PageSize +
+                          1,
+                    to: getLabelDisplayedRowsTo(),
+                    count: pagination.TotalItemCount,
+                  })}
+                </Typography>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <IconButton
+                    size="sm"
+                    color="neutral"
+                    variant="outlined"
+                    disabled={pagination.CurrentPage === 1}
+                    onClick={() =>
+                      handleChangeCurrentPage(pagination.CurrentPage - 1)
+                    }
+                    sx={{ bgcolor: "background.surface" }}
+                  >
+                    <KeyboardArrowLeftIcon />
+                  </IconButton>
+                  <IconButton
+                    size="sm"
+                    color="neutral"
+                    variant="outlined"
+                    disabled={
+                      pagination.CurrentPage * pagination.PageSize >= pagination.TotalItemCount
+                    }
+                    onClick={() =>
+                      handleChangeCurrentPage(pagination.CurrentPage + 1)
+                    }
+                    sx={{ bgcolor: "background.surface" }}
+                  >
+                    <KeyboardArrowRightIcon />
+                  </IconButton>
                 </Box>
-              </td>
-            </tr>
-          </tfoot>
-        </Table>
-      )}
+              </Box>
+            </td>
+          </tr>
+        </tfoot>
+      </Table>
     </Sheet>
   );
 };

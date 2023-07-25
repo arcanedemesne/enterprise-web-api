@@ -8,7 +8,6 @@ import NavigationBar from "../../components/NavigationBar";
 import AuthorTable from "./AuthorTable";
 import BookTable from "./BookTable";
 import ArtistTable from "./ArtistTable";
-import DataTable from "../../components/DataTable"; // TODO: refactor for reusability
 
 const Dashboard = () => {
   return (
