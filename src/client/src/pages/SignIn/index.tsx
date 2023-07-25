@@ -9,6 +9,7 @@ import Typography from "@mui/joy/Typography";
 import { ISignInProps, signIn, UserMetadata } from "../../auth/user";
 import AuthenticationLayout from "../../layouts/AuthenticationLayout";
 import FormInput from "../../components/FormInput";
+import { signUpRoute } from "../..";
 
 const dashboardUrl: string = "/dashboard";
 let redirectUrl: string = "";
@@ -31,7 +32,6 @@ const SignIn = () => {
       }
     } catch (error: any) {
       setErrorMessage(error.statusText);
-      console.info(error);
     }
   };
 
@@ -60,6 +60,13 @@ const SignIn = () => {
           boxShadow: "md",
         }}
       >
+        <Typography
+          level="h3"
+          component="h1"
+          sx={{ alignSelf: "center", py: 3 }}
+        >
+          Application Name
+        </Typography>
         <div>
           <Typography level="h4" component="h1">
             Welcome!
@@ -102,7 +109,7 @@ const SignIn = () => {
           Sign in
         </Button>
         <Typography
-          endDecorator={<Link href="/sign-up">Sign up</Link>}
+          endDecorator={<Link href={signUpRoute}>Sign up</Link>}
           fontSize="sm"
           sx={{ alignSelf: "center" }}
         >

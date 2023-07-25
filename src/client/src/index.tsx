@@ -34,11 +34,13 @@ import EditContact, { action as editAction } from "./routes/edit";
 import { action as destroyAction } from "./routes/destroy";
 /* END TEST */
 
-import { isUserLoggedIn } from "./auth/user";
+import { isSignedIn } from "./auth/user";
 
 export const signInRoute = "/sign-in";
+export const signUpRoute = "/sign-up";
+
 const RequireAuth = ({ children, redirectTo }: any) => {
-  let isAuthenticated = isUserLoggedIn();
+  let isAuthenticated = isSignedIn();
   return isAuthenticated ? children : <Navigate to={redirectTo} />;
 };
 

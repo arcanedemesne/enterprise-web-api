@@ -38,7 +38,6 @@ const SignUp = () => {
       }
     } catch (error: any) {
       setErrorMessage(error.statusText);
-      console.info(error);
     }
   };
 
@@ -67,6 +66,13 @@ const SignUp = () => {
           boxShadow: "md",
         }}
       >
+        <Typography
+          level="h3"
+          component="h1"
+          sx={{ alignSelf: "center", py: 3 }}
+        >
+          Application Name
+        </Typography>
         <div>
           <Typography level="h4" component="h1">
             Join us!

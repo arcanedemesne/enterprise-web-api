@@ -190,10 +190,12 @@ services.AddHttpContextAccessor();
 services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy",
-        builder => builder.SetIsOriginAllowed(hostName => true)
+        policy => policy
+            .SetIsOriginAllowed(hostName => true)
             .AllowAnyMethod()
             .AllowAnyHeader()
-            .AllowCredentials());
+            .AllowCredentials()
+            .WithExposedHeaders("X-Pagination"));
 });
 
 services.AddHttpClient();

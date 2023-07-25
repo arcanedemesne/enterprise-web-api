@@ -1,55 +1,96 @@
 import axios from "axios";
-import { getAccessToken } from "../auth/user";
+import {
+  getAccessToken,
+  getRefreshToken,
+  getMetadata,
+  saveUserMetadata,
+} from "../auth/user";
+import { signInRoute } from "..";
 
-const apiServer = "localhost:32768";
-const apiRoute = `https://${apiServer}/api`;
+export const apiServer = "localhost:32768";
+export const apiVersion = "v1";
+export const apiRoute = `https://${apiServer}/api`;
 
-export const GET = async ({ controller, endpoint, headers }: any) => {
+export const authenticate = async ({ userName, password }: any) => {
   return await axios({
-    url: `${apiRoute}/${controller}/${endpoint}`,
-    method: "GET",
-    headers: headers ?? {
-      Authorization: `Bearer ${getAccessToken()}`,
-    }
+    url: `${apiRoute}/authentication/authenticate`,
+    method: "POST",
+    headers: {
+      "X-UserName": userName,
+      "X-Password": password,
+    },
   });
 };
 
-export const POST = async ({ controller, endpoint, data, headers }: any) => {
+export const refreshTokens = async () => {
+  const metadata = getMetadata();
+  if (Date.now() > metadata?.access_expiry_date!) {
+    try {
+      const newMatadata = await axios({
+        url: `${apiRoute}/authentication/refresh-token`,
+        method: "POST",
+        headers: {
+          "X-Refresh-Token": `${getRefreshToken()}`,
+        },
+      });
+      saveUserMetadata(newMatadata);
+    } catch (error: any) {
+      window.location.href = signInRoute;
+    }
+  }
+};
+
+export const GET = async ({ endpoint, headers }: any) => {
+  await refreshTokens();
   return await axios({
-    url: `${apiRoute}/${controller}/${endpoint}`,
+    url: `${apiRoute}/${apiVersion}/${endpoint}`,
+    method: "GET",
+    headers: headers ?? {
+      Authorization: `Bearer ${getAccessToken()}`,
+    },
+  });
+};
+
+export const POST = async ({ endpoint, data, headers }: any) => {
+  await refreshTokens();
+  return await axios({
+    url: `${apiRoute}/${apiVersion}/${endpoint}`,
     method: "POST",
     headers: headers ?? {
       Authorization: `Bearer ${getAccessToken()}`,
     },
-    data
+    data,
   });
 };
 
-export const PUT = async ({ controller, endpoint, data, headers }: any) => {
+export const PUT = async ({ endpoint, data, headers }: any) => {
+  await refreshTokens();
   return await axios({
-    url: `${apiRoute}/${controller}/${endpoint}`,
+    url: `${apiRoute}/${apiVersion}/${endpoint}`,
     method: "PUT",
     headers: headers ?? {
       Authorization: `Bearer ${getAccessToken()}`,
     },
-    data
+    data,
   });
 };
 
-export const PATCH = async ({ controller, endpoint, data, headers }: any) => {
+export const PATCH = async ({ endpoint, data, headers }: any) => {
+  await refreshTokens();
   return await axios({
-    url: `${apiRoute}/${controller}/${endpoint}`,
+    url: `${apiRoute}/${apiVersion}/${endpoint}`,
     method: "PATCH",
     headers: headers ?? {
       Authorization: `Bearer ${getAccessToken()}`,
     },
-    data
+    data,
   });
 };
 
-export const DELETE = async ({ controller, endpoint, headers }: any) => {
+export const DELETE = async ({ endpoint, headers }: any) => {
+  await refreshTokens();
   return await axios({
-    url: `${apiRoute}/${controller}/${endpoint}`,
+    url: `${apiRoute}/${apiVersion}/${endpoint}`,
     method: "DELETE",
     headers: headers ?? {
       Authorization: `Bearer ${getAccessToken()}`,

@@ -137,12 +137,12 @@ namespace Enterprise.Solution.API.Controllers.Common
         /// Method to attempt authentication for swagger
         /// </summary>
         /// <returns></returns>
-        [HttpPost("refresh-token")] //TODO: This is not working
-        public async Task<IActionResult> RequestAccessTokenAsync(string refreshToken)
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RequestAccessTokenAsync()
         {
-            Request.Headers.TryGetValue("X-RefreshToken", out var token);
+            Request.Headers.TryGetValue("X-Refresh-Token", out var token);
 
-            var response = await Refresh(refreshToken ?? token!);
+            var response = await Refresh(token!);
 
             if (response.IsSuccessStatusCode)
             {
@@ -187,6 +187,7 @@ namespace Enterprise.Solution.API.Controllers.Common
         {
 
             var clientId = base._solutionSettings.Authentication.Schemes.Keycloak.ClientId;
+            var clientSecret = base._solutionSettings.Authentication.Schemes.Keycloak.ClientSecret;
 
             string endPoint = base._solutionSettings.Authentication.Schemes.Keycloak.TokenExchange;
             var client = new HttpClient();
@@ -194,6 +195,7 @@ namespace Enterprise.Solution.API.Controllers.Common
             var data = new[]
             {
                 new KeyValuePair<string, string>("client_id", clientId),
+                new KeyValuePair<string, string>("client_secret", clientSecret),
                 new KeyValuePair<string, string>("refresh_token", refresh_token),
                 new KeyValuePair<string, string>("grant_type", "refresh_token"),
             };

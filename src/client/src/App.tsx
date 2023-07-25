@@ -8,7 +8,7 @@ import "./App.css";
 const App = () => {
   return (
     <CssVarsProvider>
-          <Outlet />
+      <Outlet />
     </CssVarsProvider>
   );
 };
