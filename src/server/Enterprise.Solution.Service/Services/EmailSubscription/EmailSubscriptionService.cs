@@ -23,11 +23,13 @@ namespace Enterprise.Solution.Service.Services
         public async Task<EntityListWithPaginationMetadata<EmailSubscription>> ListAllAsync(
             int pageNumber,
             int pageSize,
+            string? orderBy,
             string? searchQuery = null)
         {
             return await _emailSubscriptionRepository.ListAllAsync(
                 pageNumber,
                 pageSize,
+                orderBy,
                 searchQuery);
         }
     }

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Enterprise.Solution.Data.DbContexts;
 using Enterprise.Solution.Data.Helpers;
 using Enterprise.Solution.Data.Models.Base;
+using System.Linq.Dynamic.Core;
 
 namespace Enterprise.Solution.Repository.Base
 {
@@ -25,7 +26,8 @@ namespace Enterprise.Solution.Repository.Base
 
         public virtual async Task<EntityListWithPaginationMetadata<T>> ListAllAsync(
             int pageNumber = 1,
-            int pageSize = 10)
+            int pageSize = 10,
+            string? orderBy = null)
         {
             var collection = _dbContext.Set<T>() as IQueryable<T>;
 
@@ -33,6 +35,7 @@ namespace Enterprise.Solution.Repository.Base
             var paginationMetadata = new PaginationMetadata(totalItemCount, pageSize, pageNumber);
 
             var collectionToReturn = await collection
+                .OrderBy(orderBy ?? "Id ASC")
                 .Skip(pageSize * (pageNumber - 1))
                 .Take(pageSize)
                 .ToListAsync();
@@ -40,9 +43,10 @@ namespace Enterprise.Solution.Repository.Base
             return new EntityListWithPaginationMetadata<T>(collectionToReturn, paginationMetadata);
         }
 
-        public virtual async Task<EntityListWithPaginationMetadata<T>> ListAllAsync(
+        public virtual Task<EntityListWithPaginationMetadata<T>> ListAllAsync(
             int pageNumber = 1,
             int pageSize = 10,
+            string? orderBy = null,
             string? searchQuery = null)
         {
             throw new NotImplementedException();

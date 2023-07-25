@@ -2,8 +2,10 @@
 using Enterprise.Solution.Data.Helpers;
 using Enterprise.Solution.Data.Models;
 using Enterprise.Solution.Repository.Base;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Linq.Dynamic.Core;
 
 namespace Enterprise.Solution.Repositories
 {
@@ -14,6 +16,7 @@ namespace Enterprise.Solution.Repositories
         public async Task<EntityListWithPaginationMetadata<Book>> ListAllAsync(
             int pageNumber,
             int pageSize,
+            string? orderBy,
             string? searchQuery,
             bool includeAuthor,
             bool includeCover,
@@ -49,7 +52,7 @@ namespace Enterprise.Solution.Repositories
             }
 
             var collectionToReturn = await collection
-                .OrderBy(a => a.Title)
+                .OrderBy(orderBy ?? "Title ASC")
                 .Skip(pageSize * (pageNumber - 1))
                 .Take(pageSize)
                 .ToListAsync();

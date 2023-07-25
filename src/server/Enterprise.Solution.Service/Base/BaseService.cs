@@ -25,9 +25,9 @@ namespace Enterprise.Solution.Service.Base
         {
             return await _repository.ListAllAsync();
         }
-        public async Task<EntityListWithPaginationMetadata<T>> ListAllAsync(int pageNumber, int pageSize)
+        public async Task<EntityListWithPaginationMetadata<T>> ListAllAsync(int pageNumber, int pageSize, string orderBy)
         {
-            return await _repository.ListAllAsync(pageNumber, pageSize);
+            return await _repository.ListAllAsync(pageNumber, pageSize, orderBy);
         }
 
         public async Task<T?> GetByIdAsync(int id)

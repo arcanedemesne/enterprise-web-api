@@ -50,7 +50,10 @@ namespace Enterprise.Solution.API.Application.Handlers
             var (pageNumber, pageSize) = ValidatePagedParams(request.QueryParams.PageNumber, request.QueryParams.PageSize);
 
             LogTryServiceRequest<EmailSubscription>(RequestType.ListAll);
-            return await _service.ListAllAsync(pageNumber, pageSize, request.QueryParams.SearchQuery);
+            return await _service.ListAllAsync(
+                pageNumber, pageSize,
+                request.QueryParams.OrderBy,
+                request.QueryParams.SearchQuery);
         }
     }
 }

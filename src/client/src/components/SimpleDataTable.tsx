@@ -74,21 +74,27 @@ const SimpleDataTable = ({
         <thead>
           <tr>
             {data.headers.length > 0 &&
-              data.headers.map((h: any) => (
-                <th
-                  style={{ width: h.width ?? "auto" }}
-                  key={createUniqueKey(10)}
-                >
-                  {h.label}
-                </th>
-              ))}
+              data.headers.map((h: any) => {
+                return (
+                  <th
+                    style={{ width: h.width ?? "auto" }}
+                    key={createUniqueKey(10)}
+                  >
+                    {h.label}
+                  </th>
+                );
+            })}
           </tr>
         </thead>
 
         {data.rows.length === 0 ? (
           <tbody>
             <tr>
-              <td colSpan={data.headers.length} align="center" style={{padding: 10}}>
+              <td
+                colSpan={data.headers.length}
+                align="center"
+                style={{ padding: 10 }}
+              >
                 <CircularProgress />
               </td>
             </tr>
@@ -97,12 +103,12 @@ const SimpleDataTable = ({
           <tbody>
             {data.rows.length > 0 &&
               data.rows.map((row: any) => (
-                  <tr key={createUniqueKey(10)}>
-                    {row.values.map((value: any) => (
-                      <td key={createUniqueKey(10)}>{value}</td>
-                    ))}
-                  </tr>
-                ))}
+                <tr key={createUniqueKey(10)}>
+                  {row.values.map((value: any) => (
+                    <td key={createUniqueKey(10)}>{value}</td>
+                  ))}
+                </tr>
+              ))}
           </tbody>
         )}
         <tfoot>
@@ -119,7 +125,9 @@ const SimpleDataTable = ({
                 <FormControl orientation="horizontal" size="sm">
                   <FormLabel>Rows per page:</FormLabel>
                   <Select
-                    onChange={async (event: any, pageSize: number | null) => { await handleChangePageSize(pageSize); }}
+                    onChange={async (event: any, pageSize: number | null) => {
+                      await handleChangePageSize(pageSize);
+                    }}
                     value={pagination.PageSize}
                   >
                     <Option value={5}>5</Option>
@@ -156,7 +164,8 @@ const SimpleDataTable = ({
                     color="neutral"
                     variant="outlined"
                     disabled={
-                      pagination.CurrentPage * pagination.PageSize >= pagination.TotalItemCount
+                      pagination.CurrentPage * pagination.PageSize >=
+                      pagination.TotalItemCount
                     }
                     onClick={() =>
                       handleChangeCurrentPage(pagination.CurrentPage + 1)

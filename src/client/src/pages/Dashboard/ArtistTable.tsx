@@ -28,7 +28,7 @@ const ArtistTable = () => {
   const rows = artists.map((x: any) => {
     return {
       id: x.id,
-      values: [x.id, `${x.firstName} ${x.lastName}`, x.covers.length],
+      values: [x.id, `${x.fullName}`, x.covers.length],
     };
   });
   const tableData = {

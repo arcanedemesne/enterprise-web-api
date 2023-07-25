@@ -123,10 +123,10 @@ namespace Enterprise.Solution.API.Controllers.Common
                     "authentication-controller@domain.local",
                     "admin@domain.local",
                     "Swagger Token created",
-                    $"Swagger Token created: {content?.id_token}"
+                    $"Swagger Token created: {content?.access_token}"
                 ));
 
-                return Ok(content);
+                return Ok(content?.access_token);
             }
 
             return BadRequest(response.ReasonPhrase);

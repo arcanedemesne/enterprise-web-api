@@ -20,6 +20,11 @@ namespace Enterprise.Solution.API.Models
         public string? LastName { get; set; }
 
         /// <summary>
+        /// Calculated Full Name of the Author
+        /// </summary>
+        public string FullName => $"{FirstName} {LastName}";
+
+        /// <summary>
         /// Covers made by Artist
         /// </summary>
         public ICollection<CoverDTO>? Covers { get; set; }

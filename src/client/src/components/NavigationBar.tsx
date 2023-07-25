@@ -3,15 +3,16 @@ import IconButton from "@mui/joy/IconButton";
 import Input from "@mui/joy/Input";
 import Typography from "@mui/joy/Typography";
 
-import BookRoundedIcon from "@mui/icons-material/BookRounded";
 import GridViewRoundedIcon from "@mui/icons-material/GridViewRounded";
 import GroupRoundedIcon from "@mui/icons-material/GroupRounded";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 
 import * as Layout from "../layouts";
 import Menu from "../layouts/Menu";
 import { ColorSchemeToggle } from "../components/ColorSchemeToggle";
+import { signOut } from "../auth/user";
 
 const NavigationBar = () => {
   return (
@@ -64,15 +65,6 @@ const NavigationBar = () => {
         >
           <SearchRoundedIcon />
         </IconButton>
-        <IconButton
-          size="sm"
-          variant="outlined"
-          color="primary"
-          component="a"
-          href="/blog/first-look-at-joy/"
-        >
-          <BookRoundedIcon />
-        </IconButton>
         <Menu
           id="app-selector"
           control={
@@ -103,6 +95,16 @@ const NavigationBar = () => {
           ]}
         />
         <ColorSchemeToggle />
+        <IconButton
+          size="sm"
+          variant="outlined"
+          color="primary"
+          component="a"
+          onClick={signOut}
+        >
+          
+          <LogoutRoundedIcon />
+        </IconButton>
       </Box>
     </Layout.Header>
   );

@@ -9,6 +9,7 @@ namespace Enterprise.Solution.Service.Services
         public Task<EntityListWithPaginationMetadata<EmailSubscription>> ListAllAsync(
             int pageNumber,
             int PageSize,
+            string? orderBy,
             string? searchQuery);
     }
 }

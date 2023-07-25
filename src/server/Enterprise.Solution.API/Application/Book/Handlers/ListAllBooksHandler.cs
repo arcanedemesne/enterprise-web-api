@@ -52,6 +52,7 @@ namespace Enterprise.Solution.API.Application.Handlers
             LogTryServiceRequest<Book>(RequestType.ListAll);
             return await _service.ListAllAsync(
                 pageNumber, pageSize,
+                request.QueryParams.OrderBy,
                 request.QueryParams.SearchQuery,
                 request.QueryParams.IncludeAuthor ?? false,
                 request.QueryParams.IncludeCover ?? false,

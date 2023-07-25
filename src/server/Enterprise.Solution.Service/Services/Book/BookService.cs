@@ -24,6 +24,7 @@ namespace Enterprise.Solution.Service.Services
         public async Task<EntityListWithPaginationMetadata<Book>> ListAllAsync(
             int pageNumber,
             int pageSize,
+            string? orderBy,
             string? searchQuery,
             bool includeAuthor,
             bool includeCover,
@@ -32,6 +33,7 @@ namespace Enterprise.Solution.Service.Services
             return await _bookRepository.ListAllAsync(
                 pageNumber,
                 pageSize,
+                orderBy,
                 searchQuery,
                 includeAuthor,
                 includeCover,

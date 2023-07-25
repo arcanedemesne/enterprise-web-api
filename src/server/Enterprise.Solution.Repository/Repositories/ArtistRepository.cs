@@ -5,6 +5,7 @@ using Enterprise.Solution.Repository.Base;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Linq.Dynamic.Core;
 
 namespace Enterprise.Solution.Repositories
 {
@@ -15,6 +16,7 @@ namespace Enterprise.Solution.Repositories
         public async Task<EntityListWithPaginationMetadata<Artist>> ListAllAsync(
             int pageNumber,
             int pageSize,
+            string? orderBy,
             string? searchQuery,
             bool includeCovers,
             bool includeCoversWithBook,
@@ -54,8 +56,7 @@ namespace Enterprise.Solution.Repositories
             }
 
             var collectionToReturn = await collection
-                .OrderBy(a => a.LastName)
-                .ThenBy(a => a.FirstName)
+                .OrderBy(orderBy ?? "FirstName ASC, LastName ASC")
                 .Skip(pageSize * (pageNumber - 1))
                 .Take(pageSize)
                 .ToListAsync();

@@ -6,11 +6,6 @@
     public class EmailSubscriptionPagedQueryParams : IPagedQueryParams
     {
         /// <summary>
-        /// SearchQuery
-        /// </summary>
-        public string? SearchQuery { get; set; } = null;
-
-        /// <summary>
         /// PageNumber
         /// </summary>
         public int? PageNumber { get; set; }
@@ -19,5 +14,15 @@
         /// PageSize
         /// </summary>
         public int? PageSize { get; set; }
+
+        /// <summary>
+        /// OrderBy
+        /// </summary>
+        public string? OrderBy { get; set; } = null;
+
+        /// <summary>
+        /// SearchQuery
+        /// </summary>
+        public string? SearchQuery { get; set; } = null;
     }
 }

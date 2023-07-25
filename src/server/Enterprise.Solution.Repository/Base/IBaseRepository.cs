@@ -1,7 +1,5 @@
 ﻿using Enterprise.Solution.Data.Helpers;
-using Enterprise.Solution.Data.Models;
 using Enterprise.Solution.Data.Models.Base;
-using System.Linq.Expressions;
 
 namespace Enterprise.Solution.Repository.Base
 {
@@ -13,8 +11,8 @@ namespace Enterprise.Solution.Repository.Base
     {
         Task<IReadOnlyList<T>> ListAllAsync();
 
-        Task<EntityListWithPaginationMetadata<T>> ListAllAsync(int pageNumber, int pageSize);
-        Task<EntityListWithPaginationMetadata<T>> ListAllAsync(int pageNumber, int pageSize, string? searchQuery);
+        Task<EntityListWithPaginationMetadata<T>> ListAllAsync(int pageNumber, int pageSize, string orderBy);
+        Task<EntityListWithPaginationMetadata<T>> ListAllAsync(int pageNumber, int pageSize, string orderBy, string? searchQuery);
 
         //Task<IReadOnlyList<T>> ListAsync(ISpecification<T> spec);
 

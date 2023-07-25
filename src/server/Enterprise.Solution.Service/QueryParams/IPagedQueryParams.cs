@@ -14,5 +14,10 @@
         /// PageSize
         /// </summary>
         public int? PageSize { get; set; }
+
+        /// <summary>
+        /// OrderBy
+        /// </summary>
+        public string? OrderBy { get; set; }
     }
 }

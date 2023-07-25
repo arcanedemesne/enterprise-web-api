@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.3.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Enterprise.Solution.Data\Enterprise.Solution.Data.csproj" />
   </ItemGroup>
 

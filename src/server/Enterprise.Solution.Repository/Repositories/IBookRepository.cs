@@ -13,6 +13,7 @@ namespace Enterprise.Solution.Repositories
         public Task<EntityListWithPaginationMetadata<Book>> ListAllAsync(
             int pageNumber,
             int pageSize,
+            string? orderBy,
             string? searchQuery,
             bool includeAuthor,
             bool includeCover,
