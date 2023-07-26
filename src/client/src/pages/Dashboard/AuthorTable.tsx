@@ -5,37 +5,42 @@ import SimpleDataTable from "../../components/SimpleDataTable";
 
 let initialized = false;
 const AuthorTable = () => {
-  const [authors, setAuthors] = useState([]);
+  const [apiData, setData] = useState([]);
   const [pagination, setPagination] = useState({});
 
-  const setCurrentPageNumberAndPageSize = async (pageNumber: number, pageSize: number) => {
+  const baseUri = "authors?includeBooks=true";
+  const setNewPaginationValues = async (
+    pageNumber: number,
+    pageSize: number,
+    orderBy: string
+  ) => {
     const response: any = await GET({
-      endpoint: `authors?includeBooks=true&PageNumber=${pageNumber}&PageSize=${pageSize}`,
+      endpoint: `${baseUri}&PageNumber=${pageNumber}&PageSize=${pageSize}&OrderBy=${orderBy}`,
     });
     const { headers, data } = response;
     const paginationHeaders = JSON.parse(headers.get("x-pagination"));
     setPagination(paginationHeaders);
-    setAuthors(data);
-  }
+    setData(data);
+  };
 
   useEffect(() => {
-    async function getAuthors() {
+    async function getData() {
       const response: any = await GET({
-        endpoint: "authors?includeBooks=true",
+        endpoint: baseUri,
       });
       const { headers, data } = response;
       const paginationHeaders = JSON.parse(headers.get("x-pagination"));
       setPagination(paginationHeaders);
-      setAuthors(data);
+      setData(data);
     }
 
     if (!initialized) {
-      getAuthors();
+      getData();
       initialized = true;
     }
   }, []);
 
-  const rows = authors.map((x: any) => {
+  const rows = apiData.map((x: any) => {
     return {
       id: x.id,
       values: [x.id, x.firstName, x.lastName, x.books.length],
@@ -44,17 +49,24 @@ const AuthorTable = () => {
   const tableData = {
     headers: [
       {
+        id: "id",
         width: 50,
         label: "Id",
+        numeric: true,
       },
       {
+        id: "firstName",
         label: "First Name",
+        numeric: false,
       },
       {
+        id: "lastName",
         label: "last Name",
+        numeric: false,
       },
       {
         label: "Book Count",
+        numeric: false,
       },
     ],
     rows,
@@ -66,9 +78,9 @@ const AuthorTable = () => {
       caption="This table contains Authors"
       data={tableData}
       pagination={pagination}
+      setNewPaginationValues={setNewPaginationValues}
       borderAxis="xBetween"
       hoverRow
-      setCurrentPageNumberAndPageSize={setCurrentPageNumberAndPageSize}
     />
   );
 };

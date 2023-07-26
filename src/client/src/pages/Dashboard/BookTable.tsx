@@ -5,29 +5,42 @@ import SimpleDataTable from "../../components/SimpleDataTable";
 
 let initialized = false;
 const BookTable = () => {
-  const [books, setBooks] = useState([]);
+  const [apiData, setData] = useState([]);
   const [pagination, setPagination] = useState({});
 
+  const baseUri = "books?includeAuthor=true&includeCoverAndArtists=true";
+  const setNewPaginationValues = async (
+    pageNumber: number,
+    pageSize: number,
+    orderBy: string
+  ) => {
+    const response: any = await GET({
+      endpoint: `${baseUri}&PageNumber=${pageNumber}&PageSize=${pageSize}&OrderBy=${orderBy}`,
+    });
+    const { headers, data } = response;
+    const paginationHeaders = JSON.parse(headers.get("x-pagination"));
+    setPagination(paginationHeaders);
+    setData(data);
+  };
+
   useEffect(() => {
-    async function getBooks() {
-      const response: any = (
-        await GET({
-          endpoint: "books?includeAuthor=true&includeCoverAndArtists=true",
-        })
-      );
+    async function getData() {
+      const response: any = await GET({
+        endpoint: baseUri,
+      });
       const { headers, data } = response;
       const paginationHeaders = JSON.parse(headers.get("x-pagination"));
       setPagination(paginationHeaders);
-      setBooks(data);
+      setData(data);
     }
 
     if (!initialized) {
-      getBooks();
+      getData();
       initialized = true;
     }
   }, []);
 
-  const rows = books.map((x: any) => {
+  const rows = apiData.map((x: any) => {
     return {
       id: x.id,
       values: [
@@ -44,26 +57,37 @@ const BookTable = () => {
   const tableData = {
     headers: [
       {
+        id: "id",
         width: 50,
         label: "Id",
+        numeric: true,
       },
       {
+        id: "title",
         label: "Book Title",
+        numeric: false,
       },
       {
         label: "Author",
+        numeric: false,
       },
       {
+        id: "basePrice",
         label: "Price",
+        numeric: true,
       },
       {
         label: "Has Cover Art",
+        numeric: false,
       },
       {
         label: "Cover Artist Count",
+        numeric: true,
       },
       {
+        id: "publishDate",
         label: "Publish Date",
+        numeric: false,
       },
     ],
     rows,
@@ -75,7 +99,9 @@ const BookTable = () => {
       caption="This table contains Books"
       data={tableData}
       pagination={pagination}
-      borderAxis="xBetween" hoverRow
+      setNewPaginationValues={setNewPaginationValues}
+      borderAxis="xBetween"
+      hoverRow
     />
   );
 };

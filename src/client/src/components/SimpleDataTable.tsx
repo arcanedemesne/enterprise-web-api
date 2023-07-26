@@ -3,6 +3,7 @@ import Sheet from "@mui/joy/Sheet";
 import Table from "@mui/joy/Table";
 import Typography from "@mui/joy/Typography";
 import Box from "@mui/joy/Box";
+import Link from "@mui/joy/Link";
 import FormControl from "@mui/joy/FormControl";
 import FormLabel from "@mui/joy/FormLabel";
 import IconButton from "@mui/joy/IconButton";
@@ -10,6 +11,8 @@ import Select from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import { visuallyHidden } from "@mui/utils";
 
 import createUniqueKey from "../utilities/uniqueKey";
 
@@ -30,15 +33,20 @@ const SimpleDataTable = ({
   caption,
   data,
   pagination,
-  setCurrentPageNumberAndPageSize,
+  setNewPaginationValues,
   ...props
 }: any) => {
   const handleChangeCurrentPage = async (currentPage: number) => {
-    await setCurrentPageNumberAndPageSize(currentPage, pagination.PageSize);
+    await setNewPaginationValues(currentPage, pagination.PageSize, pagination.OrderBy);
   };
 
   const handleChangePageSize = async (pageSize: number | null) => {
-    await setCurrentPageNumberAndPageSize(1, pageSize);
+    await setNewPaginationValues(1, pageSize, pagination.OrderBy);
+  };
+
+  const handleChangeOrderBy = async (orderBy: string | null, order: string) => {
+    const newOrderBy = orderBy + " " + order;
+    await setNewPaginationValues(pagination.CurrentPage, pagination.PageSize, newOrderBy);
   };
 
   const getLabelDisplayedRowsTo = () => {
@@ -74,16 +82,75 @@ const SimpleDataTable = ({
         <thead>
           <tr>
             {data.headers.length > 0 &&
-              data.headers.map((h: any) => {
+              data.headers.map((headCell: any) => {
+                const firstOrderBy = pagination.OrderBy
+                  ? pagination.OrderBy.split(",")[0]
+                  : " ";
+                const orderBy: string = firstOrderBy.split(" ")[0];
+                const order: string = firstOrderBy.split(" ")[1];
+                const active = orderBy === headCell.id;
                 return (
                   <th
-                    style={{ width: h.width ?? "auto" }}
-                    key={createUniqueKey(10)}
+                    style={{ width: headCell.width ?? "auto" }}
+                    key={headCell.id ?? createUniqueKey(10)}
+                    aria-sort={
+                      active
+                        ? ({ asc: "ascending", desc: "descending" } as any)[
+                            order
+                          ]
+                        : undefined
+                    }
                   >
-                    {h.label}
+                    {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                    {headCell.id ? (
+                    <Link
+                      underline="none"
+                      color="neutral"
+                      textColor={active ? "primary.plainColor" : undefined}
+                      component="button"
+                      onClick={async () => {
+                        await handleChangeOrderBy(
+                          headCell.id,
+                          order === "asc" && orderBy === headCell.id
+                            ? "desc"
+                            : "asc"
+                        );
+                      }}
+                      fontWeight="lg"
+                      startDecorator={
+                        headCell.numeric ? (
+                          <ArrowDownwardIcon sx={{ opacity: active ? 1 : 0 }} />
+                        ) : null
+                      }
+                      endDecorator={
+                        !headCell.numeric ? (
+                          <ArrowDownwardIcon sx={{ opacity: active ? 1 : 0 }} />
+                        ) : null
+                      }
+                      sx={{
+                        "& svg": {
+                          transition: "0.2s",
+                          transform:
+                            active && order === "desc"
+                              ? "rotate(0deg)"
+                              : "rotate(180deg)",
+                        },
+                        "&:hover": { "& svg": { opacity: 1 } },
+                      }}
+                    >
+                      {headCell.label}
+                    </Link>) : (<>{headCell.label}</>)}
+
+                    {active ? (
+                      <Box component="span" sx={visuallyHidden}>
+                        {order === "desc"
+                          ? "sorted descending"
+                          : "sorted ascending"}
+                      </Box>
+                    ) : null}
                   </th>
                 );
-            })}
+              })}
           </tr>
         </thead>
 
