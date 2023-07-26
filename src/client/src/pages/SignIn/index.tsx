@@ -85,7 +85,7 @@ const SignIn = () => {
           label="User Name"
           name="userName"
           placeholder="User Name"
-          value={userName}
+          value={userName || ""}
           onChange={(event) => {
             setUserName(event.currentTarget.value);
           }}
@@ -96,7 +96,7 @@ const SignIn = () => {
           label="Password"
           name="password"
           placeholder="Password"
-          value={password}
+          value={password || ""}
           onChange={(event) => {
             setPassword(event.currentTarget.value);
           }}

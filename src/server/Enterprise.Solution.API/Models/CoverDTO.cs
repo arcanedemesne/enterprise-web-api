@@ -24,7 +24,7 @@ namespace Enterprise.Solution.API.Models
         /// <summary>
         /// Related Book of the Cover
         /// </summary>
-        public BookDTO Book { get; set; } = null!;
+        public BookDTO_Response Book { get; set; } = null!;
         /// <summary>
         /// Artists of the Cover
         /// </summary>

@@ -74,7 +74,7 @@ export const saveUserMetadata = (userMetadata: any) => {
   }
 }
 
-const checkSessionTime = 30 * 1000; // check every 30 secs
+const checkSessionTime = 600 * 1000; // check every 30 secs
 const TimeCheckAuth = () => {
   if (!isSignedIn()) {
     window.location.href = signInRoute;

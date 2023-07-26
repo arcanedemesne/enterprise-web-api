@@ -91,7 +91,7 @@ const SignUp = () => {
           label="First Name"
           name="firstName"
           placeholder="Given Name"
-          value={firstName}
+          value={firstName || ""}
           onChange={(event) => {
             setFirstName(event.currentTarget.value);
           }}
@@ -102,7 +102,7 @@ const SignUp = () => {
           label="Last Name"
           name="lastName"
           placeholder="Family Name"
-          value={lastName}
+          value={lastName || ""}
           onChange={(event) => {
             setLastName(event.currentTarget.value);
           }}
@@ -113,7 +113,7 @@ const SignUp = () => {
           label="User Name"
           name="userName"
           placeholder="User Name"
-          value={userName}
+          value={userName || ""}
           onChange={(event) => {
             setUserName(event.currentTarget.value);
           }}
@@ -124,7 +124,7 @@ const SignUp = () => {
           label="Email Address"
           name="emailAddress"
           placeholder="Email Address"
-          value={emailAddress}
+          value={emailAddress || ""}
           onChange={(event) => {
             setEmailAddress(event.currentTarget.value);
           }}
@@ -135,7 +135,7 @@ const SignUp = () => {
           label="Password"
           name="password"
           placeholder="Password"
-          value={password}
+          value={password || ""}
           onChange={(event) => {
             setPassword(event.currentTarget.value);
           }}
@@ -146,7 +146,7 @@ const SignUp = () => {
           label="Confirm Password"
           name="confirmpassword"
           placeholder="Confirm Password"
-          value={confirmPassword}
+          value={confirmPassword || ""}
           onChange={(event) => {
             setConfirmPassword(event.currentTarget.value);
           }}

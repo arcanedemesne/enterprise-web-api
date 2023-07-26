@@ -13,8 +13,11 @@ namespace Enterprise.Solution.API.Profiles
         /// </summary>
         public BookProfile()
         {
-            CreateMap<Book, Models.BookDTO>();
-            CreateMap<Models.BookDTO, Book>();
+            CreateMap<Book, Models.BookDTO_Request>();
+            CreateMap<Models.BookDTO_Request, Book>();
+
+            CreateMap<Book, Models.BookDTO_Response>();
+            CreateMap<Models.BookDTO_Response, Book>();
         }
     }
 

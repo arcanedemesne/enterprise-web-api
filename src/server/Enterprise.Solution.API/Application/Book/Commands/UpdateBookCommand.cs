@@ -8,5 +8,5 @@ namespace Enterprise.Solution.API.Application.Commands
     /// <summary>
     /// Command to Update
     /// </summary>
-    public record UpdateBookCommand(int Id, ModelStateDictionary ModelState, BookDTO BookDTO) : IRequest;
+    public record UpdateBookCommand(int Id, ModelStateDictionary ModelState, BookDTO_Request BookDTO) : IRequest;
 }

@@ -1,47 +1,42 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { GET } from "../../utilities/httpRequest";
 import DataTable from "../../components/DataTable";
+import { setPaginationValues } from "../../utilities/pagination";
 
-let initialized = false;
-const BookTable = () => {
-  const [apiData, setData] = useState([]);
-  const [pagination, setPagination] = useState({});
-  const [selectedRows, setSelectedRows] = useState([]);
+import { domain, baseUri, IBook } from "./";
 
-  const baseUri = "books?includeAuthor=true&includeCoverAndArtists=true";
+const BookTable = ({ apiData, paginationHeaders }: any) => {
+  const navigate = useNavigate();
+  
+  const [apiResponseData, setApiResponseData] = useState<IBook[]>(apiData);
+  const [pagination, setPagination] = useState<any>(paginationHeaders);
+  const [selectedRows, setSelectedRows] = useState<number[]>([]);
+
   const setNewPaginationValues = async (
     pageNumber: number,
     pageSize: number,
     orderBy: string
   ) => {
-    const response: any = await GET({
-      endpoint: `${baseUri}&PageNumber=${pageNumber}&PageSize=${pageSize}&OrderBy=${orderBy}`,
+    setPaginationValues({
+      baseUri,
+      pageNumber,
+      pageSize,
+      orderBy,
+      setPagination,
+      setApiResponseData,
     });
-    const { headers, data } = response;
-    const paginationHeaders = JSON.parse(headers.get("x-pagination"));
-    setPagination(paginationHeaders);
-    setData(data);
   };
 
-  useEffect(() => {
-    async function getData() {
-      const response: any = await GET({
-        endpoint: baseUri,
-      });
-      const { headers, data } = response;
-      const paginationHeaders = JSON.parse(headers.get("x-pagination"));
-      setPagination(paginationHeaders);
-      setData(data);
-    }
+  const handleDeleteItems = async () => {
+    await navigate(`/${domain}/delete?ids=${selectedRows}`);
+  };
 
-    if (!initialized) {
-      getData();
-      initialized = true;
-    }
-  }, []);
+  const handleEditItem = async (id: number) => {
+    await navigate(`/${domain}/${id}`);
+  };
 
-  const rows = apiData.map((x: any) => {
+  const rows = apiResponseData.map((x: any) => {
     return {
       id: x.id,
       values: [
@@ -101,7 +96,11 @@ const BookTable = () => {
       data={tableData}
       pagination={pagination}
       setNewPaginationValues={setNewPaginationValues}
-      canDeleteItems={false}
+      canDeleteItems
+      handleDeleteItems={handleDeleteItems}
+      canEditItems
+      handleEditItem={handleEditItem}
+      canFilterItems
       selectedRows={selectedRows}
       setSelectedRows={setSelectedRows}
       borderAxis="xBetween"

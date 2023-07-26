@@ -7,13 +7,21 @@ export interface IFormInputProps {
   type: string;
   name: string;
   placeholder?: string | null;
-  value?: string | null;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  value: string;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+  hidden?: boolean;
 }
 
 const FormInput = ({
-  label, type, name, placeholder, value, onChange, onKeyUp
+  label,
+  type,
+  name,
+  placeholder,
+  value,
+  onChange,
+  onKeyUp,
+  hidden,
 }: IFormInputProps) => {
   return (
     <>
@@ -24,9 +32,10 @@ const FormInput = ({
           type={type}
           name={name}
           placeholder={placeholder || ""}
-          value={value || ""}
+          value={value}
           onChange={onChange}
           onKeyUp={onKeyUp}
+          sx={{ display: hidden ? "none" : "auto"}}
         />
       </FormControl>
     </>

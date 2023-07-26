@@ -7,7 +7,7 @@ namespace Enterprise.Solution.API.Models
     /// </summary>
     [Serializable]
     [ExcludeFromCodeCoverage]
-    public class BookDTO : BaseDTO
+    public class BookDTO_Request : BaseDTO
     {
         /// <summary>
         /// Title of the Book
@@ -26,16 +26,8 @@ namespace Enterprise.Solution.API.Models
         /// </summary>
         public int AuthorId { get; set; }
         /// <summary>
-        /// Author of the Book
-        /// </summary>
-        public AuthorDTO Author { get; set; } = null!;
-        /// <summary>
         /// CoverId of the Book
         /// </summary>
         public int CoverId { get; set; }
-        /// <summary>
-        /// The Cover of the Book
-        /// </summary>
-        public CoverDTO Cover { get; set; } = null!;
     }
 }

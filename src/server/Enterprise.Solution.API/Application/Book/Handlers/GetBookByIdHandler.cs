@@ -15,7 +15,7 @@ namespace Enterprise.Solution.API.Application.Handlers
     /// <summary>
     /// Handler for Get By Id Query
     /// </summary>
-    public class GetBookByIdHandler : BaseHandler<GetBookByIdHandler>, IRequestHandler<GetBookByIdQuery, BookDTO>
+    public class GetBookByIdHandler : BaseHandler<GetBookByIdHandler>, IRequestHandler<GetBookByIdQuery, BookDTO_Response>
     {
         private readonly IBookService _service;
 
@@ -43,7 +43,7 @@ namespace Enterprise.Solution.API.Application.Handlers
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<BookDTO> Handle(GetBookByIdQuery request, CancellationToken cancellationToken)
+        public async Task<BookDTO_Response> Handle(GetBookByIdQuery request, CancellationToken cancellationToken)
         {
             LogInsideHandler<GetBookByIdQuery>();
 
@@ -52,7 +52,7 @@ namespace Enterprise.Solution.API.Application.Handlers
 
             if (entity == null) LogAndThrowNotFoundException<Book>(request.Id);
 
-            return _mapper.Map<BookDTO>(entity);
+            return _mapper.Map<BookDTO_Response>(entity);
         }
     }
 }

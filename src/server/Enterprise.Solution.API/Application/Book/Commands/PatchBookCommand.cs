@@ -9,5 +9,5 @@ namespace Enterprise.Solution.API.Application.Commands
     /// <summary>
     /// Command to Patch
     /// </summary>
-    public record PatchBookCommand(int Id, ModelStateDictionary ModelState, Func<object, bool> TryValidateModel, JsonPatchDocument<BookDTO> JsonPatchDocument) : IRequest;
+    public record PatchBookCommand(int Id, ModelStateDictionary ModelState, Func<object, bool> TryValidateModel, JsonPatchDocument<BookDTO_Request> JsonPatchDocument) : IRequest;
 }

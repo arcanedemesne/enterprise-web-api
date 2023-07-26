@@ -27,6 +27,6 @@ namespace Enterprise.Solution.API.Models
         /// <summary>
         /// Books written by the Author
         /// </summary>
-        public ICollection<BookDTO>? Books { get; set; }
+        public ICollection<BookDTO_Response>? Books { get; set; }
     }
 }

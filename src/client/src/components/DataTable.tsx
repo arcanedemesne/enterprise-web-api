@@ -1,24 +1,26 @@
-import CircularProgress from "@mui/joy/CircularProgress";
-import Sheet from "@mui/joy/Sheet";
-import Table from "@mui/joy/Table";
-import Typography from "@mui/joy/Typography";
 import Box from "@mui/joy/Box";
-import Link from "@mui/joy/Link";
+import Checkbox from "@mui/joy/Checkbox";
+import CircularProgress from "@mui/joy/CircularProgress";
 import FormControl from "@mui/joy/FormControl";
 import FormLabel from "@mui/joy/FormLabel";
 import IconButton from "@mui/joy/IconButton";
-import Select from "@mui/joy/Select";
+import Link from "@mui/joy/Link";
 import Option from "@mui/joy/Option";
-import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
-import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import Select from "@mui/joy/Select";
+import Sheet from "@mui/joy/Sheet";
+import Table from "@mui/joy/Table";
+import Tooltip from "@mui/joy/Tooltip";
+import Typography from "@mui/joy/Typography";
+
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+
 import { visuallyHidden } from "@mui/utils";
 
 import createUniqueKey from "../utilities/uniqueKey";
-import Checkbox from "@mui/joy/Checkbox";
-import Tooltip from "@mui/joy/Tooltip";
 
 const labelDisplayedRows = ({
   from,
@@ -39,11 +41,15 @@ const SimpleDataTable = ({
   pagination,
   setNewPaginationValues,
   canDeleteItems,
+  handleDeleteItems,
   canEditItems,
+  handleEditItem,
+  canFilterItems,
   selectedRows,
   setSelectedRows,
   ...props
 }: any) => {
+
   const handleChangeCurrentPage = async (currentPage: number) => {
     await setNewPaginationValues(
       currentPage,
@@ -77,11 +83,15 @@ const SimpleDataTable = ({
   };
 
   const handleDeleteSelectedRows = async () => {
-    console.info(`delete selected rows`, selectedRows);
+    await handleDeleteItems();
   };
 
   const handleEditSelectedRow = async (id: number) => {
-    console.info(`edit selected row`, id);
+    await handleEditItem(id)
+  };
+
+  const handleFilterItems = async () => {
+    console.info(`filter items`);
   };
 
   const getLabelDisplayedRowsTo = () => {
@@ -120,7 +130,7 @@ const SimpleDataTable = ({
           </Typography>
         )}
 
-        {numSelected > 0 ? (
+        {numSelected && canDeleteItems > 0 ? (
           <Tooltip title="Delete">
             <IconButton
               size="sm"
@@ -131,13 +141,20 @@ const SimpleDataTable = ({
               <DeleteIcon />
             </IconButton>
           </Tooltip>
-        ) : (
-          <Tooltip title="Filter list">
-            <IconButton size="sm" variant="outlined" color="neutral">
-              <FilterListIcon />
-            </IconButton>
-          </Tooltip>
-        )}
+        ) : canFilterItems ? (
+          <>
+            <Tooltip title="Filter list">
+              <IconButton
+                size="sm"
+                variant="outlined"
+                color="neutral"
+                onClick={async () => await handleFilterItems()}
+              >
+                <FilterListIcon />
+              </IconButton>
+            </Tooltip>
+          </>
+        ) : null}
       </Box>
     );
   };

@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 import Box from "@mui/joy/Box";
 import IconButton from "@mui/joy/IconButton";
 import Input from "@mui/joy/Input";
@@ -15,6 +17,8 @@ import { ColorSchemeToggle } from "../components/ColorSchemeToggle";
 import { signOut } from "../auth/user";
 
 const NavigationBar = () => {
+  const navigate = useNavigate();
+
   return (
     <Layout.Header>
       <Box
@@ -24,7 +28,7 @@ const NavigationBar = () => {
           alignItems: "center",
           gap: 1.5,
         }}
-        onClick={() => window.location.href = "/"}
+        onClick={() => navigate("/")}
       >
         <IconButton
           variant="outlined"
@@ -81,25 +85,28 @@ const NavigationBar = () => {
           menus={[
             {
               label: "Dashboard",
-              active: true,
               href: "/dashboard",
-              "aria-current": "page",
-            },
-            {
-              label: "Subscriptions",
-              href: "/subscriptions",
+              active: window.location.href.toLocaleLowerCase().includes('dashboard'),
             },
             {
               label: "Authors",
               href: "/authors",
+              active: window.location.href.toLocaleLowerCase().includes('authors'),
             },
             {
               label: "Books",
               href: "/books",
+              active: window.location.href.toLocaleLowerCase().includes('books'),
             },
             {
               label: "Artists",
               href: "/artists",
+              active: window.location.href.toLocaleLowerCase().includes('artists'),
+            },
+            {
+              label: "Subscriptions",
+              href: "/subscriptions",
+              active: window.location.href.toLocaleLowerCase().includes('subscriptions'),
             },
           ]}
         />

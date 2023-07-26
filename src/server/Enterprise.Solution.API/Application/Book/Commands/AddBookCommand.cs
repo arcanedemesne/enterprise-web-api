@@ -8,5 +8,5 @@ namespace Enterprise.Solution.API.Application.Commands
     /// <summary>
     /// Command to Add
     /// </summary>
-    public record AddBookCommand(ModelStateDictionary ModelState, BookDTO BookDTO) : IRequest<BookDTO>;
+    public record AddBookCommand(ModelStateDictionary ModelState, BookDTO_Request BookDTO) : IRequest<BookDTO_Request>;
 }

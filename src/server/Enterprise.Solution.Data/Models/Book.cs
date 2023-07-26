@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Enterprise.Solution.Data.Models.Base;
 
 namespace Enterprise.Solution.Data.Models
@@ -13,8 +14,10 @@ namespace Enterprise.Solution.Data.Models
         [ForeignKey(nameof(Author))]
         public int AuthorId { get; set; }
 
+        [JsonIgnore]
         public Author Author { get; set; } = null!;
-
+        
+        [JsonIgnore]
         public Cover Cover { get; set; } = null!;
     }
 }

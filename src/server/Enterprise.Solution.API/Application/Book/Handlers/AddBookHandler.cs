@@ -15,7 +15,7 @@ namespace Enterprise.Solution.API.Application.Handlers
     /// <summary>
     /// Handler for Add Command
     /// </summary>
-    public class AddBookHandler : BaseHandler<AddBookHandler>, IRequestHandler<AddBookCommand, BookDTO>
+    public class AddBookHandler : BaseHandler<AddBookHandler>, IRequestHandler<AddBookCommand, BookDTO_Request>
     {
         private readonly IBookService _service;
 
@@ -42,7 +42,7 @@ namespace Enterprise.Solution.API.Application.Handlers
         /// </summary>
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
-        public async Task<BookDTO> Handle(AddBookCommand request, CancellationToken cancellationToken)
+        public async Task<BookDTO_Request> Handle(AddBookCommand request, CancellationToken cancellationToken)
         {
             LogInsideHandler<AddBookCommand>();
 
@@ -56,11 +56,11 @@ namespace Enterprise.Solution.API.Application.Handlers
             if (createdEntity != null)
             {
                 LogServiceRequestSuccess<Book>(RequestType.Add, createdEntity.Id);
-                return _mapper.Map<BookDTO>(createdEntity);
+                return _mapper.Map<BookDTO_Request>(createdEntity);
             }
 
             LogAndThrowNotAddedException<Book>();
-            return new BookDTO();
+            return new BookDTO_Request();
         }
     }
 }
