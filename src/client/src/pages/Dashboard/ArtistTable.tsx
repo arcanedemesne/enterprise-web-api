@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 
 import { GET } from "../../utilities/httpRequest";
-import SimpleDataTable from "../../components/SimpleDataTable";
+import DataTable from "../../components/DataTable";
 
 let initialized = false;
 const ArtistTable = () => {
   const [apiData, setData] = useState([]);
   const [pagination, setPagination] = useState({});
+  const [selectedRows, setSelectedRows] = useState([]);
 
   const baseUri = "artists?IncludeCoversWithBookAndAuthor=true";
   const setNewPaginationValues = async (
@@ -50,7 +51,7 @@ const ArtistTable = () => {
     headers: [
       {
         id: "id",
-        width: 50,
+        width: 100,
         label: "Id",
         numeric: true,
       },
@@ -73,12 +74,16 @@ const ArtistTable = () => {
   };
 
   return (
-    <SimpleDataTable
+    <DataTable
       title="Artists"
       caption="This table contains Artists"
       data={tableData}
       pagination={pagination}
       setNewPaginationValues={setNewPaginationValues}
+      canDeleteItems={false}
+      canEditItems={false}
+      selectedRows={selectedRows}
+      setSelectedRows={setSelectedRows}
       borderAxis="xBetween"
       hoverRow
     />

@@ -1,64 +1,26 @@
-import * as React from 'react';
-import Box from '@mui/joy/Box';
-import Table from '@mui/joy/Table';
-import Typography from '@mui/joy/Typography';
-import Sheet from '@mui/joy/Sheet';
-import Checkbox from '@mui/joy/Checkbox';
-import FormControl from '@mui/joy/FormControl';
-import FormLabel from '@mui/joy/FormLabel';
-import IconButton from '@mui/joy/IconButton';
-import Link from '@mui/joy/Link';
-import Tooltip from '@mui/joy/Tooltip';
-import Select from '@mui/joy/Select';
-import Option from '@mui/joy/Option';
-import DeleteIcon from '@mui/icons-material/Delete';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import { visuallyHidden } from '@mui/utils';
+import CircularProgress from "@mui/joy/CircularProgress";
+import Sheet from "@mui/joy/Sheet";
+import Table from "@mui/joy/Table";
+import Typography from "@mui/joy/Typography";
+import Box from "@mui/joy/Box";
+import Link from "@mui/joy/Link";
+import FormControl from "@mui/joy/FormControl";
+import FormLabel from "@mui/joy/FormLabel";
+import IconButton from "@mui/joy/IconButton";
+import Select from "@mui/joy/Select";
+import Option from "@mui/joy/Option";
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import DeleteIcon from "@mui/icons-material/Delete";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import { visuallyHidden } from "@mui/utils";
 
-interface Data {
-  calories: number;
-  carbs: number;
-  fat: number;
-  name: string;
-  protein: number;
-}
+import createUniqueKey from "../utilities/uniqueKey";
+import Checkbox from "@mui/joy/Checkbox";
+import Tooltip from "@mui/joy/Tooltip";
 
-function createData(
-  name: string,
-  calories: number,
-  fat: number,
-  carbs: number,
-  protein: number,
-): Data {
-  return {
-    name,
-    calories,
-    fat,
-    carbs,
-    protein,
-  };
-}
-
-const rows = [
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Donut', 452, 25.0, 51, 4.9),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-  createData('Honeycomb', 408, 3.2, 87, 6.5),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Jelly Bean', 375, 0.0, 94, 0.0),
-  createData('KitKat', 518, 26.0, 65, 7.0),
-  createData('Lollipop', 392, 0.2, 98, 0.0),
-  createData('Marshmallow', 318, 0, 81, 2.0),
-  createData('Nougat', 360, 19.0, 9, 37.0),
-  createData('Oreo', 437, 18.0, 63, 4.0),
-];
-
-function labelDisplayedRows({
+const labelDisplayedRows = ({
   from,
   to,
   count,
@@ -66,403 +28,308 @@ function labelDisplayedRows({
   from: number;
   to: number;
   count: number;
-}) {
+}) => {
   return `${from}–${to} of ${count !== -1 ? count : `more than ${to}`}`;
-}
+};
 
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
+const SimpleDataTable = ({
+  title,
+  caption,
+  data,
+  pagination,
+  setNewPaginationValues,
+  canDeleteItems,
+  canEditItems,
+  selectedRows,
+  setSelectedRows,
+  ...props
+}: any) => {
+  const handleChangeCurrentPage = async (currentPage: number) => {
+    await setNewPaginationValues(
+      currentPage,
+      pagination.PageSize,
+      pagination.OrderBy
+    );
+  };
 
-type Order = 'asc' | 'desc';
+  const handleChangePageSize = async (pageSize: number | null) => {
+    await setNewPaginationValues(1, pageSize, pagination.OrderBy);
+  };
 
-function getComparator<Key extends keyof any>(
-  order: Order,
-  orderBy: Key,
-): (
-  a: { [key in Key]: number | string },
-  b: { [key in Key]: number | string },
-) => number {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
+  const handleChangeOrderBy = async (orderBy: string | null, order: string) => {
+    const newOrderBy = orderBy + " " + order;
+    await setNewPaginationValues(
+      pagination.CurrentPage,
+      pagination.PageSize,
+      newOrderBy
+    );
+  };
 
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
-function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) {
-  const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) {
-      return order;
+  const handleRowSelected = (id: number) => {
+    const newSelectedRows = [...selectedRows];
+    if (!selectedRows.includes(id)) {
+      newSelectedRows.push(id);
+    } else {
+      const index = selectedRows.indexOf(id);
+      newSelectedRows.splice(index, 1);
     }
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
-
-interface HeadCell {
-  disablePadding: boolean;
-  id: keyof Data;
-  label: string;
-  numeric: boolean;
-}
-
-const headCells: readonly HeadCell[] = [
-  {
-    id: 'name',
-    numeric: false,
-    disablePadding: true,
-    label: 'Dessert (100g serving)',
-  },
-  {
-    id: 'calories',
-    numeric: true,
-    disablePadding: false,
-    label: 'Calories',
-  },
-  {
-    id: 'fat',
-    numeric: true,
-    disablePadding: false,
-    label: 'Fat (g)',
-  },
-  {
-    id: 'carbs',
-    numeric: true,
-    disablePadding: false,
-    label: 'Carbs (g)',
-  },
-  {
-    id: 'protein',
-    numeric: true,
-    disablePadding: false,
-    label: 'Protein (g)',
-  },
-];
-
-interface EnhancedTableProps {
-  numSelected: number;
-  onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
-  onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  order: Order;
-  orderBy: string;
-  rowCount: number;
-}
-
-function EnhancedTableHead(props: EnhancedTableProps) {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
-    props;
-  const createSortHandler =
-    (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
-      onRequestSort(event, property);
-    };
-
-  return (
-    <thead>
-      <tr>
-        <th>
-          <Checkbox
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            slotProps={{
-              input: {
-                'aria-label': 'select all desserts',
-              },
-            }}
-            sx={{ verticalAlign: 'sub' }}
-          />
-        </th>
-        {headCells.map((headCell) => {
-          const active = orderBy === headCell.id;
-          return (
-            <th
-              key={headCell.id}
-              aria-sort={
-                active
-                  ? ({ asc: 'ascending', desc: 'descending' } as const)[order]
-                  : undefined
-              }
-            >
-              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-              <Link
-                underline="none"
-                color="neutral"
-                textColor={active ? 'primary.plainColor' : undefined}
-                component="button"
-                onClick={createSortHandler(headCell.id)}
-                fontWeight="lg"
-                startDecorator={
-                  headCell.numeric ? (
-                    <ArrowDownwardIcon sx={{ opacity: active ? 1 : 0 }} />
-                  ) : null
-                }
-                endDecorator={
-                  !headCell.numeric ? (
-                    <ArrowDownwardIcon sx={{ opacity: active ? 1 : 0 }} />
-                  ) : null
-                }
-                sx={{
-                  '& svg': {
-                    transition: '0.2s',
-                    transform:
-                      active && order === 'desc' ? 'rotate(0deg)' : 'rotate(180deg)',
-                  },
-                  '&:hover': { '& svg': { opacity: 1 } },
-                }}
-              >
-                {headCell.label}
-                {active ? (
-                  <Box component="span" sx={visuallyHidden}>
-                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                  </Box>
-                ) : null}
-              </Link>
-            </th>
-          );
-        })}
-      </tr>
-    </thead>
-  );
-}
-
-interface EnhancedTableToolbarProps {
-  numSelected: number;
-}
-
-function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected } = props;
-
-  return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        py: 1,
-        pl: { sm: 2 },
-        pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 && {
-          bgcolor: 'background.level1',
-        }),
-        borderTopLeftRadius: 'var(--unstable_actionRadius)',
-        borderTopRightRadius: 'var(--unstable_actionRadius)',
-      }}
-    >
-      {numSelected > 0 ? (
-        <Typography sx={{ flex: '1 1 100%' }} component="div">
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <Typography
-          level="h6"
-          sx={{ flex: '1 1 100%' }}
-          id="tableTitle"
-          component="div"
-        >
-          Nutrition
-        </Typography>
-      )}
-
-      {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton size="sm" color="danger" variant="solid">
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton size="sm" variant="outlined" color="neutral">
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-    </Box>
-  );
-}
-
-export default function DataTable() {
-  const [order, setOrder] = React.useState<Order>('asc');
-  const [orderBy, setOrderBy] = React.useState<keyof Data>('calories');
-  const [selected, setSelected] = React.useState<readonly string[]>([]);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof Data,
-  ) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
+    setSelectedRows(newSelectedRows);
   };
 
-  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      const newSelected = rows.map((n) => n.name);
-      setSelected(newSelected);
-      return;
-    }
-    setSelected([]);
+  const handleDeleteSelectedRows = async () => {
+    console.info(`delete selected rows`, selectedRows);
   };
 
-  const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected: readonly string[] = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      );
-    }
-
-    setSelected(newSelected);
-  };
-
-  const handleChangePage = (newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: any, newValue: number | null) => {
-    setRowsPerPage(parseInt(newValue!.toString(), 10));
-    setPage(0);
+  const handleEditSelectedRow = async (id: number) => {
+    console.info(`edit selected row`, id);
   };
 
   const getLabelDisplayedRowsTo = () => {
-    if (rows.length === -1) {
-      return (page + 1) * rowsPerPage;
-    }
-    return rowsPerPage === -1
-      ? rows.length
-      : Math.min(rows.length, (page + 1) * rowsPerPage);
+    const to = pagination.CurrentPage * pagination.PageSize;
+    return to > pagination.TotalItemCount ? pagination.TotalItemCount : to;
   };
 
-  const isSelected = (name: string) => selected.indexOf(name) !== -1;
+  const EnhancedTableToolbar = ({ numSelected }: { numSelected: number }) => {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          py: 1,
+          pl: { sm: 2 },
+          pr: { xs: 1, sm: 1 },
+          ...(numSelected > 0 && {
+            bgcolor: "background.level1",
+          }),
+          borderTopLeftRadius: "var(--unstable_actionRadius)",
+          borderTopRightRadius: "var(--unstable_actionRadius)",
+        }}
+      >
+        {numSelected > 0 ? (
+          <Typography sx={{ flex: "1 1 100%" }} component="div">
+            {numSelected} selected
+          </Typography>
+        ) : (
+          <Typography
+            level="h6"
+            sx={{ flex: "1 1 100%" }}
+            id="tableTitle"
+            component="div"
+          >
+            {title}
+          </Typography>
+        )}
 
-  // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+        {numSelected > 0 ? (
+          <Tooltip title="Delete">
+            <IconButton
+              size="sm"
+              color="danger"
+              variant="solid"
+              onClick={async () => await handleDeleteSelectedRows()}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        ) : (
+          <Tooltip title="Filter list">
+            <IconButton size="sm" variant="outlined" color="neutral">
+              <FilterListIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+      </Box>
+    );
+  };
 
   return (
     <Sheet
       variant="outlined"
-      sx={{ width: '100%', boxShadow: 'sm', borderRadius: 'sm' }}
+      sx={{ width: "100%", boxShadow: "sm", borderRadius: "sm", my: 3 }}
     >
-      <EnhancedTableToolbar numSelected={selected.length} />
-      <Table
-        aria-labelledby="tableTitle"
-        hoverRow
-        sx={{
-          '--TableCell-headBackground': 'transparent',
-          '--TableCell-selectedBackground': (theme) =>
-            theme.vars.palette.info.softBg,
-          '& thead th:nth-of-type(1)': {
-            width: '40px',
-          },
-          '& thead th:nth-of-type(2)': {
-            width: '30%',
-          },
-          '& tr > *:nth-of-type(n+3)': { textAlign: 'right' },
-        }}
-      >
-        <EnhancedTableHead
-          numSelected={selected.length}
-          order={order}
-          orderBy={orderBy}
-          onSelectAllClick={handleSelectAllClick}
-          onRequestSort={handleRequestSort}
-          rowCount={rows.length}
-        />
-        <tbody>
-          {stableSort(rows, getComparator(order, orderBy))
-            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            .map((row, index) => {
-              const isItemSelected = isSelected(row.name);
-              const labelId = `enhanced-table-checkbox-${index}`;
+      <EnhancedTableToolbar numSelected={selectedRows.length} />
+      <Table aria-label="basic table" {...props}>
+        <caption>{caption}</caption>
+        <thead>
+          <tr>
+            {canDeleteItems && <th style={{ width: 50 }}>&nbsp;</th>}
+            {data.headers.length > 0 &&
+              data.headers.map((headCell: any) => {
+                const firstOrderBy = pagination.OrderBy
+                  ? pagination.OrderBy.split(",")[0]
+                  : " ";
+                const orderBy: string = firstOrderBy.split(" ")[0];
+                const order: string = firstOrderBy.split(" ")[1];
+                const active = orderBy === headCell.id;
+                return (
+                  <th
+                    style={{ width: headCell.width ?? "auto" }}
+                    key={headCell.id ?? createUniqueKey(10)}
+                    aria-sort={
+                      active
+                        ? ({ asc: "ascending", desc: "descending" } as any)[
+                            order
+                          ]
+                        : undefined
+                    }
+                  >
+                    {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                    {headCell.id ? (
+                      <Link
+                        underline="none"
+                        color="neutral"
+                        textColor={active ? "primary.plainColor" : undefined}
+                        component="button"
+                        onClick={async () => {
+                          await handleChangeOrderBy(
+                            headCell.id,
+                            order === "asc" && orderBy === headCell.id
+                              ? "desc"
+                              : "asc"
+                          );
+                        }}
+                        fontWeight="lg"
+                        startDecorator={
+                          headCell.numeric ? (
+                            <ArrowDownwardIcon
+                              sx={{ opacity: active ? 1 : 0 }}
+                            />
+                          ) : null
+                        }
+                        endDecorator={
+                          !headCell.numeric ? (
+                            <ArrowDownwardIcon
+                              sx={{ opacity: active ? 1 : 0 }}
+                            />
+                          ) : null
+                        }
+                        sx={{
+                          "& svg": {
+                            transition: "0.2s",
+                            transform:
+                              active && order === "desc"
+                                ? "rotate(0deg)"
+                                : "rotate(180deg)",
+                          },
+                          "&:hover": { "& svg": { opacity: 1 } },
+                        }}
+                      >
+                        {headCell.label}
+                      </Link>
+                    ) : (
+                      <>{headCell.label}</>
+                    )}
 
-              return (
-                <tr
-                  onClick={(event) => handleClick(event, row.name)}
-                  role="checkbox"
-                  aria-checked={isItemSelected}
-                  tabIndex={-1}
-                  key={row.name}
-                  // selected={isItemSelected}
-                  style={
-                    isItemSelected
-                      ? ({
-                          '--TableCell-dataBackground':
-                            'var(--TableCell-selectedBackground)',
-                          '--TableCell-headBackground':
-                            'var(--TableCell-selectedBackground)',
-                        } as React.CSSProperties)
-                      : {}
-                  }
-                >
-                  <th scope="row">
-                    <Checkbox
-                      checked={isItemSelected}
-                      slotProps={{
-                        input: {
-                          'aria-labelledby': labelId,
-                        },
-                      }}
-                      sx={{ verticalAlign: 'top' }}
-                    />
+                    {active ? (
+                      <Box component="span" sx={visuallyHidden}>
+                        {order === "desc"
+                          ? "sorted descending"
+                          : "sorted ascending"}
+                      </Box>
+                    ) : null}
                   </th>
-                  <th id={labelId} scope="row">
-                    {row.name}
-                  </th>
-                  <td>{row.calories}</td>
-                  <td>{row.fat}</td>
-                  <td>{row.carbs}</td>
-                  <td>{row.protein}</td>
-                </tr>
-              );
-            })}
-          {emptyRows > 0 && (
-            <tr
-              style={
-                {
-                  height: `calc(${emptyRows} * 40px)`,
-                  '--TableRow-hoverBackground': 'transparent',
-                } as React.CSSProperties
-              }
-            >
-              <td colSpan={6} />
+                );
+              })}
+          </tr>
+        </thead>
+
+        {data.rows.length === 0 ? (
+          <tbody>
+            <tr>
+              <td
+                colSpan={data.headers.length}
+                align="center"
+                style={{ padding: 10 }}
+              >
+                <CircularProgress />
+              </td>
             </tr>
-          )}
-        </tbody>
+          </tbody>
+        ) : (
+          <tbody>
+            {data.rows.length > 0 &&
+              data.rows.map((row: any, rowIndex: number) => {
+                const isItemSelected = selectedRows.indexOf(row.id) !== -1;
+                const labelId = `enhanced-table-checkbox-${rowIndex}`;
+
+                return (
+                  <>
+                    <tr key={createUniqueKey(10)}>
+                      {canDeleteItems && (
+                        <th scope="row" key={createUniqueKey(10)}>
+                          <Checkbox
+                            checked={isItemSelected}
+                            slotProps={{
+                              input: {
+                                "aria-labelledby": labelId,
+                              },
+                            }}
+                            sx={{ verticalAlign: "top" }}
+                            onClick={() => handleRowSelected(row.id)}
+                          />
+                        </th>
+                      )}
+                      {row.values.map((value: any, columnIndex: number) => (
+                        <td
+                          key={createUniqueKey(10)}
+                          onClick={async () => {
+                            if (columnIndex === 0 && canEditItems)
+                              handleEditSelectedRow(row.id);
+                          }}
+                        >
+                          {columnIndex === 0 && canEditItems ? (
+                            <>
+                              <u
+                                style={{
+                                  cursor:
+                                    columnIndex === 0 && canEditItems
+                                      ? "pointer"
+                                      : "auto",
+                                  color:
+                                    columnIndex === 0 && canEditItems
+                                      ? "#64b5f6"
+                                      : "auto",
+                                }}
+                              >
+                                edit
+                              </u>{" "}
+                              |{" "}
+                            </>
+                          ) : (
+                            ""
+                          )}
+                          {value}{" "}
+                        </td>
+                      ))}
+                    </tr>
+                  </>
+                );
+              })}
+          </tbody>
+        )}
         <tfoot>
           <tr>
-            <td colSpan={6}>
+            <td
+              colSpan={
+                canDeleteItems ? data.headers.length + 1 : data.headers.length
+              }
+            >
               <Box
                 sx={{
-                  display: 'flex',
-                  alignItems: 'center',
+                  display: "flex",
+                  alignItems: "center",
                   gap: 2,
-                  justifyContent: 'flex-end',
+                  justifyContent: "flex-end",
                 }}
               >
                 <FormControl orientation="horizontal" size="sm">
-                  <FormLabel>Rows per page:</FormLabel>
-                  <Select onChange={handleChangeRowsPerPage} value={rowsPerPage}>
+                  <FormLabel>rows per page:</FormLabel>
+                  <Select
+                    onChange={async (event: any, pageSize: number | null) => {
+                      await handleChangePageSize(pageSize);
+                    }}
+                    value={pagination.PageSize}
+                  >
                     <Option value={5}>5</Option>
                     <Option value={10}>10</Option>
                     <Option value={25}>25</Option>
@@ -470,19 +337,25 @@ export default function DataTable() {
                 </FormControl>
                 <Typography textAlign="center" sx={{ minWidth: 80 }}>
                   {labelDisplayedRows({
-                    from: rows.length === 0 ? 0 : page * rowsPerPage + 1,
+                    from:
+                      data.rows.length === 0
+                        ? 0
+                        : (pagination.CurrentPage - 1) * pagination.PageSize +
+                          1,
                     to: getLabelDisplayedRowsTo(),
-                    count: rows.length === -1 ? -1 : rows.length,
+                    count: pagination.TotalItemCount,
                   })}
                 </Typography>
-                <Box sx={{ display: 'flex', gap: 1 }}>
+                <Box sx={{ display: "flex", gap: 1 }}>
                   <IconButton
                     size="sm"
                     color="neutral"
                     variant="outlined"
-                    disabled={page === 0}
-                    onClick={() => handleChangePage(page - 1)}
-                    sx={{ bgcolor: 'background.surface' }}
+                    disabled={pagination.CurrentPage === 1}
+                    onClick={() =>
+                      handleChangeCurrentPage(pagination.CurrentPage - 1)
+                    }
+                    sx={{ bgcolor: "background.surface" }}
                   >
                     <KeyboardArrowLeftIcon />
                   </IconButton>
@@ -491,12 +364,13 @@ export default function DataTable() {
                     color="neutral"
                     variant="outlined"
                     disabled={
-                      rows.length !== -1
-                        ? page >= Math.ceil(rows.length / rowsPerPage) - 1
-                        : false
+                      pagination.CurrentPage * pagination.PageSize >=
+                      pagination.TotalItemCount
                     }
-                    onClick={() => handleChangePage(page + 1)}
-                    sx={{ bgcolor: 'background.surface' }}
+                    onClick={() =>
+                      handleChangeCurrentPage(pagination.CurrentPage + 1)
+                    }
+                    sx={{ bgcolor: "background.surface" }}
                   >
                     <KeyboardArrowRightIcon />
                   </IconButton>
@@ -508,4 +382,6 @@ export default function DataTable() {
       </Table>
     </Sheet>
   );
-}
+};
+
+export default SimpleDataTable;
