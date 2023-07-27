@@ -1,8 +1,14 @@
 import { Form } from "react-router-dom";
+
 import FormInput from "../../components/FormInput";
+import AsynchronousSearch, {
+  IOption,
+} from "../../components/AsynchronousSearch";
+import { GET } from "../../utilities/httpRequest";
 import errorMessages from "../../utilities/errorMessages";
 import regex from "../../utilities/regex";
 import { IBook } from ".";
+import { useState } from "react";
 
 interface FormProps {
   formValues: any;
@@ -43,6 +49,26 @@ const BookForm = ({
   buttons,
   errors = {},
 }: FormProps) => {
+  const defalutSearchValue = { label: formValues.author.fullName, id: formValues.authorId } as IOption;
+  const [ searchOptions, setSearchOptions ] = useState<IOption[]>([defalutSearchValue as IOption]);
+  const [ searchValue, setSearchValue ] = useState<IOption | undefined>(defalutSearchValue);
+  const [ searchInputValue, setSearchInputValue ] = useState<string | undefined>(defalutSearchValue.label);
+
+  const handleSearchAuthors = async (event: any, searchQuery: string) => {
+    setSearchInputValue(searchQuery);
+    const response = await await GET({
+      endpoint: `authors?searchQuery=${searchQuery}`,
+    });
+    setSearchOptions(response.data.map((x: any) => {
+      return { label: x.fullName, id: x.id };
+    }));
+  };
+
+  const handleClickOption = (event: any, option: IOption) => {
+    setFormValues({ ...formValues, author: option.label, authorId: option.id });
+    setSearchValue(option);
+  };
+
   return (
     <Form method="post" id="book-form">
       {Object.keys(errors)?.length > 0 &&
@@ -107,6 +133,14 @@ const BookForm = ({
             })
           }
           hasError={errors?.publishDate}
+        />
+        <AsynchronousSearch
+          label="Author"
+          options={searchOptions}
+          value={searchValue}
+          handleChange={handleClickOption}
+          inputValue={searchInputValue}
+          handleInputChange={handleSearchAuthors}
         />
       </div>
       <p>{buttons}</p>

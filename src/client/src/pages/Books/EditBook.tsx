@@ -17,7 +17,7 @@ const deleteItem = async (id: number) => {
 };
 
 export const loader = async ({ params }: any) => {
-  return await GET({ endpoint: `${domain}/${params.id}` });
+  return await GET({ endpoint: `${domain}/${params.id}?includeAuthor=true&includeCoverAndArtists=true` });
 };
 
 export const action = async ({ request, params }: any) => {
@@ -31,6 +31,8 @@ export const action = async ({ request, params }: any) => {
 const EditBook = () => {
   const { data: book }: any = useLoaderData() as { data: IBook };
   const [formValues, setFormValues] = useState<any>({
+    author: !!book.author ? book.author : null,
+    authorId: !!book.authorId ? book.authorId : 0,
     ...book,
     basePrice: !!book.basePrice ? book.basePrice : "0.00",
     publishDate:

@@ -14,10 +14,8 @@ namespace Enterprise.Solution.Data.Models
         [ForeignKey(nameof(Author))]
         public int AuthorId { get; set; }
 
-        [JsonIgnore]
         public Author Author { get; set; } = null!;
         
-        [JsonIgnore]
         public Cover Cover { get; set; } = null!;
     }
 }

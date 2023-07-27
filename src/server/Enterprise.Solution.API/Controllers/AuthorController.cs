@@ -58,16 +58,17 @@ namespace Enterprise.Solution.API.Controllers
         /// Get an Author by Id
         /// </summary>
         /// <param name="id">Non-null id</param>
+        /// <param name="queryParams">IncludeBooks || IncludBooksWithCovers || IncludeBooksWithCoversAndArtists</param>
         /// <returns code="200">Found Author</returns>
         [HttpGet("{id}", Name = $"Get{nameof(Author)}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetByIdAsync(int id)
+        public async Task<IActionResult> GetByIdAsync(int id, [FromQuery] AuthorQueryParams queryParams)
         {
             try
             {
-                var dto = await base._mediator!.Send(new GetAuthorByIdQuery(id));
+                var dto = await base._mediator!.Send(new GetAuthorByIdQuery(id, queryParams));
                 return Ok(dto);
             }
             catch (NotFoundException ex)

@@ -89,7 +89,7 @@ namespace Enterprise.Solution.Repositories
                     .FirstOrDefaultAsync(a => a.Id.Equals(id));
             }
 
-            return await _dbContext.Books.FirstOrDefaultAsync(a => a.Id.Equals(id));
+            return await collection.FirstOrDefaultAsync(a => a.Id.Equals(id));
         }
     }
 }

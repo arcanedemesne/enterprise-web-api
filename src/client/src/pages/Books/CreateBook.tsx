@@ -25,6 +25,8 @@ const CreateBook = () => {
   const [formValues, setFormValues] = useState<any>({
     basePrice: "0.00",
     publishDate: new Date().toLocaleDateString(),
+    author: "",
+    authorId: 0,
   });
   const [errors, setErrors] = useState({});
 

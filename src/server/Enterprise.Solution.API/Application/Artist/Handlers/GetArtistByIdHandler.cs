@@ -48,7 +48,10 @@ namespace Enterprise.Solution.API.Application.Handlers
             LogInsideHandler<GetArtistByIdQuery>();
 
             LogTryServiceRequest<Artist>(RequestType.GetById, request.Id);
-            var entity = await _service.GetByIdAsync(request.Id);
+            var entity = await _service.GetByIdAsync(request.Id,
+                request.QueryParams.IncludeCovers ?? false,
+                request.QueryParams.IncludeCoversWithBook ?? false,
+                request.QueryParams.IncludeCoversWithBookAndAuthor ?? false);
 
             if (entity == null) LogAndThrowNotFoundException<Artist>(request.Id);
 

@@ -72,29 +72,31 @@ namespace Enterprise.Solution.Repositories
             bool includeCoversWithBook,
             bool includeCoversWithBookAndAuthor)
         {
+            var collection = _dbContext.Artists as IQueryable<Artist>;
+
             if (includeCovers)
             {
-                return await _dbContext.Artists
+                return await collection
                     .Include(a => a.Covers)
                     .FirstOrDefaultAsync(a => a.Id.Equals(id));
             }
             else if (includeCoversWithBook)
             {
-                return await _dbContext.Artists
+                return await collection
                     .Include(a => a.Covers)
                     .ThenInclude(c => c.Book)
                     .FirstOrDefaultAsync(a => a.Id.Equals(id));
             }
             else if (includeCoversWithBookAndAuthor)
             {
-                return await _dbContext.Artists
+                return await collection
                     .Include(a => a.Covers)
                     .ThenInclude(c => c.Book)
                     .ThenInclude(b => b.Author)
                     .FirstOrDefaultAsync(a => a.Id.Equals(id));
             }
 
-            return await _dbContext.Artists.FirstOrDefaultAsync(a => a.Id.Equals(id));
+            return await collection.FirstOrDefaultAsync(a => a.Id.Equals(id));
         }
     }
 }

@@ -47,10 +47,14 @@ namespace Enterprise.Solution.API.Application.Handlers
         {
             LogInsideHandler<GetBookByIdQuery>();
 
-            LogTryServiceRequest<Book>(RequestType.GetById, request.Id);
-            var entity = await _service.GetByIdAsync(request.Id);
+            LogTryServiceRequest<Book>(RequestType.GetById, request.id);
+            var entity = await _service.GetByIdAsync(
+                request.id,
+                request.QueryParams.IncludeAuthor ?? false,
+                request.QueryParams.IncludeCover ?? false,
+                request.QueryParams.IncludeCoverAndArtists ?? false);
 
-            if (entity == null) LogAndThrowNotFoundException<Book>(request.Id);
+            if (entity == null) LogAndThrowNotFoundException<Book>(request.id);
 
             return _mapper.Map<BookDTO_Response>(entity);
         }
