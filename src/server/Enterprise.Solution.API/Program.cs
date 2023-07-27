@@ -159,6 +159,9 @@ services.AddScoped<IAuthorService, AuthorService>();
 services.AddScoped(typeof(IBookRepository), typeof(BookRepository));
 services.AddScoped<IBookService, BookService>();
 
+services.AddScoped(typeof(ICoverRepository), typeof(CoverRepository));
+services.AddScoped<ICoverService, CoverService>();
+
 // Artist DI
 services.AddScoped(typeof(IArtistRepository), typeof(ArtistRepository));
 services.AddScoped<IArtistService, ArtistService>();

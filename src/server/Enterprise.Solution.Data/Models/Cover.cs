@@ -8,14 +8,13 @@ namespace Enterprise.Solution.Data.Models
     {
         public string DesignIdeas { get; set; }
         public bool DigitalOnly { get; set; }
+        public string ImageUri { get; set; }
 
         [ForeignKey(nameof(Book))]
         public int BookId { get; set; }
         public Book Book { get; set; } = null!;
 
-        [JsonIgnore]
         public ICollection<Artist> Artists { get; set; }
-        [JsonIgnore]
         public ICollection<CoverAssignment> CoverAssignments { get; set; } = new HashSet<CoverAssignment>();
     }
 }

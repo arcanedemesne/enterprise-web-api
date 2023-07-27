@@ -23,10 +23,11 @@ export const action = async ({ request }: any) => {
 
 const CreateBook = () => {
   const [formValues, setFormValues] = useState<any>({
+    author: { fullName: "" },
+    authorId: 0,
+    coverId: 0,
     basePrice: "0.00",
     publishDate: new Date().toLocaleDateString(),
-    author: "",
-    authorId: 0,
   });
   const [errors, setErrors] = useState({});
 

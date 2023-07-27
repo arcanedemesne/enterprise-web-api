@@ -45,7 +45,7 @@ const BookTable = ({ apiData, paginationHeaders }: any) => {
         x.author.fullName,
         x.basePrice,
         x.coverId ? "true" : "false",
-        x.cover?.artists.length ?? "None",
+        x.cover?.artists.length || 0,
         new Date(x.publishDate).toDateString(),
       ],
     };
