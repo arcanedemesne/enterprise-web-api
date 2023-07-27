@@ -55,7 +55,7 @@ namespace Enterprise.Solution.API.Application.Handlers
             var entity = await _service.GetByIdAsync(request.Id);
             if (entity == null) LogAndThrowNotFoundException<EmailSubscription>(request.Id);
 
-            var patchedEntity = _mapper.Map<EmailSubscriptionDTO>(entity);
+            var patchedEntity = _mapper.Map<EmailSubscriptionDTO_Request>(entity);
 
             LogTryServiceRequest<EmailSubscription>(RequestType.Patch, request.Id);
             request.JsonPatchDocument.ApplyTo(patchedEntity, request.ModelState);

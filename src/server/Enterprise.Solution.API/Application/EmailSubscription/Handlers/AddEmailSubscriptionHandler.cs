@@ -15,7 +15,7 @@ namespace Enterprise.Solution.API.Application.Handlers
     /// <summary>
     /// Handler for Add Command
     /// </summary>
-    public class AddEmailSubscriptionHandler : BaseHandler<AddEmailSubscriptionHandler>, IRequestHandler<AddEmailSubscriptionCommand, EmailSubscriptionDTO>
+    public class AddEmailSubscriptionHandler : BaseHandler<AddEmailSubscriptionHandler>, IRequestHandler<AddEmailSubscriptionCommand, EmailSubscriptionDTO_Request>
     {
         private readonly IEmailSubscriptionService _service;
 
@@ -42,7 +42,7 @@ namespace Enterprise.Solution.API.Application.Handlers
         /// </summary>
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
-        public async Task<EmailSubscriptionDTO> Handle(AddEmailSubscriptionCommand request, CancellationToken cancellationToken)
+        public async Task<EmailSubscriptionDTO_Request> Handle(AddEmailSubscriptionCommand request, CancellationToken cancellationToken)
         {
             LogInsideHandler<AddEmailSubscriptionCommand>();
 
@@ -56,11 +56,11 @@ namespace Enterprise.Solution.API.Application.Handlers
             if (createdEntity != null)
             {
                 LogServiceRequestSuccess<EmailSubscription>(RequestType.Add, createdEntity.Id);
-                return _mapper.Map<EmailSubscriptionDTO>(createdEntity);
+                return _mapper.Map<EmailSubscriptionDTO_Request>(createdEntity);
             }
 
             LogAndThrowNotAddedException<EmailSubscription>();
-            return new EmailSubscriptionDTO();
+            return new EmailSubscriptionDTO_Request();
         }
     }
 }

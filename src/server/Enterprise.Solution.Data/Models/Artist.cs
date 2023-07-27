@@ -1,4 +1,5 @@
 ﻿using Enterprise.Solution.Data.Models.Base;
+using System.Text.Json.Serialization;
 
 namespace Enterprise.Solution.Data.Models
 {
@@ -7,8 +8,9 @@ namespace Enterprise.Solution.Data.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string FullName => $"{FirstName} {LastName}";
-
+        [JsonIgnore]
         public ICollection<Cover> Covers { get; set; }
+        [JsonIgnore]
         public ICollection<CoverAssignment> CoversAssignments { get; set; } = new HashSet<CoverAssignment>();
     }
 }

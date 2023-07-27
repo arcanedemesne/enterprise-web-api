@@ -24,6 +24,9 @@ import ListAuthors, {
   loader as listAuthorsLoader,
   action as listAuthorsAction,
 } from "./pages/Authors/ListAuthors";
+import CreateAuthor, {
+  action as createAuthorAction,
+} from "./pages/Authors/CreateAuthor";
 import EditAuthor, {
   loader as editAuthorLoader,
   action as editAuthorAction,
@@ -33,6 +36,9 @@ import ListBooks, {
   loader as listBooksLoader,
   action as listBooksAction,
  } from "./pages/Books/ListBooks";
+ import CreateBook, {
+   action as createBookAction,
+ } from "./pages/Books/CreateBook";
 import EditBook, {
   loader as editBookLoader,
   action as editBookAction, 
@@ -42,6 +48,9 @@ import ListArtists, {
   loader as listArtistsLoader,
   action as listArtistsAction,
  } from "./pages/Artists/ListArtists";
+ import CreateArtist, {
+   action as createArtistAction,
+ } from "./pages/Artists/CreateArtist";
 import EditArtist, {
   loader as editArtistLoader,
   action as editArtistAction, 
@@ -93,6 +102,11 @@ const router = createBrowserRouter([
         action: listAuthorsAction,
       },
       {
+        path: "authors/create",
+        element: <RequireAuth redirectTo={signInRoute}><CreateAuthor /></RequireAuth>,
+        action: createAuthorAction,
+      },
+      {
         path: "authors/:id",
         element: <RequireAuth redirectTo={signInRoute}><EditAuthor /></RequireAuth>,
         loader: editAuthorLoader,
@@ -105,6 +119,11 @@ const router = createBrowserRouter([
         action: listBooksAction,
       },
       {
+        path: "books/create",
+        element: <RequireAuth redirectTo={signInRoute}><CreateBook /></RequireAuth>,
+        action: createBookAction,
+      },
+      {
         path: "books/:id",
         element: <RequireAuth redirectTo={signInRoute}><EditBook /></RequireAuth>,
         loader: editBookLoader,
@@ -115,6 +134,11 @@ const router = createBrowserRouter([
         element: <RequireAuth redirectTo={signInRoute}><ListArtists /></RequireAuth>,
         loader: listArtistsLoader,
         action: listArtistsAction,
+      },
+      {
+        path: "artists/create",
+        element: <RequireAuth redirectTo={signInRoute}><CreateArtist /></RequireAuth>,
+        action: createArtistAction,
       },
       {
         path: "artists/:id",

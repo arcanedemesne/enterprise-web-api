@@ -55,7 +55,7 @@ namespace Enterprise.Solution.API.Application.Handlers
             var entity = await _service.GetByIdAsync(request.Id);
             if (entity == null) LogAndThrowNotFoundException<Author>(request.Id);
 
-            var patchedEntity = _mapper.Map<AuthorDTO>(entity);
+            var patchedEntity = _mapper.Map<AuthorDTO_Request>(entity);
 
             LogTryServiceRequest<Author>(RequestType.Patch, request.Id);
             request.JsonPatchDocument.ApplyTo(patchedEntity, request.ModelState);

@@ -15,7 +15,7 @@ namespace Enterprise.Solution.API.Application.Handlers
     /// <summary>
     /// Handler for Add Command
     /// </summary>
-    public class AddAuthorHandler : BaseHandler<AddAuthorHandler>, IRequestHandler<AddAuthorCommand, AuthorDTO>
+    public class AddAuthorHandler : BaseHandler<AddAuthorHandler>, IRequestHandler<AddAuthorCommand, AuthorDTO_Request>
     {
         private readonly IAuthorService _service;
 
@@ -43,7 +43,7 @@ namespace Enterprise.Solution.API.Application.Handlers
         /// </summary>
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
-        public async Task<AuthorDTO> Handle(AddAuthorCommand request, CancellationToken cancellationToken)
+        public async Task<AuthorDTO_Request> Handle(AddAuthorCommand request, CancellationToken cancellationToken)
         {
             LogInsideHandler<AddAuthorCommand>();
 
@@ -57,11 +57,11 @@ namespace Enterprise.Solution.API.Application.Handlers
             if (createdEntity != null)
             {
                 LogServiceRequestSuccess<Author>(RequestType.Add, createdEntity.Id);
-                return _mapper.Map<AuthorDTO>(createdEntity);
+                return _mapper.Map<AuthorDTO_Request>(createdEntity);
             }
 
             LogAndThrowNotAddedException<Author>();
-            return new AuthorDTO();
+            return new AuthorDTO_Request();
         }
     }
 }

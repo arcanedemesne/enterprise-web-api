@@ -8,5 +8,5 @@ namespace Enterprise.Solution.API.Application.Commands
     /// <summary>
     /// Command to Update
     /// </summary>
-    public record UpdateArtistCommand(int Id, ModelStateDictionary ModelState, ArtistDTO ArtistDTO) : IRequest;
+    public record UpdateArtistCommand(int Id, ModelStateDictionary ModelState, ArtistDTO_Request ArtistDTO) : IRequest;
 }

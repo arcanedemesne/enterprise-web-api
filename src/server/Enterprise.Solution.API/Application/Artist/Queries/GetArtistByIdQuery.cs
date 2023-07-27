@@ -7,5 +7,5 @@ namespace Enterprise.Solution.API.Application.Queries
     /// <summary>
     /// Query to get by Id
     /// </summary>
-    public record GetArtistByIdQuery(int Id) : IRequest<ArtistDTO>;
+    public record GetArtistByIdQuery(int Id) : IRequest<ArtistDTO_Response>;
 }

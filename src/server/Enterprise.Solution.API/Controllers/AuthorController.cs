@@ -40,13 +40,13 @@ namespace Enterprise.Solution.API.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<AuthorDTO>>> ListAllAsync([FromQuery] AuthorPagedQueryParams queryParams, CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<AuthorDTO_Response>>> ListAllAsync([FromQuery] AuthorPagedQueryParams queryParams, CancellationToken cancellationToken)
         {
             try
             {
                 var response = await base._mediator!.Send(new ListAllAuthorsQuery(queryParams), cancellationToken);
                 Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(response!.PaginationMetadata));
-                return Ok(Mapper.Map<IReadOnlyList<AuthorDTO>>(response.Entities));
+                return Ok(Mapper.Map<IReadOnlyList<AuthorDTO_Response>>(response.Entities));
             }
             catch (Exception ex)
             {
@@ -84,7 +84,7 @@ namespace Enterprise.Solution.API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddAsync([FromBody] AuthorDTO dto)
+        public async Task<IActionResult> AddAsync([FromBody] AuthorDTO_Request dto)
         {
             try
             {
@@ -111,7 +111,7 @@ namespace Enterprise.Solution.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateAsync(int id, [FromBody] AuthorDTO dto)
+        public async Task<IActionResult> UpdateAsync(int id, [FromBody] AuthorDTO_Request dto)
         {
             try
             {
@@ -142,7 +142,7 @@ namespace Enterprise.Solution.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> PatchAsync(int id, [FromBody] JsonPatchDocument<AuthorDTO> jsonPatchDocument)
+        public async Task<IActionResult> PatchAsync(int id, [FromBody] JsonPatchDocument<AuthorDTO_Request> jsonPatchDocument)
         {
             try
             {

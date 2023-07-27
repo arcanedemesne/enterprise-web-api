@@ -3,19 +3,19 @@
 namespace Enterprise.Solution.API.Models
 {
     /// <summary>
-    /// a DTO representing the shape of an Author
+    /// a DTO representing the shape of an Artist
     /// </summary>
     [Serializable]
     [ExcludeFromCodeCoverage]
-    public class AuthorDTO : BaseDTO
+    public class ArtistDTO_Response : BaseDTO
     {
         /// <summary>
-        /// First Name of the Author
+        /// FirstName of the Artist
         /// </summary>
         public string? FirstName { get; set; }
 
         /// <summary>
-        /// Last Name of the Author
+        /// LastName of the Artist
         /// </summary>
         public string? LastName { get; set; }
 
@@ -25,8 +25,8 @@ namespace Enterprise.Solution.API.Models
         public string? FullName { get; set; }
 
         /// <summary>
-        /// Books written by the Author
+        /// Covers made by Artist
         /// </summary>
-        public ICollection<BookDTO_Response>? Books { get; set; }
+        public ICollection<CoverDTO_Response>? Covers { get; set; }
     }
 }

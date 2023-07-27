@@ -4,9 +4,10 @@ import { GET } from "../../utilities/httpRequest";
 
 import Page from "../../components/Page";
 import { parseHeaders } from "../../utilities/pagination";
+import CreateButton from "../../components/CreateButton";
 
 import ArtistTable from "./ArtistTable";
-import { baseUri } from ".";
+import { baseUri, domain } from ".";
 
 export const loader = async () => {
   return await GET({ endpoint: baseUri });
@@ -24,7 +25,12 @@ const ListArtists = () => {
   return (
     <Page
       pageTitle="Viewing Artists"
-      children={<ArtistTable apiData={data} paginationHeaders={pagination} />}
+      children={
+        <p>
+          <CreateButton domain={domain} />
+          <ArtistTable apiData={data} paginationHeaders={pagination} />
+        </p>
+      }
     />
   );
 };

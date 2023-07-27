@@ -8,5 +8,5 @@ namespace Enterprise.Solution.API.Application.Commands
     /// <summary>
     /// Command to Update
     /// </summary>
-    public record UpdateEmailSubscriptionCommand(int Id, ModelStateDictionary ModelState, EmailSubscriptionDTO EmailSubscriptionDTO) : IRequest;
+    public record UpdateEmailSubscriptionCommand(int Id, ModelStateDictionary ModelState, EmailSubscriptionDTO_Request EmailSubscriptionDTO) : IRequest;
 }

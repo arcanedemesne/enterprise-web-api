@@ -13,8 +13,11 @@ namespace Enterprise.Solution.API.Profiles
         /// </summary>
         public EmailSubscriptionProfile()
         {
-            CreateMap<EmailSubscription, Models.EmailSubscriptionDTO>();
-            CreateMap<Models.EmailSubscriptionDTO, EmailSubscription>();
+            CreateMap<EmailSubscription, Models.EmailSubscriptionDTO_Request>();
+            CreateMap<Models.EmailSubscriptionDTO_Request, EmailSubscription>();
+
+            CreateMap<EmailSubscription, Models.EmailSubscriptionDTO_Response>();
+            CreateMap<Models.EmailSubscriptionDTO_Response, EmailSubscription>();
         }
     }
 

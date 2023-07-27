@@ -3,10 +3,11 @@ import { useLoaderData } from "react-router-dom";
 import { GET } from "../../utilities/httpRequest";
 
 import Page from "../../components/Page";
+import CreateButton from "../../components/CreateButton";
 import { parseHeaders } from "../../utilities/pagination";
 
 import BookTable from "./BookTable";
-import { baseUri } from ".";
+import { baseUri, domain } from ".";
 
 export const loader = async () => {
   return await GET({ endpoint: baseUri });
@@ -24,7 +25,12 @@ const ListBooks = () => {
   return (
     <Page
       pageTitle="Viewing Books"
-      children={<BookTable apiData={data} paginationHeaders={pagination} />}
+      children={
+        <p>
+          <CreateButton domain={domain} />
+          <BookTable apiData={data} paginationHeaders={pagination} />
+        </p>
+      }
     />
   );
 };

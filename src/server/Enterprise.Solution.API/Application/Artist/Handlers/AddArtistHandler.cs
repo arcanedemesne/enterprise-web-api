@@ -15,7 +15,7 @@ namespace Enterprise.Solution.API.Application.Handlers
     /// <summary>
     /// Handler for Add Command
     /// </summary>
-    public class AddArtistHandler : BaseHandler<AddArtistHandler>, IRequestHandler<AddArtistCommand, ArtistDTO>
+    public class AddArtistHandler : BaseHandler<AddArtistHandler>, IRequestHandler<AddArtistCommand, ArtistDTO_Request>
     {
         private readonly IArtistService _service;
 
@@ -43,7 +43,7 @@ namespace Enterprise.Solution.API.Application.Handlers
         /// </summary>
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
-        public async Task<ArtistDTO> Handle(AddArtistCommand request, CancellationToken cancellationToken)
+        public async Task<ArtistDTO_Request> Handle(AddArtistCommand request, CancellationToken cancellationToken)
         {
             LogInsideHandler<AddArtistCommand>();
 
@@ -57,11 +57,11 @@ namespace Enterprise.Solution.API.Application.Handlers
             if (createdEntity != null)
             {
                 LogServiceRequestSuccess<Artist>(RequestType.Add, createdEntity.Id);
-                return _mapper.Map<ArtistDTO>(createdEntity);
+                return _mapper.Map<ArtistDTO_Request>(createdEntity);
             }
 
             LogAndThrowNotAddedException<Artist>();
-            return new ArtistDTO();
+            return new ArtistDTO_Request();
         }
     }
 }

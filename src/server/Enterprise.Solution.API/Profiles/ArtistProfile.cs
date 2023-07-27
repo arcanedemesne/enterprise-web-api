@@ -13,8 +13,11 @@ namespace Enterprise.Solution.API.Profiles
         /// </summary>
         public ArtistProfile()
         {
-            CreateMap<Artist, Models.ArtistDTO>();
-            CreateMap<Models.ArtistDTO, Artist>();
+            CreateMap<Artist, Models.ArtistDTO_Request>();
+            CreateMap<Models.ArtistDTO_Request, Artist>();
+
+            CreateMap<Artist, Models.ArtistDTO_Response>();
+            CreateMap<Models.ArtistDTO_Response, Artist>();
         }
     }
 

@@ -1,20 +1,18 @@
-
 import { useState } from "react";
-import { Form, useLoaderData, useNavigate, redirect } from "react-router-dom";
-
-import Button from "@mui/joy/Button";
+import { useLoaderData, redirect } from "react-router-dom";
 
 import { DELETE, GET, PUT } from "../../utilities/httpRequest";
 
 import Page from "../../components/Page";
-import FormInput from "../../components/FormInput";
+import { EditFormButtons } from "../../components/FormButtons";
 import { IBook, domain } from "./";
+import BookForm, { hasErrors } from "./BookForm";
 
-const updateBook = async (id: number, data: any) => {
+const updateItem = async (id: number, data: any) => {
   await PUT({ endpoint: `${domain}/${id}`, data });
 };
 
-const deleteBook = async (id: number) => {
+const deleteItem = async (id: number) => {
   await DELETE({ endpoint: `${domain}/${id}` });
 };
 
@@ -25,108 +23,45 @@ export const loader = async ({ params }: any) => {
 export const action = async ({ request, params }: any) => {
   let formData = await request.formData();
   const updates = Object.fromEntries(formData) as IBook;
-  await updateBook(params.id, updates);
+  updates.publishDate = new Date(updates.publishDate);
+  await updateItem(params.id, updates);
   return redirect(`/${domain}`);
 };
 
 const EditBook = () => {
-  const navigate = useNavigate();
   const { data: book }: any = useLoaderData() as { data: IBook };
-  const [formValues, setFormValues] = useState(book);
+  const [formValues, setFormValues] = useState<any>({
+    ...book,
+    basePrice: !!book.basePrice ? book.basePrice : "0.00",
+    publishDate:
+      Date.parse(book.publishDate) > 0
+        ? new Date(book.publishDate).toLocaleDateString()
+        : new Date().toLocaleDateString(),
+  });
+  const [errors, setErrors] = useState({});
 
   return (
     <Page
-      pageTitle={`Editing Book: ${book?.title}`}
+      pageTitle={`Edit Book: ${book?.id}`}
       children={
-        <Form method="post" id="book-form">
-          <div>
-            <FormInput
-              type="text"
-              name="id"
-              value={formValues.id}
-              hidden={true}
-            />
-            <FormInput
-              type="text"
-              name="authorId"
-              value={formValues.authorId}
-              hidden={true}
-            />
-            <FormInput
-              type="text"
-              name="coverId"
-              value={formValues.coverId}
-              hidden={true}
-            />
-            <span>Title</span>
-            <FormInput
-              placeholder="Title"
-              aria-label="Title"
-              type="text"
-              name="title"
-              value={formValues.title}
-              onChange={(event) =>
-                setFormValues({
-                  ...formValues,
-                  title: event.currentTarget.value,
-                })
-              }
-            />
-            <span>Base Price</span>
-            <FormInput
-              placeholder="Base Price"
-              aria-label="Base price"
-              type="text"
-              name="basePrice"
-              value={formValues.basePrice || 0}
-              onChange={(event) =>
-                setFormValues({
-                  ...formValues,
-                  basePrice: event.currentTarget.value,
-                })
-              }
-            />
-            <span>Publish Date</span>
-            <FormInput
-              placeholder="Publish Date"
-              aria-label="Publish date"
-              type="text"
-              name="publishDate"
-              value={formValues.publishDate}
-              onChange={(event) =>
-                setFormValues({
-                  ...formValues,
-                  publishDate: event.currentTarget.value,
-                })
-              }
-            />
-          </div>
-          <p>
-            <Button type="submit" sx={{ mr: 2 }}>
-              Save
-            </Button>
-            <Button
-              sx={{ mr: 2 }}
-              color="neutral"
-              type="button"
-              onClick={() => {
-                navigate(`/${domain}`);
+        <BookForm
+          formValues={formValues}
+          setFormValues={setFormValues}
+          errors={errors}
+          buttons={
+            <EditFormButtons
+              domain={domain}
+              handleSave={(event) => {
+                const errors = hasErrors(formValues);
+                if (errors) {
+                  event.preventDefault();
+                  setErrors(errors);
+                }
               }}
-            >
-              Cancel
-            </Button>
-            <Button
-              color="danger"
-              type="button"
-              onClick={async () => {
-                await deleteBook(formValues.id);
-                navigate(`/${domain}`);
-              }}
-            >
-              Delete
-            </Button>
-          </p>
-        </Form>
+              handleDelete={async () => await deleteItem(formValues.id)}
+            />
+          }
+        />
       }
     />
   );

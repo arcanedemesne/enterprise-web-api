@@ -11,6 +11,7 @@ export interface IFormInputProps {
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   hidden?: boolean;
+  hasError?: boolean;
 }
 
 const FormInput = ({
@@ -22,6 +23,7 @@ const FormInput = ({
   onChange,
   onKeyUp,
   hidden,
+  hasError,
 }: IFormInputProps) => {
   return (
     <>
@@ -35,7 +37,10 @@ const FormInput = ({
           value={value}
           onChange={onChange}
           onKeyUp={onKeyUp}
-          sx={{ display: hidden ? "none" : "auto"}}
+          sx={{
+            display: hidden ? "none" : "auto",
+          }}
+          error={hasError}
         />
       </FormControl>
     </>

@@ -7,7 +7,7 @@ namespace Enterprise.Solution.API.Models
     /// </summary>
     [Serializable]
     [ExcludeFromCodeCoverage]
-    public class ArtistDTO : BaseDTO
+    public class AuthorDTO_Request : BaseDTO
     {
         /// <summary>
         /// FirstName of the Artist
@@ -23,10 +23,5 @@ namespace Enterprise.Solution.API.Models
         /// Full Name of the Author
         /// </summary>
         public string? FullName { get; set; }
-
-        /// <summary>
-        /// Covers made by Artist
-        /// </summary>
-        public ICollection<CoverDTO>? Covers { get; set; }
     }
 }

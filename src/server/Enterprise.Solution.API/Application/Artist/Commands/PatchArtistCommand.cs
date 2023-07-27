@@ -9,5 +9,5 @@ namespace Enterprise.Solution.API.Application.Commands
     /// <summary>
     /// Command to Patch
     /// </summary>
-    public record PatchArtistCommand(int Id, ModelStateDictionary ModelState, Func<object, bool> TryValidateModel, JsonPatchDocument<ArtistDTO> JsonPatchDocument) : IRequest;
+    public record PatchArtistCommand(int Id, ModelStateDictionary ModelState, Func<object, bool> TryValidateModel, JsonPatchDocument<ArtistDTO_Request> JsonPatchDocument) : IRequest;
 }

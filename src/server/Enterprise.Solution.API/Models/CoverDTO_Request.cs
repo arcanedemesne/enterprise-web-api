@@ -7,7 +7,7 @@ namespace Enterprise.Solution.API.Models
     /// </summary>
     [Serializable]
     [ExcludeFromCodeCoverage]
-    public class CoverDTO : BaseDTO
+    public class CoverDTO_Request : BaseDTO
     {
         /// <summary>
         /// DesignIdeas of the Cover
@@ -21,13 +21,5 @@ namespace Enterprise.Solution.API.Models
         /// Related BookId of the Cover
         /// </summary>
         public int BookId { get; set; }
-        /// <summary>
-        /// Related Book of the Cover
-        /// </summary>
-        public BookDTO_Response Book { get; set; } = null!;
-        /// <summary>
-        /// Artists of the Cover
-        /// </summary>
-        public ICollection<ArtistDTO>? Artists { get; set; }
     }
 }

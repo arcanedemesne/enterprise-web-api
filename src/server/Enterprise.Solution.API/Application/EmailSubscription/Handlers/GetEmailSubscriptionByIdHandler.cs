@@ -15,7 +15,7 @@ namespace Enterprise.Solution.API.Application.Handlers
     /// <summary>
     /// Handler for Get By Id Query
     /// </summary>
-    public class GetEmailSubscriptionByIdHandler : BaseHandler<GetEmailSubscriptionByIdHandler>, IRequestHandler<GetEmailSubscriptionByIdQuery, EmailSubscriptionDTO>
+    public class GetEmailSubscriptionByIdHandler : BaseHandler<GetEmailSubscriptionByIdHandler>, IRequestHandler<GetEmailSubscriptionByIdQuery, EmailSubscriptionDTO_Response>
     {
         private readonly IEmailSubscriptionService _service;
 
@@ -43,7 +43,7 @@ namespace Enterprise.Solution.API.Application.Handlers
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<EmailSubscriptionDTO> Handle(GetEmailSubscriptionByIdQuery request, CancellationToken cancellationToken)
+        public async Task<EmailSubscriptionDTO_Response> Handle(GetEmailSubscriptionByIdQuery request, CancellationToken cancellationToken)
         {
             LogInsideHandler<GetEmailSubscriptionByIdQuery>();
 
@@ -52,7 +52,7 @@ namespace Enterprise.Solution.API.Application.Handlers
 
             if (entity == null) LogAndThrowNotFoundException<EmailSubscription>(request.Id);
 
-            return _mapper.Map<EmailSubscriptionDTO>(entity);
+            return _mapper.Map<EmailSubscriptionDTO_Response>(entity);
         }
     }
 }

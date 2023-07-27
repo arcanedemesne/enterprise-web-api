@@ -15,7 +15,7 @@ namespace Enterprise.Solution.API.Application.Handlers
     /// <summary>
     /// Handler for Get By Id Query
     /// </summary>
-    public class GetArtistByIdHandler : BaseHandler<GetArtistByIdHandler>, IRequestHandler<GetArtistByIdQuery, ArtistDTO>
+    public class GetArtistByIdHandler : BaseHandler<GetArtistByIdHandler>, IRequestHandler<GetArtistByIdQuery, ArtistDTO_Response>
     {
         private readonly IArtistService _service;
 
@@ -43,7 +43,7 @@ namespace Enterprise.Solution.API.Application.Handlers
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<ArtistDTO> Handle(GetArtistByIdQuery request, CancellationToken cancellationToken)
+        public async Task<ArtistDTO_Response> Handle(GetArtistByIdQuery request, CancellationToken cancellationToken)
         {
             LogInsideHandler<GetArtistByIdQuery>();
 
@@ -52,7 +52,7 @@ namespace Enterprise.Solution.API.Application.Handlers
 
             if (entity == null) LogAndThrowNotFoundException<Artist>(request.Id);
 
-            return _mapper.Map<ArtistDTO>(entity);
+            return _mapper.Map<ArtistDTO_Response>(entity);
         }
     }
 }

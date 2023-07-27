@@ -15,7 +15,7 @@ namespace Enterprise.Solution.API.Application.Handlers
     /// <summary>
     /// Handler for Get By Id Query
     /// </summary>
-    public class GetAuthorByIdHandler : BaseHandler<GetAuthorByIdHandler>, IRequestHandler<GetAuthorByIdQuery, AuthorDTO>
+    public class GetAuthorByIdHandler : BaseHandler<GetAuthorByIdHandler>, IRequestHandler<GetAuthorByIdQuery, AuthorDTO_Response>
     {
         private readonly IAuthorService _service;
 
@@ -43,7 +43,7 @@ namespace Enterprise.Solution.API.Application.Handlers
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<AuthorDTO> Handle(GetAuthorByIdQuery request, CancellationToken cancellationToken)
+        public async Task<AuthorDTO_Response> Handle(GetAuthorByIdQuery request, CancellationToken cancellationToken)
         {
             LogInsideHandler<GetAuthorByIdQuery>();
 
@@ -52,7 +52,7 @@ namespace Enterprise.Solution.API.Application.Handlers
 
             if (entity == null) LogAndThrowNotFoundException<Author>(request.Id);
 
-            return _mapper.Map<AuthorDTO>(entity);
+            return _mapper.Map<AuthorDTO_Response>(entity);
         }
     }
 }

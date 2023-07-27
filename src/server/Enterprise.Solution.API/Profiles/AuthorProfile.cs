@@ -13,8 +13,11 @@ namespace Enterprise.Solution.API.Profiles
         /// </summary>
         public AuthorProfile()
         {
-            CreateMap<Author, Models.AuthorDTO>();
-            CreateMap<Models.AuthorDTO, Author>();
+            CreateMap<Author, Models.AuthorDTO_Request>();
+            CreateMap<Models.AuthorDTO_Request, Author>();
+
+            CreateMap<Author, Models.AuthorDTO_Response>();
+            CreateMap<Models.AuthorDTO_Response, Author>();
         }
     }
 

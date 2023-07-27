@@ -7,7 +7,7 @@ namespace Enterprise.Solution.API.Models
     /// </summary>
     [Serializable]
     [ExcludeFromCodeCoverage]
-    public class EmailSubscriptionDTO : BaseDTO
+    public class EmailSubscriptionDTO_Request : BaseDTO
     {
         /// <summary>
         /// First Name of the EmailSubscription

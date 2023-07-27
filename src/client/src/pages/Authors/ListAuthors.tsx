@@ -3,10 +3,11 @@ import { useLoaderData } from "react-router-dom";
 import { GET } from "../../utilities/httpRequest";
 
 import Page from "../../components/Page";
+import CreateButton from "../../components/CreateButton";
 import { parseHeaders } from "../../utilities/pagination";
 
 import AuthorTable from "./AuthorTable";
-import { baseUri } from ".";
+import { baseUri, domain } from ".";
 
 export const loader = async () => {
   return await GET({ endpoint: baseUri });
@@ -24,7 +25,12 @@ const ListAuthors = () => {
   return (
     <Page
       pageTitle="Viewing Authors"
-      children={<AuthorTable apiData={data} paginationHeaders={pagination} />}
+      children={
+        <p>
+          <CreateButton domain={domain} />
+          <AuthorTable apiData={data} paginationHeaders={pagination} />
+        </p>
+      }
     />
   );
 };

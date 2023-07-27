@@ -50,7 +50,15 @@ export const setRefreshToken = (refresh_token: string | null): void => {
   setItem(refreshTokenKey, refresh_token);
 };
 
+const checkSessionTime = 30 * 1000; // check every 30 secs
+const TimeCheckAuth = () => {
+  if (!isSignedIn()) {
+    window.location.href = signInRoute;
+  }
+};
+
 export const isSignedIn = (): boolean => {
+  setTimeout(() => { TimeCheckAuth() }, checkSessionTime);
   const metadata = getMetadata();
   const id_token = getIdToken();
   const refresh_token = getRefreshToken();
@@ -74,13 +82,6 @@ export const saveUserMetadata = (userMetadata: any) => {
   }
 }
 
-const checkSessionTime = 600 * 1000; // check every 30 secs
-const TimeCheckAuth = () => {
-  if (!isSignedIn()) {
-    window.location.href = signInRoute;
-  }
-};
-
 export interface ISignInProps {
   userName: string;
   password: string;
@@ -96,7 +97,6 @@ export const signIn = async ({ userName, password }: ISignInProps) => {
       statusText: "Invalid UserName and/or Password",
     });
   } finally {
-    setInterval(() => { TimeCheckAuth() }, checkSessionTime);
     return saveUserMetadata(userMetadata);
   }
 };

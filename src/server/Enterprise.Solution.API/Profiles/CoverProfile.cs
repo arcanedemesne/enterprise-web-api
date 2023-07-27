@@ -13,8 +13,11 @@ namespace Enterprise.Solution.API.Profiles
         /// </summary>
         public CoverProfile()
         {
-            CreateMap<Cover, Models.CoverDTO>();
-            CreateMap<Models.CoverDTO, Cover>();
+            CreateMap<Cover, Models.CoverDTO_Request>();
+            CreateMap<Models.CoverDTO_Request, Cover>();
+
+            CreateMap<Cover, Models.CoverDTO_Response>();
+            CreateMap<Models.CoverDTO_Response, Cover>();
         }
     }
 

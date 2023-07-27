@@ -28,7 +28,7 @@ namespace Enterprise.Solution.API.Models
         /// <summary>
         /// Author of the Book
         /// </summary>
-        public AuthorDTO Author { get; set; } = null!;
+        public AuthorDTO_Response Author { get; set; } = null!;
         /// <summary>
         /// CoverId of the Book
         /// </summary>
@@ -36,6 +36,6 @@ namespace Enterprise.Solution.API.Models
         /// <summary>
         /// The Cover of the Book
         /// </summary>
-        public CoverDTO Cover { get; set; } = null!;
+        public CoverDTO_Response Cover { get; set; } = null!;
     }
 }

@@ -38,13 +38,13 @@ namespace Enterprise.Solution.API.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<EmailSubscriptionDTO>>> ListAllAsync([FromQuery] EmailSubscriptionPagedQueryParams queryParams, CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<EmailSubscriptionDTO_Response>>> ListAllAsync([FromQuery] EmailSubscriptionPagedQueryParams queryParams, CancellationToken cancellationToken)
         {
             try
             {
                 var response = await base._mediator!.Send(new ListAllEmailSubscriptionsQuery(queryParams), cancellationToken);
                 Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(response!.PaginationMetadata));
-                return Ok(Mapper.Map<IReadOnlyList<EmailSubscriptionDTO>>(response.Entities));
+                return Ok(Mapper.Map<IReadOnlyList<EmailSubscriptionDTO_Response>>(response.Entities));
             }
             catch (Exception ex)
             {
@@ -82,7 +82,7 @@ namespace Enterprise.Solution.API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddAsync([FromBody] EmailSubscriptionDTO dto)
+        public async Task<IActionResult> AddAsync([FromBody] EmailSubscriptionDTO_Request dto)
         {
             try
             {
@@ -109,7 +109,7 @@ namespace Enterprise.Solution.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateAsync(int id, [FromBody] EmailSubscriptionDTO dto)
+        public async Task<IActionResult> UpdateAsync(int id, [FromBody] EmailSubscriptionDTO_Request dto)
         {
             try
             {
@@ -140,7 +140,7 @@ namespace Enterprise.Solution.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> PatchAsync(int id, [FromBody] JsonPatchDocument<EmailSubscriptionDTO> jsonPatchDocument)
+        public async Task<IActionResult> PatchAsync(int id, [FromBody] JsonPatchDocument<EmailSubscriptionDTO_Request> jsonPatchDocument)
         {
             try
             {
