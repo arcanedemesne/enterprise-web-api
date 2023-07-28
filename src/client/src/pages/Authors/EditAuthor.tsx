@@ -24,7 +24,7 @@ export const action = async ({ request, params }: any) => {
   let formData = await request.formData();
   const updates = Object.fromEntries(formData) as IAuthor;
   await updateItem(params.id, updates);
-  return redirect(`/${domain}`);
+  return redirect(`/admin/${domain}`);
 };
 
 const EditAuthor = () => {

@@ -7,6 +7,8 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
+import { StyledEngineProvider } from "@mui/joy/styles";
+
 import Root, {
   loader as rootLoader,
   action as rootAction,
@@ -18,6 +20,7 @@ import SplashPage from "./pages/SplashPage";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 
+import Admin from "./pages/Admin";
 import Dashboard from "./pages/Dashboard";
 
 import ListAuthors, {
@@ -35,25 +38,25 @@ import EditAuthor, {
 import ListBooks, {
   loader as listBooksLoader,
   action as listBooksAction,
- } from "./pages/Books/ListBooks";
- import CreateBook, {
-   action as createBookAction,
- } from "./pages/Books/CreateBook";
+} from "./pages/Books/ListBooks";
+import CreateBook, {
+  action as createBookAction,
+} from "./pages/Books/CreateBook";
 import EditBook, {
   loader as editBookLoader,
-  action as editBookAction, 
+  action as editBookAction,
 } from "./pages/Books/EditBook";
 
 import ListArtists, {
   loader as listArtistsLoader,
   action as listArtistsAction,
- } from "./pages/Artists/ListArtists";
- import CreateArtist, {
-   action as createArtistAction,
- } from "./pages/Artists/CreateArtist";
+} from "./pages/Artists/ListArtists";
+import CreateArtist, {
+  action as createArtistAction,
+} from "./pages/Artists/CreateArtist";
 import EditArtist, {
   loader as editArtistLoader,
-  action as editArtistAction, 
+  action as editArtistAction,
 } from "./pages/Artists/EditArtist";
 
 /* TEST */
@@ -88,71 +91,106 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <SplashPage /> },
       {
-        path: "dashboard",
-        element: (
-          <RequireAuth redirectTo={signInRoute}>
-            <Dashboard />
-          </RequireAuth>
-        ),
-      },
-      {
-        path: "authors",
-        element: <RequireAuth redirectTo={signInRoute}><ListAuthors /></RequireAuth>,
-        loader: listAuthorsLoader,
-        action: listAuthorsAction,
-      },
-      {
-        path: "authors/create",
-        element: <RequireAuth redirectTo={signInRoute}><CreateAuthor /></RequireAuth>,
-        action: createAuthorAction,
-      },
-      {
-        path: "authors/:id",
-        element: <RequireAuth redirectTo={signInRoute}><EditAuthor /></RequireAuth>,
-        loader: editAuthorLoader,
-        action: editAuthorAction,
-      },
-      {
-        path: "books",
-        element: <RequireAuth redirectTo={signInRoute}><ListBooks /></RequireAuth>,
-        loader: listBooksLoader,
-        action: listBooksAction,
-      },
-      {
-        path: "books/create",
-        element: <RequireAuth redirectTo={signInRoute}><CreateBook /></RequireAuth>,
-        action: createBookAction,
-      },
-      {
-        path: "books/:id",
-        element: <RequireAuth redirectTo={signInRoute}><EditBook /></RequireAuth>,
-        loader: editBookLoader,
-        action: editBookAction,
-      },
-      {
-        path: "artists",
-        element: <RequireAuth redirectTo={signInRoute}><ListArtists /></RequireAuth>,
-        loader: listArtistsLoader,
-        action: listArtistsAction,
-      },
-      {
-        path: "artists/create",
-        element: <RequireAuth redirectTo={signInRoute}><CreateArtist /></RequireAuth>,
-        action: createArtistAction,
-      },
-      {
-        path: "artists/:id",
-        element: <RequireAuth redirectTo={signInRoute}><EditArtist /></RequireAuth>,
-        loader: editArtistLoader,
-        action: editArtistAction,
-      },
-      {
         path: "sign-in",
         element: <SignIn />,
       },
       {
         path: "sign-up",
         element: <SignUp />,
+      },
+      {
+        path: "admin",
+        element: (
+          <RequireAuth redirectTo={signInRoute}>
+            <Admin />
+          </RequireAuth>
+        ),
+        children: [
+          { path: "dashboard", element: <Dashboard /> },
+          {
+            path: "authors",
+            element: <ListAuthors />,
+            loader: listAuthorsLoader,
+            action: listAuthorsAction,
+          },
+          {
+            path: "authors/create",
+            element: (
+              <RequireAuth redirectTo={signInRoute}>
+                <CreateAuthor />
+              </RequireAuth>
+            ),
+            action: createAuthorAction,
+          },
+          {
+            path: "authors/:id",
+            element: (
+              <RequireAuth redirectTo={signInRoute}>
+                <EditAuthor />
+              </RequireAuth>
+            ),
+            loader: editAuthorLoader,
+            action: editAuthorAction,
+          },
+          {
+            path: "books",
+            element: (
+              <RequireAuth redirectTo={signInRoute}>
+                <ListBooks />
+              </RequireAuth>
+            ),
+            loader: listBooksLoader,
+            action: listBooksAction,
+          },
+          {
+            path: "books/create",
+            element: (
+              <RequireAuth redirectTo={signInRoute}>
+                <CreateBook />
+              </RequireAuth>
+            ),
+            action: createBookAction,
+          },
+          {
+            path: "books/:id",
+            element: (
+              <RequireAuth redirectTo={signInRoute}>
+                <EditBook />
+              </RequireAuth>
+            ),
+            loader: editBookLoader,
+            action: editBookAction,
+          },
+          {
+            path: "artists",
+            element: (
+              <RequireAuth redirectTo={signInRoute}>
+                <ListArtists />
+              </RequireAuth>
+            ),
+            loader: listArtistsLoader,
+            action: listArtistsAction,
+          },
+          {
+            path: "artists/create",
+            element: (
+              <RequireAuth redirectTo={signInRoute}>
+                <CreateArtist />
+              </RequireAuth>
+            ),
+            action: createArtistAction,
+          },
+          {
+            path: "artists/:id",
+            element: (
+              <RequireAuth redirectTo={signInRoute}>
+                <EditArtist />
+              </RequireAuth>
+            ),
+            loader: editArtistLoader,
+            action: editArtistAction,
+          },
+        ],
       },
     ],
   },
@@ -195,8 +233,9 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    {/* <Navbar keycloak={keycloak} /> */}
-    <RouterProvider router={router} />
+    <StyledEngineProvider injectFirst>
+      <RouterProvider router={router} />
+    </StyledEngineProvider>
   </React.StrictMode>
 );
 

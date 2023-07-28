@@ -19,7 +19,6 @@ export default function SplashPage() {
         width: "auto",
         mx: "auto", // margin left & right
         my: "auto", // margin top & bottom
-        py: 5, // padding tpo & bottom
         display: "flex",
         flexDirection: "column",
         gap: 2,

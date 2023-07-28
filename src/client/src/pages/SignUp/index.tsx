@@ -10,7 +10,7 @@ import { create, ISignUpProps, UserMetadata } from "../../auth/user";
 import AuthenticationLayout from "../../layouts/AuthenticationLayout";
 import FormInput from "../../components/FormInput";
 
-const dashboardUrl: string = "/dashboard";
+const dashboardUrl: string = "admin/dashboard";
 let redirectUrl: string = "";
 
 const SignUp = () => {

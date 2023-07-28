@@ -17,7 +17,7 @@ export const action = async ({ request }: any) => {
   const item = Object.fromEntries(formData) as IArtist;
   delete item.id;
   await addItem(item);
-  return redirect(`/${domain}`);
+  return redirect(`/admin/${domain}`);
 };
 
 const CreateArtist = () => {

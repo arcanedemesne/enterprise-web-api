@@ -12,7 +12,7 @@ const CreateButton = ({ domain }: CreateButtonProps) => {
       sx={{ position: "relative", my: 2 }}
       type="button"
       onClick={() => {
-        navigate(`/${domain}/create`);
+        navigate(`/admin/${domain}/create`);
       }}
     >
       Create New

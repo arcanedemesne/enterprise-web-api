@@ -11,7 +11,7 @@ import AuthenticationLayout from "../../layouts/AuthenticationLayout";
 import FormInput from "../../components/FormInput";
 import { signUpRoute } from "../..";
 
-const dashboardUrl: string = "/dashboard";
+const adminUrl: string = "/admin/dashboard";
 let redirectUrl: string = "";
 
 const SignIn = () => {
@@ -27,8 +27,8 @@ const SignIn = () => {
         userName,
         password,
       } as ISignInProps)) as UserMetadata | undefined;
-      if (metadata?.email_verified) {
-        navigate(redirectUrl.length > 0 ? redirectUrl : dashboardUrl);
+      if (metadata?.email_address) {
+        navigate(redirectUrl.length > 0 ? redirectUrl : adminUrl);
       }
     } catch (error: any) {
       setErrorMessage(error.statusText);

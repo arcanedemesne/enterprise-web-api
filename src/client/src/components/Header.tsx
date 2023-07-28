@@ -12,11 +12,11 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 
 import * as Layout from "../layouts";
-import Menu from "../layouts/Menu";
-import { ColorSchemeToggle } from "../components/ColorSchemeToggle";
+import Menu from "./Menu";
+import { ColorSchemeToggle } from "./ColorSchemeToggle";
 import { signOut } from "../auth/user";
 
-const NavigationBar = () => {
+const Header = () => {
   const navigate = useNavigate();
 
   return (
@@ -85,27 +85,27 @@ const NavigationBar = () => {
           menus={[
             {
               label: "Dashboard",
-              href: "/dashboard",
+              href: "/",
               active: window.location.href.toLocaleLowerCase().includes('dashboard'),
             },
             {
               label: "Authors",
-              href: "/authors",
+              href: "/admin/authors",
               active: window.location.href.toLocaleLowerCase().includes('authors'),
             },
             {
               label: "Books",
-              href: "/books",
+              href: "/admin/books",
               active: window.location.href.toLocaleLowerCase().includes('books'),
             },
             {
               label: "Artists",
-              href: "/artists",
+              href: "/admin/artists",
               active: window.location.href.toLocaleLowerCase().includes('artists'),
             },
             {
               label: "Subscriptions",
-              href: "/subscriptions",
+              href: "/admin/subscriptions",
               active: window.location.href.toLocaleLowerCase().includes('subscriptions'),
             },
           ]}
@@ -126,4 +126,4 @@ const NavigationBar = () => {
   );
 };
 
-export default NavigationBar;
+export default Header;

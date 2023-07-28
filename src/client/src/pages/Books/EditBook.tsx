@@ -25,7 +25,7 @@ export const action = async ({ request, params }: any) => {
   const updates = Object.fromEntries(formData) as IBook;
   updates.publishDate = new Date(updates.publishDate);
   await updateItem(params.id, updates);
-  return redirect(`/${domain}`);
+  return redirect(`/admin/${domain}`);
 };
 
 const EditBook = () => {

@@ -18,7 +18,7 @@ export const action = async ({ request }: any) => {
   item.publishDate = new Date(item.publishDate);
   delete item.id;
   await addItem(item);
-  return redirect(`/${domain}`);
+  return redirect(`/admin/${domain}`);
 };
 
 const CreateBook = () => {

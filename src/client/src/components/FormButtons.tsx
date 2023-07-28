@@ -22,7 +22,7 @@ export const CreateFormButtons = ({
         color="neutral"
         type="button"
         onClick={() => {
-          navigate(`/${domain}`);
+          navigate(`/admin/${domain}`);
         }}
       >
         Cancel
@@ -51,7 +51,7 @@ export const EditFormButtons = ({
         type="button"
         onClick={async () => {
           await handleDelete();
-          navigate(`/${domain}`);
+          navigate(`/admin/${domain}`);
         }}
       >
         Delete

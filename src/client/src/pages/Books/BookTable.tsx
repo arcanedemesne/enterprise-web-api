@@ -29,11 +29,11 @@ const BookTable = ({ apiData, paginationHeaders }: any) => {
   };
 
   const handleDeleteItems = async () => {
-    await navigate(`/${domain}/delete?ids=${selectedRows}`);
+    await navigate(`/admin/${domain}/delete?ids=${selectedRows}`);
   };
 
   const handleEditItem = async (id: number) => {
-    await navigate(`/${domain}/${id}`);
+    await navigate(`/admin/${domain}/${id}`);
   };
 
   const rows = apiResponseData.map((x: any) => {
