@@ -1,26 +1,45 @@
-import { useLoaderData } from "react-router-dom";
-
-import { GET } from "../../utilities/httpRequest";
+import { useEffect } from "react";
+import { useAppSelector, useAppDispatch } from "../../store/hooks";
 
 import Page from "../../components/Page";
 import CreateButton from "../../components/CreateButton";
-import { parseHeaders } from "../../utilities/pagination";
 
 import BookTable from "./BookTable";
 import { baseUri, domain } from ".";
+import { BookState, fetchBooks } from "./state";
+import { paginate } from "../../utilities/pagination";
 
-export const loader = async () => {
-  return await GET({ endpoint: baseUri });
-};
-
-export const action = async ({ request }: any) => {
-  let formData = await request.formData();
-  return new Promise(() => formData); // TODO: decide action
-};
-
+let initialized = false;
 const ListBooks = () => {
-  const { data, headers }: any = useLoaderData();
-  const pagination = parseHeaders(headers);
+  const bookState: BookState = useAppSelector((state) => state.bookState);
+  const dispatch = useAppDispatch();
+
+  const setNewPaginationValues = (
+    pageNumber: number,
+    pageSize: number,
+    orderBy: string
+  ) => {
+    paginate({
+      baseUri,
+      pageNumber,
+      pageSize,
+      orderBy,
+      callback: async (endpoint: string) => {
+        dispatch(await fetchBooks(endpoint));
+      },
+    });
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      dispatch(await fetchBooks(baseUri));
+    };
+
+    if (!initialized) {
+      fetchData();
+      initialized = true;
+    }
+  });
 
   return (
     <Page
@@ -28,7 +47,12 @@ const ListBooks = () => {
       children={
         <>
           <CreateButton domain={domain} />
-          <BookTable apiData={data} paginationHeaders={pagination} />
+          <BookTable 
+            loading={bookState.status === "loading"}
+            books={bookState.books}
+            pagination={bookState.pagination}
+            setNewPaginationValues={setNewPaginationValues}
+          />
         </>
       }
     />

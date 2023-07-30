@@ -2,31 +2,20 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import DataTable from "../../components/DataTable";
-import { setPaginationValues } from "../../utilities/pagination";
 
-import { domain, baseUri, IEmailSubscription } from ".";
+import { domain, IEmailSubscription } from "./";
 
-const EmailSubscriptionTable = ({ apiData, paginationHeaders }: any) => {
+interface EmailSubscriptionTableProps {
+  loading: boolean;
+  emailSubscriptions: IEmailSubscription[];
+  pagination: any;
+  setNewPaginationValues: (pageNumber: number, pageSize: number, orderBy: string) => void;
+}
+
+const EmailSubscriptionTable = ({ loading, emailSubscriptions, pagination, setNewPaginationValues }: EmailSubscriptionTableProps) => {
   const navigate = useNavigate();
 
-  const [apiResponseData, setApiResponseData] = useState<IEmailSubscription[]>(apiData || []);
-  const [pagination, setPagination] = useState<any>(paginationHeaders || {});
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
-
-  const setNewPaginationValues = async (
-    pageNumber: number,
-    pageSize: number,
-    orderBy: string
-  ) => {
-    setPaginationValues({
-      baseUri,
-      pageNumber,
-      pageSize,
-      orderBy,
-      setPagination,
-      setApiResponseData,
-    });
-  };
 
   const handleDeleteItems = async () => {
     await navigate(`/admin/${domain}/delete?ids=${selectedRows}`);
@@ -36,7 +25,7 @@ const EmailSubscriptionTable = ({ apiData, paginationHeaders }: any) => {
     await navigate(`/admin/${domain}/${id}`);
   };
 
-  const rows = apiResponseData.map((x: any) => {
+  const rows = emailSubscriptions && emailSubscriptions.map((x: any) => {
     return {
       id: x.id,
       values: [x.id, x.firstName, x.lastName, x.emailAddress],
@@ -71,8 +60,9 @@ const EmailSubscriptionTable = ({ apiData, paginationHeaders }: any) => {
 
   return (
     <DataTable
-      title="Authors"
-      caption="This table contains Authors"
+      title="Email Subscriptions"
+      caption="This table contains Email Subscriptions"
+      loading={loading}
       data={tableData}
       pagination={pagination}
       setNewPaginationValues={setNewPaginationValues}

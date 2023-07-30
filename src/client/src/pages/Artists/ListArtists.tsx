@@ -1,34 +1,57 @@
-import { useLoaderData } from "react-router-dom";
-
-import { GET } from "../../utilities/httpRequest";
+import { useEffect } from "react";
+import { useAppSelector, useAppDispatch } from "../../store/hooks";
 
 import Page from "../../components/Page";
-import { parseHeaders } from "../../utilities/pagination";
 import CreateButton from "../../components/CreateButton";
 
 import ArtistTable from "./ArtistTable";
 import { baseUri, domain } from ".";
+import { ArtistState, fetchArtists } from "./state";
+import { paginate } from "../../utilities/pagination";
 
-export const loader = async ({ params }: any) => {
-  return await GET({ endpoint: `${baseUri}&onlyShowDeleted=${params.onlyShowDeleted ?? false}` });
-};
-
-export const action = async ({ request }: any) => {
-  let formData = await request.formData();
-  return new Promise(() => formData); // TODO: decide action
-};
-
+let initialized = false;
 const ListArtists = () => {
-  const { data, headers }: any = useLoaderData();
-  const pagination = parseHeaders(headers);
+  const artistState: ArtistState = useAppSelector((state) => state.artistState);
+  const dispatch = useAppDispatch();
 
+  const setNewPaginationValues = (
+    pageNumber: number,
+    pageSize: number,
+    orderBy: string
+  ) => {
+    paginate({
+      baseUri,
+      pageNumber,
+      pageSize,
+      orderBy,
+      callback: async (endpoint: string) => {
+        dispatch(await fetchArtists(endpoint));
+      },
+    });
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      dispatch(await fetchArtists(baseUri));
+    };
+
+    if (!initialized) {
+      fetchData();
+      initialized = true;
+    }
+  });
   return (
     <Page
       pageTitle="Viewing Artists"
       children={
         <>
           <CreateButton domain={domain} />
-          <ArtistTable apiData={data} paginationHeaders={pagination} />
+          <ArtistTable
+            loading={artistState.status === "loading"}
+            artists={artistState.artists}
+            pagination={artistState.pagination}
+            setNewPaginationValues={setNewPaginationValues}
+          />
         </>
       }
     />

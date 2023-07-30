@@ -1,5 +1,33 @@
 import { GET } from "./httpRequest";
 
+export interface IPagination {
+  TotalItems: number;
+  CurrentPage: number;
+  PageSize: number;
+  OrderBy: string;
+}
+
+interface PaginateProps {
+  baseUri: string;
+  pageNumber: number;
+  pageSize: number;
+  orderBy: string;
+  callback: (endpoint: string) => {};
+}
+
+export const paginate = ({
+  baseUri,
+  pageNumber,
+  pageSize,
+  orderBy,
+  callback,
+}: PaginateProps) => {
+  const endpoint = `${baseUri}${
+    baseUri.includes("?") ? "&" : "?"
+  }PageNumber=${pageNumber}&PageSize=${pageSize}&OrderBy=${orderBy}`;
+  callback(endpoint);
+};
+
 interface SetPaginationValuesProps {
   baseUri: string;
   pageNumber: number;
@@ -27,5 +55,5 @@ export const setPaginationValues = async ({
 };
 
 export const parseHeaders = (headers: any) => {
- return JSON.parse(headers.get("x-pagination"));
+  return JSON.parse(headers.get("x-pagination"));
 };

@@ -1,6 +1,5 @@
 import Box from "@mui/joy/Box";
 import Checkbox from "@mui/joy/Checkbox";
-import CircularProgress from "@mui/joy/CircularProgress";
 import FormControl from "@mui/joy/FormControl";
 import FormLabel from "@mui/joy/FormLabel";
 import IconButton from "@mui/joy/IconButton";
@@ -21,6 +20,7 @@ import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { visuallyHidden } from "@mui/utils";
 
 import createUniqueKey from "../utilities/uniqueKey";
+import CircularProgress from "@mui/joy/CircularProgress";
 
 const labelDisplayedRows = ({
   from,
@@ -37,6 +37,7 @@ const labelDisplayedRows = ({
 const DataTable = ({
   title,
   caption,
+  loading,
   data,
   pagination,
   setNewPaginationValues,
@@ -171,9 +172,9 @@ const DataTable = ({
             {canDeleteItems && <th style={{ width: 50 }}>&nbsp;</th>}
             {data.headers.length > 0 &&
               data.headers.map((headCell: any) => {
-                const firstOrderBy = pagination.OrderBy
+                const firstOrderBy = pagination.OrderBy.includes(",")
                   ? pagination.OrderBy.split(",")[0]
-                  : " ";
+                  : pagination.OrderBy;
                 const orderBy: string = firstOrderBy.split(" ")[0];
                 const order: string = firstOrderBy.split(" ")[1];
                 const active = orderBy === headCell.id;
@@ -249,11 +250,11 @@ const DataTable = ({
           </tr>
         </thead>
 
-        {data.rows.length === 0 ? (
+        {loading ? (
           <tbody>
             <tr>
               <td
-                colSpan={data.headers.length}
+                colSpan={data.headers.length + 1}
                 align="center"
                 style={{ padding: 10 }}
               >
@@ -262,64 +263,64 @@ const DataTable = ({
             </tr>
           </tbody>
         ) : (
-          <tbody>
-            {data.rows.length > 0 &&
-              data.rows.map((row: any, rowIndex: number) => {
-                const isItemSelected = selectedRows.indexOf(row.id) !== -1;
-                const labelId = `enhanced-table-checkbox-${rowIndex}`;
+        <tbody>
+          {data.rows.length > 0 &&
+            data.rows.map((row: any, rowIndex: number) => {
+              const isItemSelected = selectedRows.indexOf(row.id) !== -1;
+              const labelId = `enhanced-table-checkbox-${rowIndex}`;
 
-                return (
-                  <tr key={createUniqueKey(10)}>
-                    {canDeleteItems && (
-                      <th scope="row" key={createUniqueKey(10)}>
-                        <Checkbox
-                          checked={isItemSelected}
-                          slotProps={{
-                            input: {
-                              "aria-labelledby": labelId,
-                            },
-                          }}
-                          sx={{ verticalAlign: "top" }}
-                          onClick={() => handleRowSelected(row.id)}
-                        />
-                      </th>
-                    )}
-                    {row.values.map((value: any, columnIndex: number) => (
-                      <td
-                        key={createUniqueKey(10)}
-                        onClick={async () => {
-                          if (columnIndex === 0 && canEditItems)
-                            handleEditSelectedRow(row.id);
+              return (
+                <tr key={createUniqueKey(10)}>
+                  {canDeleteItems && (
+                    <th scope="row" key={createUniqueKey(10)}>
+                      <Checkbox
+                        checked={isItemSelected}
+                        slotProps={{
+                          input: {
+                            "aria-labelledby": labelId,
+                          },
                         }}
-                      >
-                        {columnIndex === 0 && canEditItems ? (
-                          <>
-                            <u
-                              style={{
-                                cursor:
-                                  columnIndex === 0 && canEditItems
-                                    ? "pointer"
-                                    : "auto",
-                                color:
-                                  columnIndex === 0 && canEditItems
-                                    ? "#64b5f6"
-                                    : "auto",
-                              }}
-                            >
-                              edit
-                            </u>{" "}
-                            |{" "}
-                          </>
-                        ) : (
-                          ""
-                        )}
-                        {value}{" "}
-                      </td>
-                    ))}
-                  </tr>
-                );
-              })}
-          </tbody>
+                        sx={{ verticalAlign: "top" }}
+                        onClick={() => handleRowSelected(row.id)}
+                      />
+                    </th>
+                  )}
+                  {row.values.map((value: any, columnIndex: number) => (
+                    <td
+                      key={createUniqueKey(10)}
+                      onClick={async () => {
+                        if (columnIndex === 0 && canEditItems)
+                          handleEditSelectedRow(row.id);
+                      }}
+                    >
+                      {columnIndex === 0 && canEditItems ? (
+                        <>
+                          <u
+                            style={{
+                              cursor:
+                                columnIndex === 0 && canEditItems
+                                  ? "pointer"
+                                  : "auto",
+                              color:
+                                columnIndex === 0 && canEditItems
+                                  ? "#64b5f6"
+                                  : "auto",
+                            }}
+                          >
+                            edit
+                          </u>{" "}
+                          |{" "}
+                        </>
+                      ) : (
+                        ""
+                      )}
+                      {value}{" "}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+        </tbody>
         )}
         <tfoot>
           <tr>

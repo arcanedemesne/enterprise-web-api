@@ -9,6 +9,8 @@ import {
 
 import { StyledEngineProvider } from "@mui/joy/styles";
 
+import { store } from './store';
+
 import Root, {
   loader as rootLoader,
   action as rootAction,
@@ -23,10 +25,7 @@ import SignUp from "./pages/SignUp";
 import Admin from "./pages/Admin";
 import Dashboard from "./pages/Dashboard";
 
-import ListAuthors, {
-  loader as listAuthorsLoader,
-  action as listAuthorsAction,
-} from "./pages/Authors/ListAuthors";
+import ListAuthors from "./pages/Authors/ListAuthors";
 import CreateAuthor, {
   action as createAuthorAction,
 } from "./pages/Authors/CreateAuthor";
@@ -35,10 +34,7 @@ import EditAuthor, {
   action as editAuthorAction,
 } from "./pages/Authors/EditAuthor";
 
-import ListBooks, {
-  loader as listBooksLoader,
-  action as listBooksAction,
-} from "./pages/Books/ListBooks";
+import ListBooks from "./pages/Books/ListBooks";
 import CreateBook, {
   action as createBookAction,
 } from "./pages/Books/CreateBook";
@@ -47,10 +43,7 @@ import EditBook, {
   action as editBookAction,
 } from "./pages/Books/EditBook";
 
-import ListArtists, {
-  loader as listArtistsLoader,
-  action as listArtistsAction,
-} from "./pages/Artists/ListArtists";
+import ListArtists from "./pages/Artists/ListArtists";
 import CreateArtist, {
   action as createArtistAction,
 } from "./pages/Artists/CreateArtist";
@@ -59,10 +52,7 @@ import EditArtist, {
   action as editArtistAction,
 } from "./pages/Artists/EditArtist";
 
-import ListEmailSubscriptions, {
-  loader as listEmailSubscriptionsLoader,
-  action as listEmailSubscriptionsAction,
-} from "./pages/EmailSubscriptions/ListEmailSubscriptions";
+import ListEmailSubscriptions from "./pages/EmailSubscriptions/ListEmailSubscriptions";
 import CreateEmailSubscription, {
   action as createEmailSubscriptionAction,
 } from "./pages/EmailSubscriptions/CreateEmailSubscription";
@@ -71,13 +61,7 @@ import EditEmailSubscription, {
   action as editEmailSubscriptionAction,
 } from "./pages/EmailSubscriptions/EditEmailSubscription";
 
-import ListUsers, {
-  loader as listUsersLoader,
-  action as listUsersAction,
-} from "./pages/Users/ListUsers";
-import CreateUser, {
-  action as createUserAction,
-} from "./pages/Users/CreateUser";
+import ListUsers from "./pages/Users/ListUsers";
 import EditUser, {
   loader as editUserLoader,
   action as editUserAction,
@@ -99,6 +83,7 @@ import { action as destroyAction } from "./routes/destroy";
 
 import { isSignedIn } from "./auth/user";
 import PAGE_ROUTES from "./utilities/pageRoutes";
+import { Provider } from "react-redux";
 
 const RequireAuth = ({ children, redirectTo }: any) => {
   let isAuthenticated = isSignedIn();
@@ -132,8 +117,6 @@ const router = createBrowserRouter([
           {
             path: PAGE_ROUTES.ADMIN.AUTHORS.path,
             element: <ListAuthors />,
-            loader: listAuthorsLoader,
-            action: listAuthorsAction,
           },
           {
             path: PAGE_ROUTES.ADMIN.AUTHORS.CREATE.path,
@@ -149,8 +132,6 @@ const router = createBrowserRouter([
           {
             path: PAGE_ROUTES.ADMIN.BOOKS.path,
             element: <ListBooks />,
-            loader: listBooksLoader,
-            action: listBooksAction,
           },
           {
             path: PAGE_ROUTES.ADMIN.BOOKS.CREATE.path,
@@ -166,8 +147,6 @@ const router = createBrowserRouter([
           {
             path: PAGE_ROUTES.ADMIN.ARTISTS.path,
             element: <ListArtists />,
-            loader: listArtistsLoader,
-            action: listArtistsAction,
           },
           {
             path: PAGE_ROUTES.ADMIN.ARTISTS.CREATE.path,
@@ -183,8 +162,6 @@ const router = createBrowserRouter([
           {
             path: PAGE_ROUTES.ADMIN.EMAIL_SUBSCRIPTIONS.path,
             element: <ListEmailSubscriptions />,
-            loader: listEmailSubscriptionsLoader,
-            action: listEmailSubscriptionsAction,
           },
           {
             path: PAGE_ROUTES.ADMIN.EMAIL_SUBSCRIPTIONS.CREATE.path,
@@ -200,13 +177,6 @@ const router = createBrowserRouter([
           {
             path: PAGE_ROUTES.ADMIN.USERS.path,
             element: <ListUsers />,
-            loader: listUsersLoader,
-            action: listUsersAction,
-          },
-          {
-            path: PAGE_ROUTES.ADMIN.USERS.CREATE.path,
-            element: <CreateUser />,
-            action: createUserAction,
           },
           {
             path: PAGE_ROUTES.ADMIN.USERS.EDIT.path,
@@ -257,9 +227,11 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <StyledEngineProvider injectFirst>
-      <RouterProvider router={router} />
-    </StyledEngineProvider>
+    <Provider store={store}>
+      <StyledEngineProvider injectFirst>
+        <RouterProvider router={router} />
+      </StyledEngineProvider>
+    </Provider>
   </React.StrictMode>
 );
 

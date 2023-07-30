@@ -1,34 +1,56 @@
-import { useLoaderData } from "react-router-dom";
-
-import { GET } from "../../utilities/httpRequest";
+import { useEffect } from "react";
+import { useAppSelector, useAppDispatch } from "../../store/hooks";
 
 import Page from "../../components/Page";
-import CreateButton from "../../components/CreateButton";
-import { parseHeaders } from "../../utilities/pagination";
 
 import UserTable from "./UserTable";
-import { baseUri, domain } from ".";
+import { baseUri } from ".";
+import { UserState, fetchUsers } from "./state";
+import { paginate } from "../../utilities/pagination";
 
-export const loader = async () => {
-  return await GET({ endpoint: baseUri });
-};
-
-export const action = async ({ request }: any) => {
-  let formData = await request.formData();
-  return new Promise(() => formData); // TODO: decide action
-};
-
+let initialized = false;
 const ListUsers = () => {
-  const { data, headers }: any = useLoaderData();
-  const pagination = parseHeaders(headers);
+  const userState: UserState = useAppSelector((state) => state.userState);
+  const dispatch = useAppDispatch();
+
+  const setNewPaginationValues = (
+    pageNumber: number,
+    pageSize: number,
+    orderBy: string
+  ) => {
+    paginate({
+      baseUri,
+      pageNumber,
+      pageSize,
+      orderBy,
+      callback: async (endpoint: string) => {
+        dispatch(await fetchUsers(endpoint));
+      },
+    });
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      dispatch(await fetchUsers(baseUri));
+    };
+
+    if (!initialized) {
+      fetchData();
+      initialized = true;
+    }
+  });
 
   return (
     <Page
       pageTitle="Viewing Users"
       children={
         <>
-          <CreateButton domain={domain} />
-          <UserTable apiData={data} paginationHeaders={pagination} />
+          <UserTable
+            loading={userState.status === "loading"}
+            users={userState.users}
+            pagination={userState.pagination}
+            setNewPaginationValues={setNewPaginationValues}
+          />
         </>
       }
     />

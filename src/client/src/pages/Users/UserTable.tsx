@@ -2,31 +2,20 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import DataTable from "../../components/DataTable";
-import { setPaginationValues } from "../../utilities/pagination";
 
-import { domain, baseUri, IUser } from ".";
+import { domain, IUser } from "./";
 
-const UserTable = ({ apiData, paginationHeaders }: any) => {
+interface UserTableProps {
+  loading: boolean;
+  users: IUser[];
+  pagination: any;
+  setNewPaginationValues: (pageNumber: number, pageSize: number, orderBy: string) => void;
+}
+
+const UserTable = ({ loading, users, pagination, setNewPaginationValues }: UserTableProps) => {
   const navigate = useNavigate();
-
-  const [apiResponseData, setApiResponseData] = useState<IUser[]>(apiData || []);
-  const [pagination, setPagination] = useState<any>(paginationHeaders || {});
+  
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
-
-  const setNewPaginationValues = async (
-    pageNumber: number,
-    pageSize: number,
-    orderBy: string
-  ) => {
-    setPaginationValues({
-      baseUri,
-      pageNumber,
-      pageSize,
-      orderBy,
-      setPagination,
-      setApiResponseData,
-    });
-  };
 
   const handleDeleteItems = async () => {
     await navigate(`/admin/${domain}/delete?ids=${selectedRows}`);
@@ -36,7 +25,7 @@ const UserTable = ({ apiData, paginationHeaders }: any) => {
     await navigate(`/admin/${domain}/${id}`);
   };
 
-  const rows = apiResponseData.map((x: any) => {
+  const rows = users && users.map((x: any) => {
     return {
       id: x.id,
       values: [x.id, x.userName, x.firstName, x.lastName, x.emailAddress],
@@ -76,8 +65,9 @@ const UserTable = ({ apiData, paginationHeaders }: any) => {
 
   return (
     <DataTable
-      title="Authors"
-      caption="This table contains Authors"
+      title="Users"
+      caption="This table contains Users"
+      loading={loading}
       data={tableData}
       pagination={pagination}
       setNewPaginationValues={setNewPaginationValues}

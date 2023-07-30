@@ -1,32 +1,21 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 
-import { setPaginationValues } from "../../utilities/pagination";
 import DataTable from "../../components/DataTable";
 
-import { IArtist, baseUri, domain } from ".";;
+import { domain, IArtist } from "./";
 
-const ArtistTable = ({ apiData, paginationHeaders }: any) => {
+interface ArtistTableProps {
+  loading: boolean;
+  artists: IArtist[];
+  pagination: any;
+  setNewPaginationValues: (pageNumber: number, pageSize: number, orderBy: string) => void;
+}
+
+const ArtistTable = ({ loading, artists, pagination, setNewPaginationValues }: ArtistTableProps) => {
   const navigate = useNavigate();
   
-  const [apiResponseData, setApiResponseData] = useState<IArtist[]>(apiData);
-  const [pagination, setPagination] = useState<any>(paginationHeaders);
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
-
-  const setNewPaginationValues = async (
-    pageNumber: number,
-    pageSize: number,
-    orderBy: string
-  ) => {
-    setPaginationValues({
-      baseUri,
-      pageNumber,
-      pageSize,
-      orderBy,
-      setPagination,
-      setApiResponseData,
-    });
-  };
 
   const handleDeleteItems = async () => {
     await navigate(`/admin/${domain}/delete?ids=${selectedRows}`);
@@ -36,7 +25,7 @@ const ArtistTable = ({ apiData, paginationHeaders }: any) => {
     await navigate(`/admin/${domain}/${id}`);
   };
 
-  const rows = apiResponseData.map((x: any) => {
+  const rows = artists && artists.map((x: any) => {
     return {
       id: x.id,
       values: [x.id, `${x.firstName}`, `${x.lastName}`, x.covers.length],
@@ -72,6 +61,7 @@ const ArtistTable = ({ apiData, paginationHeaders }: any) => {
     <DataTable
       title="Artists"
       caption="This table contains Artists"
+      loading={loading}
       data={tableData}
       pagination={pagination}
       setNewPaginationValues={setNewPaginationValues}
