@@ -11,34 +11,14 @@ import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownR
 
 import { getMetadata } from "../auth/user";
 import { useNavigate } from "react-router-dom";
+import PAGE_ROUTES from "../utilities/pageRoutes";
 
 export default function Navigation() {
   const navigate = useNavigate();
 
-  const isActivePage = (page: string) =>
-    window.location.href.toLocaleLowerCase().includes(page);
-  const pages = [
-    {
-      label: "Dashboard",
-      value: "dashboard",
-    },
-    {
-      label: "Authors",
-      value: "authors",
-    },
-    {
-      label: "Books",
-      value: "books",
-    },
-    {
-      label: "Covers",
-      value: "covers",
-    },
-    {
-      label: "Artists",
-      value: "artists",
-    },
-  ];
+  const isActivePage = (path: string) => {
+    return window.location.href.includes(path);
+  };
 
   return (
     <List size="sm" sx={{ "--ListItem-radius": "8px", "--List-gap": "4px" }}>
@@ -65,17 +45,21 @@ export default function Navigation() {
             "& .JoyListItemButton-root": { p: "8px" },
           }}
         >
-          {pages.map((page: { label: string, value: string}) => (
-            <ListItem>
-              <ListItemButton
-                variant={isActivePage(page.value) ? "soft" : "plain"}
-                color={isActivePage(page.value) ? "primary" : "neutral"}
-                onClick={() => navigate(`/admin/${page.value}`)}
-              >
-                <ListItemContent>{page.label}</ListItemContent>
-              </ListItemButton>
-            </ListItem>
-          ))}
+          {Object.keys(PAGE_ROUTES.ADMIN).map((route: any) => {
+            if (PAGE_ROUTES.ADMIN[route].label) {
+              return (
+                <ListItem key={PAGE_ROUTES.ADMIN[route].path}>
+                  <ListItemButton
+                    variant={isActivePage(PAGE_ROUTES.ADMIN[route].path) ? "soft" : "plain"}
+                    color={isActivePage(PAGE_ROUTES.ADMIN[route].path) ? "primary" : "neutral"}
+                    onClick={() => navigate(`${PAGE_ROUTES.ADMIN[route].path}`)}
+                  >
+                    <ListItemContent>{PAGE_ROUTES.ADMIN[route].label}</ListItemContent>
+                  </ListItemButton>
+                </ListItem>
+              );
+            } else return null;
+          })}
         </List>
       </ListItem>
 

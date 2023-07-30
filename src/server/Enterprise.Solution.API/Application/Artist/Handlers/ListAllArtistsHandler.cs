@@ -56,7 +56,8 @@ namespace Enterprise.Solution.API.Application.Handlers
                 request.QueryParams.SearchQuery,
                 request.QueryParams.IncludeCovers ?? false,
                 request.QueryParams.IncludeCoversWithBook ?? false,
-                request.QueryParams.IncludeCoversWithBookAndAuthor ?? false);
+                request.QueryParams.IncludeCoversWithBookAndAuthor ?? false,
+                request.QueryParams.OnlyShowDeleted ?? false);
         }
     }
 }

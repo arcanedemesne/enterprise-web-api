@@ -66,7 +66,7 @@ namespace Enterprise.Solution.API.Application.Handlers
                 await _service.UpdateAsync(entity!);
                 return;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 LogAndThrowNotUpdatedException<Book>(request.Id);
             }

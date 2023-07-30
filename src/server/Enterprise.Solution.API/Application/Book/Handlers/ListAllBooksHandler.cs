@@ -56,7 +56,8 @@ namespace Enterprise.Solution.API.Application.Handlers
                 request.QueryParams.SearchQuery,
                 request.QueryParams.IncludeAuthor ?? false,
                 request.QueryParams.IncludeCover ?? false,
-                request.QueryParams.IncludeCoverAndArtists ?? false);
+                request.QueryParams.IncludeCoverAndArtists ?? false,
+                request.QueryParams.OnlyShowDeleted ?? false);
         }
     }
 }

@@ -19,5 +19,10 @@
         /// OrderBy
         /// </summary>
         public string? OrderBy { get; set; }
+
+        /// <summary>
+        /// OnlyShowDeleted
+        /// </summary>
+        public bool? OnlyShowDeleted { get; set; }
     }
 }

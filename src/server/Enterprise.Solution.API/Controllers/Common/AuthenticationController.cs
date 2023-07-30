@@ -92,14 +92,61 @@ namespace Enterprise.Solution.API.Controllers.Common
             {
                 var content = JsonConvert.DeserializeObject<KeycloakResponse>(response.Content.ReadAsStringAsync().Result);
 
-                await EmailService.SendAsync(new System.Net.Mail.MailMessage(
-                    "authentication-controller@domain.local",
-                    "admin@domain.local",
-                    "User Token created",
-                    $"Id Token created: {content}"
-                ));
+                var id_token = content?.id_token;
+                JwtSecurityToken jwtSecurityToken = new JwtSecurityToken(id_token);
 
-                return Ok(content);
+                var token_username = GetClaimFromToken(jwtSecurityToken, "preferred_username")?.Value;
+                var token_given_name = GetClaimFromToken(jwtSecurityToken, "given_name")?.Value;
+                var token_family_name = GetClaimFromToken(jwtSecurityToken, "family_name")?.Value;
+                var token_email_address = GetClaimFromToken(jwtSecurityToken, "email")?.Value;
+                var token_user_role = GetClaimFromToken(jwtSecurityToken, "aud")?.Value;
+                var token_keycloak_uid = GetClaimFromToken(jwtSecurityToken, "sub")?.Value;
+
+                Guid userGuid;
+                if (Guid.TryParse(token_keycloak_uid, out userGuid)) {
+                    if (await UserService.ExistsAsync(userGuid))
+                    {
+                        // TODO: Update User Info
+                        var User = await UserService.GetByIdAsync(userGuid);
+                        if (User != null)
+                        {
+                            User.UserName = token_username!;
+                            User.FirstName = token_given_name!;
+                            User.LastName = token_family_name!;
+                            User.EmailAddress = token_email_address!;
+
+                            User.ModifiedBy = userGuid;
+                            User.ModifiedTs = DateTime.UtcNow;
+
+                            await UserService.UpdateAsync(User);
+                        }
+                    }
+                    else
+                    {
+                        // TODO: Create User Info
+                        var User = await UserService.AddAsync(new Data.Models.User()
+                        {
+                            KeycloakUniqueIdentifier = userGuid,
+                            UserName = token_username!,
+                            FirstName = token_given_name!,
+                            LastName = token_family_name!,
+                            EmailAddress = token_email_address!,
+
+                            CreatedBy = userGuid,
+                        });
+                    }
+
+                    await EmailService.SendAsync(new System.Net.Mail.MailMessage(
+                        "authentication-controller@domain.local",
+                        "admin@domain.local",
+                        $"Token created for User: {token_username} - with KeyclaokId: {token_keycloak_uid}",
+                        $"Id Token created: {content}"
+                    ));
+
+                    return Ok(content);
+                }
+
+                return BadRequest("Invalid User");
             }                    
 
             return BadRequest(response.ReasonPhrase);
@@ -151,7 +198,7 @@ namespace Enterprise.Solution.API.Controllers.Common
                 await EmailService.SendAsync(new System.Net.Mail.MailMessage(
                     "authentication-controller@domain.local",
                     "admin@domain.local",
-                    "Swagger Token refreshed",
+                    "User Token refreshed",
                     $"Refresh Token created: {content?.refresh_token}"
                 ));
 

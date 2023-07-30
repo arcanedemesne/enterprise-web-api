@@ -24,13 +24,15 @@ namespace Enterprise.Solution.Service.Services
             int pageNumber,
             int pageSize,
             string? orderBy,
-            string? searchQuery = null)
+            string? searchQuery = null,
+            bool onlyShowDeleted = false)
         {
             return await _emailSubscriptionRepository.ListAllAsync(
                 pageNumber,
                 pageSize,
                 orderBy,
-                searchQuery);
+                searchQuery,
+                onlyShowDeleted);
         }
     }
 }

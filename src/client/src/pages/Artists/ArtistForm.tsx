@@ -37,10 +37,6 @@ const ArtistForm = ({
 }: ArtistFormProps) => {
   return (
     <Form method="post" id="artist-form">
-      {Object.keys(errors)?.length > 0 &&
-        Object.keys(errors)?.map((error: any) => (
-          <div style={{ color: "red" }}>{errors[error]}</div>
-        ))}
       <div>
         <FormInput type="text" name="id" value={formValues.id} hidden={true} />
         <span>First Name</span>
@@ -56,7 +52,7 @@ const ArtistForm = ({
               firstName: event.currentTarget.value,
             })
           }
-          hasError={errors?.firstName}
+          error={errors?.firstName}
         />
         <span>Last Name</span>
         <FormInput
@@ -71,7 +67,7 @@ const ArtistForm = ({
               lastName: event.currentTarget.value,
             })
           }
-          hasError={errors?.lastName}
+          error={errors?.lastName}
         />
       </div>
       <p>{buttons}</p>

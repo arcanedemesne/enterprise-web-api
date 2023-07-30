@@ -34,7 +34,7 @@ const labelDisplayedRows = ({
   return `${from}–${to} of ${count !== -1 ? count : `more than ${to}`}`;
 };
 
-const SimpleDataTable = ({
+const DataTable = ({
   title,
   caption,
   data,
@@ -49,7 +49,6 @@ const SimpleDataTable = ({
   setSelectedRows,
   ...props
 }: any) => {
-
   const handleChangeCurrentPage = async (currentPage: number) => {
     await setNewPaginationValues(
       currentPage,
@@ -87,7 +86,7 @@ const SimpleDataTable = ({
   };
 
   const handleEditSelectedRow = async (id: number) => {
-    await handleEditItem(id)
+    await handleEditItem(id);
   };
 
   const handleFilterItems = async () => {
@@ -116,7 +115,7 @@ const SimpleDataTable = ({
         }}
       >
         {numSelected > 0 ? (
-          <Typography sx={{ flex: "1 1 100%" }} component="div">
+          <Typography sx={{ flex: "1 1 100%" }} component="span">
             {numSelected} selected
           </Typography>
         ) : (
@@ -124,7 +123,7 @@ const SimpleDataTable = ({
             level="h6"
             sx={{ flex: "1 1 100%" }}
             id="tableTitle"
-            component="div"
+            component="span"
           >
             {title}
           </Typography>
@@ -181,7 +180,7 @@ const SimpleDataTable = ({
                 return (
                   <th
                     style={{ width: headCell.width ?? "auto" }}
-                    key={headCell.id ?? createUniqueKey(10)}
+                    key={createUniqueKey(10)}
                     aria-sort={
                       active
                         ? ({ asc: "ascending", desc: "descending" } as any)[
@@ -270,56 +269,54 @@ const SimpleDataTable = ({
                 const labelId = `enhanced-table-checkbox-${rowIndex}`;
 
                 return (
-                  <>
-                    <tr key={createUniqueKey(10)}>
-                      {canDeleteItems && (
-                        <th scope="row" key={createUniqueKey(10)}>
-                          <Checkbox
-                            checked={isItemSelected}
-                            slotProps={{
-                              input: {
-                                "aria-labelledby": labelId,
-                              },
-                            }}
-                            sx={{ verticalAlign: "top" }}
-                            onClick={() => handleRowSelected(row.id)}
-                          />
-                        </th>
-                      )}
-                      {row.values.map((value: any, columnIndex: number) => (
-                        <td
-                          key={createUniqueKey(10)}
-                          onClick={async () => {
-                            if (columnIndex === 0 && canEditItems)
-                              handleEditSelectedRow(row.id);
+                  <tr key={createUniqueKey(10)}>
+                    {canDeleteItems && (
+                      <th scope="row" key={createUniqueKey(10)}>
+                        <Checkbox
+                          checked={isItemSelected}
+                          slotProps={{
+                            input: {
+                              "aria-labelledby": labelId,
+                            },
                           }}
-                        >
-                          {columnIndex === 0 && canEditItems ? (
-                            <>
-                              <u
-                                style={{
-                                  cursor:
-                                    columnIndex === 0 && canEditItems
-                                      ? "pointer"
-                                      : "auto",
-                                  color:
-                                    columnIndex === 0 && canEditItems
-                                      ? "#64b5f6"
-                                      : "auto",
-                                }}
-                              >
-                                edit
-                              </u>{" "}
-                              |{" "}
-                            </>
-                          ) : (
-                            ""
-                          )}
-                          {value}{" "}
-                        </td>
-                      ))}
-                    </tr>
-                  </>
+                          sx={{ verticalAlign: "top" }}
+                          onClick={() => handleRowSelected(row.id)}
+                        />
+                      </th>
+                    )}
+                    {row.values.map((value: any, columnIndex: number) => (
+                      <td
+                        key={createUniqueKey(10)}
+                        onClick={async () => {
+                          if (columnIndex === 0 && canEditItems)
+                            handleEditSelectedRow(row.id);
+                        }}
+                      >
+                        {columnIndex === 0 && canEditItems ? (
+                          <>
+                            <u
+                              style={{
+                                cursor:
+                                  columnIndex === 0 && canEditItems
+                                    ? "pointer"
+                                    : "auto",
+                                color:
+                                  columnIndex === 0 && canEditItems
+                                    ? "#64b5f6"
+                                    : "auto",
+                              }}
+                            >
+                              edit
+                            </u>{" "}
+                            |{" "}
+                          </>
+                        ) : (
+                          ""
+                        )}
+                        {value}{" "}
+                      </td>
+                    ))}
+                  </tr>
                 );
               })}
           </tbody>
@@ -332,6 +329,7 @@ const SimpleDataTable = ({
               }
             >
               <Box
+                component="span"
                 sx={{
                   display: "flex",
                   alignItems: "center",
@@ -339,7 +337,11 @@ const SimpleDataTable = ({
                   justifyContent: "flex-end",
                 }}
               >
-                <FormControl orientation="horizontal" size="sm">
+                <FormControl
+                  orientation="horizontal"
+                  size="sm"
+                  component="span"
+                >
                   <FormLabel>rows per page:</FormLabel>
                   <Select
                     onChange={async (event: any, pageSize: number | null) => {
@@ -352,7 +354,11 @@ const SimpleDataTable = ({
                     <Option value={25}>25</Option>
                   </Select>
                 </FormControl>
-                <Typography textAlign="center" sx={{ minWidth: 80 }}>
+                <Typography
+                  textAlign="center"
+                  sx={{ minWidth: 80 }}
+                  component="span"
+                >
                   {labelDisplayedRows({
                     from:
                       data.rows.length === 0
@@ -363,7 +369,7 @@ const SimpleDataTable = ({
                     count: pagination.TotalItemCount,
                   })}
                 </Typography>
-                <Box sx={{ display: "flex", gap: 1 }}>
+                <Box sx={{ display: "flex", gap: 1 }} component="span">
                   <IconButton
                     size="sm"
                     color="neutral"
@@ -401,4 +407,4 @@ const SimpleDataTable = ({
   );
 };
 
-export default SimpleDataTable;
+export default DataTable;

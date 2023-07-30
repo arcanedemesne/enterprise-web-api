@@ -10,6 +10,7 @@ namespace Enterprise.Solution.Service.Services
             int pageNumber,
             int PageSize,
             string? orderBy,
-            string? searchQuery);
+            string? searchQuery,
+            bool onlyShowDeleted);
     }
 }

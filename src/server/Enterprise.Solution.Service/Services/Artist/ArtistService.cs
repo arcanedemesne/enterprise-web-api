@@ -27,7 +27,8 @@ namespace Enterprise.Solution.Service.Services
             string? searchQuery,
             bool includeCovers,
             bool includeCoversWithBook,
-            bool includeCoversWithBookAndAuthor)
+            bool includeCoversWithBookAndAuthor,
+            bool onlyShowDeleted)
         {
             return await _artistRepository.ListAllAsync(
                 pageNumber,
@@ -36,7 +37,8 @@ namespace Enterprise.Solution.Service.Services
                 searchQuery,
                 includeCovers,
                 includeCoversWithBook,
-                includeCoversWithBookAndAuthor);
+                includeCoversWithBookAndAuthor,
+                onlyShowDeleted);
         }
 
         public async Task<Artist?> GetByIdAsync(

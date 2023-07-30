@@ -12,9 +12,14 @@ namespace Enterprise.Solution.Data.DbContexts
         public DbSet<Cover> Covers { get; set; }
         public DbSet<Artist> Artists { get; set; }
         public DbSet<EmailSubscription> EmailSubscriptions { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+
+
             // SEED DATA: Will move to script later on
             var authorList = new Author[] {
                 new Author { Id =  1, FirstName = "Rhoda", LastName = "Lerman" },
@@ -77,41 +82,41 @@ namespace Enterprise.Solution.Data.DbContexts
 
             var someCovers = new Cover[] {
                 new Cover { Id =  3, BookId =  1, DesignIdeas = "A big ear in the clouds?",
-                    DigitalOnly = false, ImageUri = "" },
-                new Cover { Id =  2, BookId =  2, DesignIdeas = "Should we put a clock?",
-                    DigitalOnly = true,  ImageUri = "" },
+                    DigitalOnly = false, ImageUri = "https://media.gettyimages.com/photos/voice-recognition-technology-in-the-cloud-picture-id1176901715" },
+                new Cover { Id =  2, BookId =  2, DesignIdeas = "Should we put a clock in a person?",
+                    DigitalOnly = true,  ImageUri = "https://elitenp.com/wp-content/uploads/2020/11/time-clock-man-silhouette-business-5439652-1024x682.jpg" },
                 new Cover { Id =  1, BookId =  3, DesignIdeas = "How about a left hand in the dark?",
-                    DigitalOnly = false, ImageUri = "" },
+                    DigitalOnly = false, ImageUri = "https://thumbs.dreamstime.com/b/left-hand-print-4788544.jpg" },
                 new Cover { Id =  4, BookId =  4, DesignIdeas = "What if the devil was good?",
-                    DigitalOnly = false, ImageUri = "" },
+                    DigitalOnly = false, ImageUri = "https://www.hollywoodoutbreak.com/wp-content/uploads/2018/10/Hellboy_-_First_Look_Image_rgb.jpg" },
                 new Cover { Id =  5, BookId =  5, DesignIdeas = "You can't handle the truth!",
-                    DigitalOnly = false, ImageUri = "" },
-                new Cover { Id =  6, BookId =  6, DesignIdeas = "What id almost a legend?",
-                    DigitalOnly = false, ImageUri = "" },
+                    DigitalOnly = false, ImageUri = "https://i2.wp.com/listverse.com/wp-content/uploads/2012/11/You-cant-handle-the-truth.jpg" },
+                new Cover { Id =  6, BookId =  6, DesignIdeas = "What is almost a legend?",
+                    DigitalOnly = false, ImageUri = "https://i.pinimg.com/736x/9c/a1/84/9ca184bf2ddb6a3f2a666fb74e521558--emmett-brown-doc-brown.jpg" },
                 new Cover { Id =  7, BookId =  7, DesignIdeas = "What if god was bad?",
-                    DigitalOnly = false, ImageUri = "" },
+                    DigitalOnly = false, ImageUri = "https://2.bp.blogspot.com/-m9PzOVscJLY/WLc6pwsZcDI/AAAAAAAAAbk/qO3Om1T5eZgzA_Ig4X-vKLCXjedE-VRRQCLcB/s1600/evil%2Bgod.jpg" },
                 new Cover { Id =  8, BookId =  8, DesignIdeas = "A sickness that you can't hear.",
-                    DigitalOnly = false, ImageUri = "" },
+                    DigitalOnly = false, ImageUri = "https://i.pinimg.com/originals/ed/0f/fb/ed0ffb3250f411ac100cf14cedbc9aa3.jpg" },
                 new Cover { Id =  9, BookId =  9, DesignIdeas = "Someone stole a librarian...",
-                    DigitalOnly = false, ImageUri = "" },
+                    DigitalOnly = false, ImageUri = "https://m.media-amazon.com/images/M/MV5BYmJmNDM2MzItMTVlNC00ZTRkLTkzMGItN2RlZmIyY2I1MGIyL2ltYWdlXkEyXkFqcGdeQXVyNDcxNzU3MTE@._V1_SY500_CR0,0,767,500_AL_.jpg" },
                 new Cover { Id =  10, BookId = 10, DesignIdeas = "Laws and flowers.",
-                    DigitalOnly = false, ImageUri = "" },
+                    DigitalOnly = false, ImageUri = "https://thumbs.dreamstime.com/z/book-roses-old-closed-rose-petal-bed-background-55441413.jpg" },
                 new Cover { Id =  11, BookId = 11, DesignIdeas = "What if you saw an instrument ripped in half?",
-                    DigitalOnly = false, ImageUri = "" },
+                    DigitalOnly = false, ImageUri = "https://www.tooveys.com/lots/382988/2560.jpg" },
                 new Cover { Id =  12, BookId = 12, DesignIdeas = "A maid cleans for a whole year.",
-                    DigitalOnly = false, ImageUri = "" },
+                    DigitalOnly = false, ImageUri = "https://i.pinimg.com/originals/34/43/ec/3443ecd426b69c2e8917d5b23573ab90.jpg" },
                 new Cover { Id =  13, BookId = 13, DesignIdeas = "Rope made of fear?",
-                    DigitalOnly = false, ImageUri = "" },
+                    DigitalOnly = false, ImageUri = "https://image.shutterstock.com/shutterstock/photos/1136096/display_1500/stock-photo-triathlete-bound-my-ropes-1136096.jpg" },
                 new Cover { Id =  14, BookId = 14, DesignIdeas = "A Sci-Fi love story.",
-                    DigitalOnly = false, ImageUri = "" },
+                    DigitalOnly = false, ImageUri = "https://i.pinimg.com/originals/e8/6a/06/e86a06e48d8493950a20ba5a8b83197f.jpg" },
                 new Cover { Id =  15, BookId = 15, DesignIdeas = "It's a metal dude who ensares darkness.",
-                    DigitalOnly = false, ImageUri = "" },
+                    DigitalOnly = false, ImageUri = "https://hdqwalls.com/wallpapers/the-dark-knight-paint-jw.jpg" },
                 new Cover { Id =  16, BookId = 16, DesignIdeas = "Florida Man! 'nough said.",
-                    DigitalOnly = false, ImageUri = "" },
+                    DigitalOnly = false, ImageUri = "https://www.mystateline.com/wp-content/uploads/sites/17/2019/10/Florida-man-Marion-County-Viral.jpg?w=1280" },
                 new Cover { Id =  17, BookId = 17, DesignIdeas = "It's a sinking cloud in space.",
-                    DigitalOnly = false, ImageUri = "" },
+                    DigitalOnly = false, ImageUri = "https://en.wikipedia.org/wiki/Nebula#/media/File:Hs-2009-25-e-full.jpg" },
                 new Cover { Id =  18, BookId = 18, DesignIdeas = "Someone killed the little guy?",
-                    DigitalOnly = false, ImageUri = "" },
+                    DigitalOnly = false, ImageUri = "https://mymodernmet.com/wp/wp-content/uploads/archive/At0FmCtX6MEUCMkPN9nO_1082012468.jpeg" },
             };
             modelBuilder.Entity<Cover>().HasData(someCovers);
 

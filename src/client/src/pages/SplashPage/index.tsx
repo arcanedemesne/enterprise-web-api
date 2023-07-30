@@ -8,7 +8,7 @@ import ArrowForward from "@mui/icons-material/ArrowForward";
 import Sheet from "@mui/joy/Sheet";
 
 import TwoSidedLayout from "../../layouts/TwoSidedLayout";
-import { signInRoute, signUpRoute } from "../..";
+import PAGE_ROUTES from "../../utilities/pageRoutes";
 
 export default function SplashPage() {
   return (
@@ -40,12 +40,12 @@ export default function SplashPage() {
           A descriptive secondary text placeholder. Use it to explain your
           business offer better.
         </Typography>
-        <Button size="lg" endDecorator={<ArrowForward />} onClick={() => window.location.href=signUpRoute}>
+        <Button size="lg" endDecorator={<ArrowForward />} onClick={() => window.location.href=PAGE_ROUTES.SIGN_UP.path}>
           Get Started
         </Button>
         <Typography>
           Already a member?{" "}
-          <Link fontWeight="lg" href={signInRoute}>
+          <Link fontWeight="lg" href={PAGE_ROUTES.SIGN_IN.path}>
             Sign in
           </Link>
         </Typography>

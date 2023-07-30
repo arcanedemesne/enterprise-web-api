@@ -54,9 +54,9 @@ namespace Enterprise.Solution.API.Application.Handlers
             await _service.DeleteAsync(request.Id);
 
             LogCheckIfExists<Author>(request.Id);
-            var stillExists = await _service.ExistsAsync(request.Id);
+            var entity = await _service.GetByIdAsync(request.Id);
 
-            if (!stillExists) LogServiceRequestSuccess<Author>(RequestType.Delete, request.Id);
+            if (entity == null || entity.IsDeleted) LogServiceRequestSuccess<Author>(RequestType.Delete, request.Id);
             else LogAndThrowNotDeletedException<Author>(request.Id);
         }
     }

@@ -9,7 +9,7 @@ import Typography from "@mui/joy/Typography";
 import { ISignInProps, signIn, UserMetadata } from "../../auth/user";
 import AuthenticationLayout from "../../layouts/AuthenticationLayout";
 import FormInput from "../../components/FormInput";
-import { signUpRoute } from "../..";
+import PAGE_ROUTES from "../../utilities/pageRoutes";
 
 const adminUrl: string = "/admin/dashboard";
 let redirectUrl: string = "";
@@ -109,7 +109,7 @@ const SignIn = () => {
           Sign in
         </Button>
         <Typography
-          endDecorator={<Link href={signUpRoute}>Sign up</Link>}
+          endDecorator={<Link href={PAGE_ROUTES.SIGN_IN.path}>Sign up</Link>}
           fontSize="sm"
           sx={{ alignSelf: "center" }}
         >

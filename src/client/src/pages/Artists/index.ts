@@ -1,3 +1,5 @@
+import PAGE_ROUTES from "../../utilities/pageRoutes";
+
 export interface IArtist {
   id?: number;
   firstName: string;
@@ -6,5 +8,5 @@ export interface IArtist {
   covers: any[];
 }
 
-export const domain = "artists";
+export const domain = PAGE_ROUTES.ADMIN.ARTISTS.endpoint;
 export const baseUri = `${domain}?IncludeCoversWithBookAndAuthor=true`;

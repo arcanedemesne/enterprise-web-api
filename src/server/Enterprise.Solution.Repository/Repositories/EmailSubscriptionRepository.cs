@@ -13,16 +13,19 @@ namespace Enterprise.Solution.Repositories
     {
         public EmailSubscriptionRepository(EnterpriseSolutionDbContext dbContext, ILogger<BaseRepository<EmailSubscription>> logger) : base(dbContext, logger) { }
 
-        public async Task<EntityListWithPaginationMetadata<EmailSubscription>> ListAllAsync(
+        public async override Task<EntityListWithPaginationMetadata<EmailSubscription>> ListAllAsync(
             int pageNumber,
             int pageSize,
             string? orderBy,
-            string? searchQuery)
+            string? searchQuery,
+            bool onlyShowDeleted)
         {
             if (orderBy == null) orderBy = "firstName asc, lastName asc";
 
             var collection = _dbContext.EmailSubscriptions as IQueryable<EmailSubscription>;
-            
+
+            collection = collection.Where(c => c.IsDeleted == onlyShowDeleted);
+
             if (!String.IsNullOrWhiteSpace(searchQuery))
             {
                 searchQuery = searchQuery.Trim();

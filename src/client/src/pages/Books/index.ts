@@ -1,3 +1,4 @@
+import PAGE_ROUTES from "../../utilities/pageRoutes";
 
 export interface IBook {
   id?: number;
@@ -8,5 +9,5 @@ export interface IBook {
   publishDate: Date;
 }
 
-export const domain = "books";
+export const domain = PAGE_ROUTES.ADMIN.BOOKS.endpoint;
 export const baseUri = `${domain}?includeAuthor=true&includeCoverAndArtists=true`;

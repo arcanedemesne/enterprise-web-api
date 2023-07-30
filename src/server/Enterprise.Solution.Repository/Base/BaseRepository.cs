@@ -27,9 +27,12 @@ namespace Enterprise.Solution.Repository.Base
         public virtual async Task<EntityListWithPaginationMetadata<T>> ListAllAsync(
             int pageNumber = 1,
             int pageSize = 10,
-            string orderBy = "Id ASC")
+            string orderBy = "Id ASC",
+            bool onlyShowDeleted = false)
         {
             var collection = _dbContext.Set<T>() as IQueryable<T>;
+
+            collection = collection.Where(c => c.IsDeleted == onlyShowDeleted);
 
             var totalItemCount = await collection.CountAsync();
             var paginationMetadata = new PaginationMetadata(totalItemCount, pageSize, pageNumber, orderBy);
@@ -47,7 +50,8 @@ namespace Enterprise.Solution.Repository.Base
             int pageNumber = 1,
             int pageSize = 10,
             string? orderBy = null,
-            string? searchQuery = null)
+            string? searchQuery = null,
+            bool onlyShowDeleted = false)
         {
             throw new NotImplementedException();
         }
@@ -74,13 +78,14 @@ namespace Enterprise.Solution.Repository.Base
 
         public virtual async Task UpdateAsync(T entity)
         {
+            entity.ModifiedTs = DateTime.UtcNow;
+
             _dbContext.Entry(entity).State = EntityState.Modified;
             await _dbContext.SaveChangesAsync();
         }
 
         public virtual async Task DeleteAsync(int id)
         {
-
             var entity = await _dbContext.Set<T>().FindAsync(id);
             if (entity != null)
             {

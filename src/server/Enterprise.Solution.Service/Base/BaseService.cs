@@ -25,9 +25,9 @@ namespace Enterprise.Solution.Service.Base
         {
             return await _repository.ListAllAsync();
         }
-        public async Task<EntityListWithPaginationMetadata<T>> ListAllAsync(int pageNumber, int pageSize, string orderBy)
+        public async Task<EntityListWithPaginationMetadata<T>> ListAllAsync(int pageNumber, int pageSize, string orderBy, bool onlyShowDeleted)
         {
-            return await _repository.ListAllAsync(pageNumber, pageSize, orderBy);
+            return await _repository.ListAllAsync(pageNumber, pageSize, orderBy, onlyShowDeleted);
         }
 
         public async Task<T?> GetByIdAsync(int id)
@@ -52,7 +52,16 @@ namespace Enterprise.Solution.Service.Base
 
         public async Task DeleteAsync(int id)
         {
-            await _repository.DeleteAsync(id);
+            T? entity = await _repository.GetByIdAsync(id);
+            if (entity != null)
+            {
+                if (entity.IsDeleted)
+                {
+                    await _repository.DeleteAsync(id);
+                }
+                entity.IsDeleted = true;
+                await _repository.UpdateAsync(entity);
+            }
         }
     }
 }

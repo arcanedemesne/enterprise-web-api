@@ -42,6 +42,11 @@ namespace Enterprise.Solution.API.Controllers.Common
         private readonly ICacheService _cacheService;
 
         /// <summary>
+        /// IUserService
+        /// </summary>
+        private readonly IUserService _userService;
+
+        /// <summary>
         /// Constructor for the BaseController with MediatR
         /// </summary>
         /// <param name="solutionSettings"></param>
@@ -85,5 +90,9 @@ namespace Enterprise.Solution.API.Controllers.Common
         /// IArtistService for reaching CRUD operations for artists
         /// </summary>
         protected IArtistService ArtistService => _artistService ?? HttpContext.RequestServices.GetRequiredService<IArtistService>();
+        /// <summary>
+        /// IUserService for reaching CRUD operations for users
+        /// </summary>
+        protected IUserService UserService => _userService ?? HttpContext.RequestServices.GetRequiredService<IUserService>();
     }
 }

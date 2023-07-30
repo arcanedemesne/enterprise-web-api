@@ -13,7 +13,8 @@ namespace Enterprise.Solution.Service.Services
             string? searchQuery,
             bool includeArtists,
             bool includeBook,
-            bool includeBookAndAuthor);
+            bool includeBookAndAuthor,
+            bool onlyShowDeleted);
 
         public Task<Cover?> GetByIdAsync(
             int id,

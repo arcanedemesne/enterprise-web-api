@@ -57,7 +57,7 @@ const AuthorTable = ({ apiData, paginationHeaders }: any) => {
       },
       {
         id: "lastName",
-        label: "last Name",
+        label: "Last Name",
         numeric: false,
       },
       {

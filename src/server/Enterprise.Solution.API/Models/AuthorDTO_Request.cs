@@ -3,7 +3,7 @@
 namespace Enterprise.Solution.API.Models
 {
     /// <summary>
-    /// a DTO representing the shape of an Artist
+    /// a DTO representing the shape of an Author
     /// </summary>
     [Serializable]
     [ExcludeFromCodeCoverage]
@@ -18,10 +18,5 @@ namespace Enterprise.Solution.API.Models
         /// LastName of the Artist
         /// </summary>
         public string? LastName { get; set; }
-
-        /// <summary>
-        /// Full Name of the Author
-        /// </summary>
-        public string? FullName { get; set; }
     }
 }

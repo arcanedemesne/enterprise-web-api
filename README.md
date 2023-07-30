@@ -20,6 +20,8 @@ This is a demo project to implement the lastest techiniques and best practices i
 4. Run the Power Shell script 'setup-dev-certs.ps1' in [src/server/] in order, this will install the nginx certificates
 5. Inside [src/server/] Run docker-compose build, and then docker-compose up. Everything should just start running :)
    [Note: make sure Docker Desktop is Running]
+6. Once Keycloak is running, import the realm ( using 'enterprise-solution-realm.json' in [src/server/]).
+   This will contain a test user with admin priviledges, and a swagger user for testing in swagger.
 
 
 ### Find your Services

@@ -53,7 +53,8 @@ namespace Enterprise.Solution.API.Application.Handlers
             return await _service.ListAllAsync(
                 pageNumber, pageSize,
                 request.QueryParams.OrderBy,
-                request.QueryParams.SearchQuery);
+                request.QueryParams.SearchQuery,
+                request.QueryParams.OnlyShowDeleted ?? false);
         }
     }
 }

@@ -9,6 +9,8 @@ import { IBook, domain } from "./";
 import BookForm, { hasErrors } from "./BookForm";
 
 const updateItem = async (id: number, data: any) => {
+  delete data.author;
+  delete data.cover;
   await PUT({ endpoint: `${domain}/${id}`, data });
 };
 
@@ -17,7 +19,9 @@ const deleteItem = async (id: number) => {
 };
 
 export const loader = async ({ params }: any) => {
-  return await GET({ endpoint: `${domain}/${params.id}?includeAuthor=true&includeCoverAndArtists=true` });
+  return await GET({
+    endpoint: `${domain}/${params.id}?includeAuthor=true&includeCoverAndArtists=true`,
+  });
 };
 
 export const action = async ({ request, params }: any) => {
@@ -60,7 +64,14 @@ const EditBook = () => {
                   setErrors(errors);
                 }
               }}
-              handleDelete={async () => await deleteItem(formValues.id)}
+              handleDelete={async () =>
+                formValues.isDeleted
+                  ? await deleteItem(formValues.id)
+                  : await updateItem(formValues.id, {
+                      ...formValues,
+                      isDeleted: true,
+                    })
+              }
             />
           }
         />

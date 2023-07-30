@@ -5,7 +5,7 @@ import {
   getMetadata,
   saveUserMetadata,
 } from "../auth/user";
-import { signInRoute } from "..";
+import PAGE_ROUTES from "./pageRoutes";
 
 export const apiServer = "localhost:32768";
 export const apiVersion = "v1";
@@ -35,7 +35,7 @@ export const refreshTokens = async () => {
       });
       saveUserMetadata(newMatadata);
     } catch (error: any) {
-      window.location.href = signInRoute;
+      window.location.href = PAGE_ROUTES.SIGN_IN.path;
     }
   }
 };
@@ -53,6 +53,9 @@ export const GET = async ({ endpoint, headers }: any) => {
 
 export const POST = async ({ endpoint, data, headers }: any) => {
   await refreshTokens();
+
+  data.createdBy = getMetadata()?.keycloakUniqueIdentifier;
+
   return await axios({
     url: `${apiRoute}/${apiVersion}/${endpoint}`,
     method: "POST",
@@ -65,6 +68,9 @@ export const POST = async ({ endpoint, data, headers }: any) => {
 
 export const PUT = async ({ endpoint, data, headers }: any) => {
   await refreshTokens();
+  
+  data.modifiedBy = getMetadata()?.keycloakUniqueIdentifier;
+
   return await axios({
     url: `${apiRoute}/${apiVersion}/${endpoint}`,
     method: "PUT",
@@ -77,6 +83,9 @@ export const PUT = async ({ endpoint, data, headers }: any) => {
 
 export const PATCH = async ({ endpoint, data, headers }: any) => {
   await refreshTokens();
+  
+  data.modifiedBy = getMetadata()?.keycloakUniqueIdentifier;
+
   return await axios({
     url: `${apiRoute}/${apiVersion}/${endpoint}`,
     method: "PATCH",

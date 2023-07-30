@@ -25,5 +25,6 @@ namespace Enterprise.Solution.Shared.Settings
         public string ClientSecret { get; set; } = null!;
         public string MetadataAddress { get; set; } = null!;
         public string TokenExchange { get; set; } = null!;
+        public string Users { get; set; } = null!;
     }
 }

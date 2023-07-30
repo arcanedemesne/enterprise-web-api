@@ -26,10 +26,10 @@ const ListBooks = () => {
     <Page
       pageTitle="Viewing Books"
       children={
-        <p>
+        <>
           <CreateButton domain={domain} />
           <BookTable apiData={data} paginationHeaders={pagination} />
-        </p>
+        </>
       }
     />
   );

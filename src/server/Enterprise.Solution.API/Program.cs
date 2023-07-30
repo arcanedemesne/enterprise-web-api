@@ -30,6 +30,7 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 IdentityModelEventSource.ShowPII = true;
 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
@@ -169,6 +170,10 @@ services.AddScoped<IArtistService, ArtistService>();
 // EmailSubscription DI
 services.AddScoped(typeof(IEmailSubscriptionRepository), typeof(EmailSubscriptionRepository));
 services.AddScoped<IEmailSubscriptionService, EmailSubscriptionService>();
+
+// User DI
+services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
+services.AddScoped<IUserService, UserService>();
 
 // Add AutoMapper
 services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

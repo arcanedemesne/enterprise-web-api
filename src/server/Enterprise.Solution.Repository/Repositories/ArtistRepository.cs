@@ -6,6 +6,7 @@ using Enterprise.Solution.Repository.Base;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Linq.Dynamic.Core;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace Enterprise.Solution.Repositories
 {
@@ -20,11 +21,15 @@ namespace Enterprise.Solution.Repositories
             string? searchQuery,
             bool includeCovers,
             bool includeCoversWithBook,
-            bool includeCoversWithBookAndAuthor)
+            bool includeCoversWithBookAndAuthor,
+            bool onlyShowDeleted)
         {
             if (orderBy == null) orderBy = "firstName asc, lastName asc";
             
             var collection = _dbContext.Artists as IQueryable<Artist>;
+
+            // Check if IsDeleted
+            collection = collection.Where(a => a.IsDeleted == onlyShowDeleted);
 
             if (!String.IsNullOrWhiteSpace(searchQuery))
             {
@@ -35,27 +40,27 @@ namespace Enterprise.Solution.Repositories
                 || a.LastName.ToLower().Contains(searchQuery.ToLower()));
             }
 
-            var totalArtistCount = await collection.CountAsync();
-            var paginationMetadata = new PaginationMetadata(totalArtistCount, pageSize, pageNumber, orderBy);
-
             if (includeCovers)
             {
                 collection = collection
-                    .Include(a => a.Covers);
+                    .Include(artist => artist.Covers.Where(cover => !cover.IsDeleted));
             }
             else if (includeCoversWithBook)
             {
                 collection = collection
-                    .Include(a => a.Covers)
+                    .Include(artist => artist.Covers.Where(cover => !cover.IsDeleted))
                     .ThenInclude(c => c.Book);
             }
             else if (includeCoversWithBookAndAuthor)
             {
                 collection = collection
-                    .Include(a => a.Covers)
+                    .Include(artist => artist.Covers.Where(cover => !cover.IsDeleted))
                     .ThenInclude(b => b.Book)
                     .ThenInclude(c => c.Author);
             }
+
+            var totalArtistCount = await collection.CountAsync();
+            var paginationMetadata = new PaginationMetadata(totalArtistCount, pageSize, pageNumber, orderBy);
 
             var collectionToReturn = await collection
                 .OrderBy(orderBy)

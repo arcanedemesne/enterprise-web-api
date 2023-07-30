@@ -1,6 +1,7 @@
 import Input from "@mui/joy/Input";
 import FormControl from "@mui/joy/FormControl";
 import FormLabel from "@mui/joy/FormLabel";
+import FormHelperText from "@mui/joy/FormHelperText";
 
 export interface IFormInputProps {
   label?: string | null;
@@ -11,7 +12,8 @@ export interface IFormInputProps {
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   hidden?: boolean;
-  hasError?: boolean;
+  disabled?: boolean;
+  error?: string;
 }
 
 const FormInput = ({
@@ -23,11 +25,12 @@ const FormInput = ({
   onChange,
   onKeyUp,
   hidden,
-  hasError,
+  disabled,
+  error,
 }: IFormInputProps) => {
   return (
     <>
-      <FormControl>
+      <FormControl sx={{ mb: 2 }} error={!!error && error!.length > 0}>
         {label && <FormLabel>{label}</FormLabel>}
         <Input
           // html input attribute
@@ -40,8 +43,10 @@ const FormInput = ({
           sx={{
             display: hidden ? "none" : "auto",
           }}
-          error={hasError}
+          disabled={disabled}
+          error={!!error && error!.length > 0}
         />
+        <FormHelperText>{error}</FormHelperText>
       </FormControl>
     </>
   );

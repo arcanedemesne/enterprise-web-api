@@ -20,11 +20,14 @@ namespace Enterprise.Solution.Repositories
             string? searchQuery,
             bool includeAuthor,
             bool includeCover,
-            bool includeCoverAndArtists)
+            bool includeCoverAndArtists,
+            bool onlyShowDeleted)
         {
             if (orderBy == null) orderBy = "title asc";
 
             var collection = _dbContext.Books as IQueryable<Book>;
+
+            collection = collection.Where(c => c.IsDeleted == onlyShowDeleted);
 
             if (!String.IsNullOrWhiteSpace(searchQuery))
             {
@@ -39,18 +42,18 @@ namespace Enterprise.Solution.Repositories
             if (includeAuthor)
             {
                 collection = collection
-                    .Include(a => a.Author);
+                    .Include(book => book.Author);
             }
             if (includeCover)
             {
                 collection = collection
-                    .Include(b => b.Cover);
+                    .Include(book => book.Cover);
             }
             else if (includeCoverAndArtists)
             {
                 collection = collection
-                    .Include(b => b.Cover)
-                    .ThenInclude(c => c.Artists);
+                    .Include(book => book.Cover)
+                    .ThenInclude(cover => cover.Artists.Where(artist => !artist.IsDeleted));
             }
 
             var collectionToReturn = await collection

@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 using Enterprise.Solution.Data.Models.Base;
 
 namespace Enterprise.Solution.Data.Models

@@ -26,10 +26,10 @@ const ListAuthors = () => {
     <Page
       pageTitle="Viewing Authors"
       children={
-        <p>
+        <>
           <CreateButton domain={domain} />
           <AuthorTable apiData={data} paginationHeaders={pagination} />
-        </p>
+        </>
       }
     />
   );

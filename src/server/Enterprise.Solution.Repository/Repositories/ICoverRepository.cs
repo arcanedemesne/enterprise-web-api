@@ -17,7 +17,8 @@ namespace Enterprise.Solution.Repositories
             string? searchQuery,
             bool includeArtists,
             bool includeBook,
-            bool includeBookAndAuthor);
+            bool includeBookAndAuthor,
+            bool onlyShowDeleted);
 
         public Task<Cover?> GetByIdAsync(
             int id,

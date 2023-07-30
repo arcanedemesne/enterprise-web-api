@@ -9,8 +9,8 @@ import CreateButton from "../../components/CreateButton";
 import ArtistTable from "./ArtistTable";
 import { baseUri, domain } from ".";
 
-export const loader = async () => {
-  return await GET({ endpoint: baseUri });
+export const loader = async ({ params }: any) => {
+  return await GET({ endpoint: `${baseUri}&onlyShowDeleted=${params.onlyShowDeleted ?? false}` });
 };
 
 export const action = async ({ request }: any) => {
@@ -26,10 +26,10 @@ const ListArtists = () => {
     <Page
       pageTitle="Viewing Artists"
       children={
-        <p>
+        <>
           <CreateButton domain={domain} />
           <ArtistTable apiData={data} paginationHeaders={pagination} />
-        </p>
+        </>
       }
     />
   );

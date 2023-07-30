@@ -18,10 +18,5 @@ namespace Enterprise.Solution.API.Models
         /// LastName of the Artist
         /// </summary>
         public string? LastName { get; set; }
-
-        /// <summary>
-        /// Full Name of the Author
-        /// </summary>
-        public string? FullName { get; set; }
     }
 }

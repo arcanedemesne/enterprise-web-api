@@ -10,10 +10,5 @@ namespace Enterprise.Solution.Repositories
     /// <typeparam name="EmailSubscription"></typeparam>
     public interface IEmailSubscriptionRepository : IBaseRepository<EmailSubscription>
     {
-        public Task<EntityListWithPaginationMetadata<EmailSubscription>> ListAllAsync(
-            int pageNumber,
-            int pageSize,
-            string? orderBy,
-            string? searchQuery);
     }
 }

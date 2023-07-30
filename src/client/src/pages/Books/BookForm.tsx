@@ -71,10 +71,6 @@ const BookForm = ({
 
   return (
     <Form method="post" id="book-form">
-      {Object.keys(errors)?.length > 0 &&
-        Object.keys(errors)?.map((error: any) => (
-          <div style={{ color: "red" }}>{errors[error]}</div>
-        ))}
       <div>
         <FormInput type="text" name="id" value={formValues.id} hidden={true} />
         <FormInput
@@ -102,7 +98,7 @@ const BookForm = ({
               title: event.currentTarget.value,
             })
           }
-          hasError={errors?.title}
+          error={errors?.title}
         />
         <span>Base Price</span>
         <FormInput
@@ -117,7 +113,7 @@ const BookForm = ({
               basePrice: event.currentTarget.value,
             })
           }
-          hasError={errors?.basePrice}
+          error={errors?.basePrice}
         />
         <span>Publish Date</span>
         <FormInput
@@ -132,7 +128,7 @@ const BookForm = ({
               publishDate: event.currentTarget.value,
             })
           }
-          hasError={errors?.publishDate}
+          error={errors?.publishDate}
         />
         <AsynchronousSearch
           label="Author"

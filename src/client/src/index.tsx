@@ -59,6 +59,30 @@ import EditArtist, {
   action as editArtistAction,
 } from "./pages/Artists/EditArtist";
 
+import ListEmailSubscriptions, {
+  loader as listEmailSubscriptionsLoader,
+  action as listEmailSubscriptionsAction,
+} from "./pages/EmailSubscriptions/ListEmailSubscriptions";
+import CreateEmailSubscription, {
+  action as createEmailSubscriptionAction,
+} from "./pages/EmailSubscriptions/CreateEmailSubscription";
+import EditEmailSubscription, {
+  loader as editEmailSubscriptionLoader,
+  action as editEmailSubscriptionAction,
+} from "./pages/EmailSubscriptions/EditEmailSubscription";
+
+import ListUsers, {
+  loader as listUsersLoader,
+  action as listUsersAction,
+} from "./pages/Users/ListUsers";
+import CreateUser, {
+  action as createUserAction,
+} from "./pages/Users/CreateUser";
+import EditUser, {
+  loader as editUserLoader,
+  action as editUserAction,
+} from "./pages/Users/EditUser";
+
 /* TEST */
 import Index from "./routes";
 import ErrorPage from "./ErrorPage";
@@ -74,9 +98,7 @@ import { action as destroyAction } from "./routes/destroy";
 /* END TEST */
 
 import { isSignedIn } from "./auth/user";
-
-export const signInRoute = "/sign-in";
-export const signUpRoute = "/sign-up";
+import PAGE_ROUTES from "./utilities/pageRoutes";
 
 const RequireAuth = ({ children, redirectTo }: any) => {
   let isAuthenticated = isSignedIn();
@@ -91,104 +113,106 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <SplashPage /> },
       {
-        path: "sign-in",
+        path: PAGE_ROUTES.SIGN_IN.path,
         element: <SignIn />,
       },
       {
-        path: "sign-up",
+        path: PAGE_ROUTES.SIGN_UP.path,
         element: <SignUp />,
       },
       {
-        path: "admin",
+        path: PAGE_ROUTES.ADMIN.path,
         element: (
-          <RequireAuth redirectTo={signInRoute}>
+          <RequireAuth redirectTo={PAGE_ROUTES.SIGN_IN.path}>
             <Admin />
           </RequireAuth>
         ),
         children: [
-          { path: "dashboard", element: <Dashboard /> },
+          { path: PAGE_ROUTES.ADMIN.DASHBOARD.path, element: <Dashboard /> },
           {
-            path: "authors",
+            path: PAGE_ROUTES.ADMIN.AUTHORS.path,
             element: <ListAuthors />,
             loader: listAuthorsLoader,
             action: listAuthorsAction,
           },
           {
-            path: "authors/create",
-            element: (
-              <RequireAuth redirectTo={signInRoute}>
-                <CreateAuthor />
-              </RequireAuth>
-            ),
+            path: PAGE_ROUTES.ADMIN.AUTHORS.CREATE.path,
+            element: <CreateAuthor />,
             action: createAuthorAction,
           },
           {
-            path: "authors/:id",
-            element: (
-              <RequireAuth redirectTo={signInRoute}>
-                <EditAuthor />
-              </RequireAuth>
-            ),
+            path: PAGE_ROUTES.ADMIN.AUTHORS.EDIT.path,
+            element: <EditAuthor />,
             loader: editAuthorLoader,
             action: editAuthorAction,
           },
           {
-            path: "books",
-            element: (
-              <RequireAuth redirectTo={signInRoute}>
-                <ListBooks />
-              </RequireAuth>
-            ),
+            path: PAGE_ROUTES.ADMIN.BOOKS.path,
+            element: <ListBooks />,
             loader: listBooksLoader,
             action: listBooksAction,
           },
           {
-            path: "books/create",
-            element: (
-              <RequireAuth redirectTo={signInRoute}>
-                <CreateBook />
-              </RequireAuth>
-            ),
+            path: PAGE_ROUTES.ADMIN.BOOKS.CREATE.path,
+            element: <CreateBook />,
             action: createBookAction,
           },
           {
-            path: "books/:id",
-            element: (
-              <RequireAuth redirectTo={signInRoute}>
-                <EditBook />
-              </RequireAuth>
-            ),
+            path: PAGE_ROUTES.ADMIN.BOOKS.EDIT.path,
+            element: <EditBook />,
             loader: editBookLoader,
             action: editBookAction,
           },
           {
-            path: "artists",
-            element: (
-              <RequireAuth redirectTo={signInRoute}>
-                <ListArtists />
-              </RequireAuth>
-            ),
+            path: PAGE_ROUTES.ADMIN.ARTISTS.path,
+            element: <ListArtists />,
             loader: listArtistsLoader,
             action: listArtistsAction,
           },
           {
-            path: "artists/create",
-            element: (
-              <RequireAuth redirectTo={signInRoute}>
-                <CreateArtist />
-              </RequireAuth>
-            ),
+            path: PAGE_ROUTES.ADMIN.ARTISTS.CREATE.path,
+            element: <CreateArtist />,
             action: createArtistAction,
           },
           {
-            path: "artists/:id",
-            element: (
-              <RequireAuth redirectTo={signInRoute}>
-                <EditArtist />
-              </RequireAuth>
-            ),
+            path: PAGE_ROUTES.ADMIN.ARTISTS.EDIT.path,
+            element: <EditArtist />,
             loader: editArtistLoader,
             action: editArtistAction,
+          },
+          {
+            path: PAGE_ROUTES.ADMIN.EMAIL_SUBSCRIPTIONS.path,
+            element: <ListEmailSubscriptions />,
+            loader: listEmailSubscriptionsLoader,
+            action: listEmailSubscriptionsAction,
+          },
+          {
+            path: PAGE_ROUTES.ADMIN.EMAIL_SUBSCRIPTIONS.CREATE.path,
+            element: <CreateEmailSubscription />,
+            action: createEmailSubscriptionAction,
+          },
+          {
+            path: PAGE_ROUTES.ADMIN.EMAIL_SUBSCRIPTIONS.EDIT.path,
+            element: <EditEmailSubscription />,
+            loader: editEmailSubscriptionLoader,
+            action: editEmailSubscriptionAction,
+          },
+          {
+            path: PAGE_ROUTES.ADMIN.USERS.path,
+            element: <ListUsers />,
+            loader: listUsersLoader,
+            action: listUsersAction,
+          },
+          {
+            path: PAGE_ROUTES.ADMIN.USERS.CREATE.path,
+            element: <CreateUser />,
+            action: createUserAction,
+          },
+          {
+            path: PAGE_ROUTES.ADMIN.USERS.EDIT.path,
+            element: <EditUser />,
+            loader: editUserLoader,
+            action: editUserAction,
           },
         ],
       },

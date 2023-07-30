@@ -1,6 +1,6 @@
-import { signInRoute } from "..";
 import { authenticate } from "../utilities/httpRequest";
 import { getItem, setItem } from "../utilities/localStorage";
+import PAGE_ROUTES from "../utilities/pageRoutes";
 
 export interface UserMetadata {
   //roles: string[];
@@ -12,6 +12,8 @@ export interface UserMetadata {
   email_verified: boolean;
   expiry_date: number;
   access_expiry_date: number;
+
+  keycloakUniqueIdentifier: string;
 }
 
 const userMetadataKey = "userMetadataKey";
@@ -53,12 +55,14 @@ export const setRefreshToken = (refresh_token: string | null): void => {
 const checkSessionTime = 30 * 1000; // check every 30 secs
 const TimeCheckAuth = () => {
   if (!isSignedIn()) {
-    window.location.href = signInRoute;
+    window.location.href = PAGE_ROUTES.SIGN_IN.path;
   }
 };
 
 export const isSignedIn = (): boolean => {
-  setTimeout(() => { TimeCheckAuth() }, checkSessionTime);
+  setTimeout(() => {
+    TimeCheckAuth();
+  }, checkSessionTime);
   const metadata = getMetadata();
   const id_token = getIdToken();
   const refresh_token = getRefreshToken();
@@ -72,15 +76,25 @@ export const isSignedIn = (): boolean => {
 
 export const saveUserMetadata = (userMetadata: any) => {
   if (userMetadata && userMetadata.data) {
-    const { id_token, expires_in, access_token, refresh_token, refresh_expires_in } = userMetadata.data;
+    const {
+      id_token,
+      expires_in,
+      access_token,
+      refresh_token,
+      refresh_expires_in,
+    } = userMetadata.data;
     setIdToken(id_token);
     setAccessToken(access_token);
     setRefreshToken(refresh_token);
-    const metadata = convertToUserMetadata(parseJwt(id_token), expires_in, refresh_expires_in);
+    const metadata = convertToUserMetadata(
+      parseJwt(id_token),
+      expires_in,
+      refresh_expires_in
+    );
     setMetadata(metadata);
     return metadata;
   }
-}
+};
 
 export interface ISignInProps {
   userName: string;
@@ -117,16 +131,22 @@ const parseJwt = (id_token: string) => {
   return JSON.parse(jsonPayload);
 };
 
-const convertToUserMetadata = (metadata: any, access_exp: number, refresh_exp: number): UserMetadata => {
+const convertToUserMetadata = (
+  parsedToken: any,
+  access_exp: number,
+  refresh_exp: number
+): UserMetadata => {
   return {
-    username: metadata.preferred_username,
-    full_name: `${metadata.given_name} ${metadata.family_name}`,
-    first_name: metadata.given_name,
-    last_name: metadata.family_name,
-    email_address: metadata.email,
-    email_verified: metadata.email_verified,
-    expiry_date:  Date.now() + (refresh_exp * 1000),
-    access_expiry_date: Date.now() + (access_exp * 1000),
+    username: parsedToken.preferred_username,
+    full_name: `${parsedToken.given_name} ${parsedToken.family_name}`,
+    first_name: parsedToken.given_name,
+    last_name: parsedToken.family_name,
+    email_address: parsedToken.email,
+    email_verified: parsedToken.email_verified,
+    expiry_date: Date.now() + refresh_exp * 1000,
+    access_expiry_date: Date.now() + access_exp * 1000,
+
+    keycloakUniqueIdentifier: parsedToken.sub,
   } as UserMetadata;
 };
 
@@ -135,7 +155,7 @@ export const signOut = (): void => {
   setIdToken(null);
   setAccessToken(null);
   setRefreshToken(null);
-  window.location.href = signInRoute;
+  window.location.href = PAGE_ROUTES.SIGN_IN.path;
 };
 
 export interface ISignUpProps {
@@ -145,12 +165,3 @@ export interface ISignUpProps {
   emailAddress: string;
   password: string;
 }
-export const create = ({
-  firstName,
-  lastName,
-  userName,
-  emailAddress,
-  password,
-}: ISignUpProps): void => {
-  // TODO: create API endpoint to sign up
-};

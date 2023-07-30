@@ -24,7 +24,7 @@ const AsynchronousSearch = ({ label, options, value, handleChange, inputValue, h
 
   return (
     <FormControl id="asynchronous-search">
-      <FormLabel>{label}</FormLabel>
+      {label && <FormLabel sx={{ fontSize: "1em"}}>{label}</FormLabel>}
       <Autocomplete
         sx={{ width: 300 }}
         placeholder="Asynchronous"

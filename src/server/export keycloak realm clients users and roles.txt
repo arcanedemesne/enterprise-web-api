@@ -1,0 +1,5 @@
+https://simonscholz.github.io/tutorials/keycloak-realm-export-import
+
+
+/opt/keycloak/bin/kc.sh export --dir /opt/keycloak/data/import --users realm_file --realm enterprise-solution-realm
+cat /opt/keycloak/data/import/enterprise-solution-realm-realm.json

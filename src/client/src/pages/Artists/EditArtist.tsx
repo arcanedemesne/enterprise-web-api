@@ -50,7 +50,13 @@ const EditArtist = () => {
                   setErrors(errors);
                 }
               }}
-              handleDelete={async () => await deleteItem(formValues.id)}
+              handleDelete={async () => 
+                formValues.isDeleted
+                  ? await deleteItem(formValues.id)
+                  : await updateItem(formValues.id, {
+                      ...formValues,
+                      isDeleted: true,
+                    })}
             />
           }
         />

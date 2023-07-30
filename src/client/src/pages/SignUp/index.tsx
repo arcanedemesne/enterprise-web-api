@@ -1,21 +1,14 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import Button from "@mui/joy/Button";
 import Link from "@mui/joy/Link";
 import Sheet from "@mui/joy/Sheet";
 import Typography from "@mui/joy/Typography";
 
-import { create, ISignUpProps, UserMetadata } from "../../auth/user";
 import AuthenticationLayout from "../../layouts/AuthenticationLayout";
 import FormInput from "../../components/FormInput";
 
-const dashboardUrl: string = "admin/dashboard";
-let redirectUrl: string = "";
-
 const SignUp = () => {
-  const navigate = useNavigate();
-
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [firstName, setFirstName] = useState<string | null>(null);
   const [lastName, setLastName] = useState<string | null>(null);
@@ -26,16 +19,16 @@ const SignUp = () => {
 
   const onSignUp = async () => {
     try {
-      const metadata = (await create({
-        firstName,
-        lastName,
-        userName,
-        emailAddress,
-        password,
-      } as ISignUpProps)) as UserMetadata | undefined;
-      if (metadata?.email_address) {
-        navigate(redirectUrl.length > 0 ? redirectUrl : dashboardUrl);
-      }
+      // const metadata = (await create({
+      //   firstName,
+      //   lastName,
+      //   userName,
+      //   emailAddress,
+      //   password,
+      // } as ISignUpProps)) as UserMetadata | undefined;
+      // if (metadata?.email_address) {
+      //   navigate(redirectUrl.length > 0 ? redirectUrl : dashboardUrl);
+      // }
     } catch (error: any) {
       setErrorMessage(error.statusText);
     }
