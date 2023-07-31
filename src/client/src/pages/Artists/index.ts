@@ -1,17 +1,11 @@
+import { IBaseEntity } from "../../store";
 import PAGE_ROUTES from "../../utilities/pageRoutes";
 
-export interface IArtist {
-  id?: number;
+export interface IArtist extends IBaseEntity {
   firstName: string;
   lastName: string;
   fullName: string;
   covers: any[];
-
-  createdBy: string;
-  createdTs: number;
-  modifiedBy: string;
-  modifiedTs: number;
-  isDeleted: boolean;
 }
 
 export const domain = PAGE_ROUTES.ADMIN.ARTISTS.endpoint;

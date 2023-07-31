@@ -2,13 +2,11 @@ import { useNavigate } from "react-router-dom";
 
 import Box from "@mui/joy/Box";
 import IconButton from "@mui/joy/IconButton";
-import Input from "@mui/joy/Input";
 import Typography from "@mui/joy/Typography";
 
 import GridViewRoundedIcon from "@mui/icons-material/GridViewRounded";
 import GroupRoundedIcon from "@mui/icons-material/GroupRounded";
 import MenuIcon from "@mui/icons-material/Menu";
-import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 
 import * as Layout from "../layouts";
@@ -49,27 +47,7 @@ const Header = () => {
           Application Name
         </Typography>
       </Box>
-      <Input
-        size="sm"
-        placeholder="Search anything…"
-        startDecorator={<SearchRoundedIcon color="primary" />}
-        sx={{
-          flexBasis: "500px",
-          display: {
-            xs: "none",
-            sm: "flex",
-          },
-        }}
-      />
       <Box sx={{ display: "flex", flexDirection: "row", gap: 1.5 }}>
-        <IconButton
-          size="sm"
-          variant="outlined"
-          color="primary"
-          sx={{ display: { xs: "inline-flex", sm: "none" } }}
-        >
-          <SearchRoundedIcon />
-        </IconButton>
         <Menu
           id="app-selector"
           control={
@@ -84,29 +62,19 @@ const Header = () => {
           }
           menus={[
             {
-              label: "Dashboard",
-              href: "/",
-              active: window.location.href.toLocaleLowerCase().includes('dashboard'),
+              label: "Profile",
+              href: "/admin/profile",
+              active: window.location.href.toLocaleLowerCase().includes('profile'),
             },
             {
-              label: "Authors",
-              href: "/admin/authors",
-              active: window.location.href.toLocaleLowerCase().includes('authors'),
+              label: "Users",
+              href: "/admin/users",
+              active: window.location.href.toLocaleLowerCase().includes('users'),
             },
             {
-              label: "Books",
-              href: "/admin/books",
-              active: window.location.href.toLocaleLowerCase().includes('books'),
-            },
-            {
-              label: "Artists",
-              href: "/admin/artists",
-              active: window.location.href.toLocaleLowerCase().includes('artists'),
-            },
-            {
-              label: "Subscriptions",
-              href: "/admin/subscriptions",
-              active: window.location.href.toLocaleLowerCase().includes('subscriptions'),
+              label: "Email Subscriptions",
+              href: "/admin/email-subscriptions",
+              active: window.location.href.toLocaleLowerCase().includes('email-subscriptions'),
             },
           ]}
         />

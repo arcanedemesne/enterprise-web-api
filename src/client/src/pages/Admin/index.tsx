@@ -22,14 +22,9 @@ import Header from "../../components/Header";
 import Details from "../../components/Details";
 
 export default function Admin() {
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const [drawerOpen ] = React.useState(true);
   return (
     <>
-      {drawerOpen && (
-        <Layout.SideDrawer onClose={() => setDrawerOpen(false)}>
-          <Navigation />
-        </Layout.SideDrawer>
-      )}
       <Layout.Root
         sx={{
           gridTemplateColumns: {

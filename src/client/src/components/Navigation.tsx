@@ -1,13 +1,9 @@
-import IconButton from "@mui/joy/IconButton";
 import List from "@mui/joy/List";
 import ListSubheader from "@mui/joy/ListSubheader";
 import ListItem from "@mui/joy/ListItem";
 import ListItemButton from "@mui/joy/ListItemButton";
 import ListItemContent from "@mui/joy/ListItemContent";
 import Typography from "@mui/joy/Typography";
-
-// Icons import
-import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 
 import { getMetadata } from "../auth/user";
 import { useNavigate } from "react-router-dom";
@@ -20,24 +16,20 @@ export default function Navigation() {
     return window.location.href.includes(path);
   };
 
-  return (
-    <List size="sm" sx={{ "--ListItem-radius": "8px", "--List-gap": "4px" }}>
-      <ListSubheader>
-        <Typography level="body2" alignSelf="right">
-          Signed in: <b>{getMetadata()?.full_name}</b>
-        </Typography>
-      </ListSubheader>
-      <ListItem nested>
+  const listItemTemplate = (title: string, pages: string[]) => {
+    return (
+      
+      <ListItem nested sx={{mt: 3}}>
         <ListSubheader>
-          Application Stuff
-          <IconButton
+          {title}
+          {/* <IconButton
             size="sm"
             variant="plain"
             color="primary"
             sx={{ "--IconButton-size": "24px", ml: "auto" }}
           >
             <KeyboardArrowDownRoundedIcon fontSize="small" color="primary" />
-          </IconButton>
+          </IconButton> */}
         </ListSubheader>
         <List
           aria-labelledby="nav-list-browse"
@@ -45,7 +37,7 @@ export default function Navigation() {
             "& .JoyListItemButton-root": { p: "8px" },
           }}
         >
-          {Object.keys(PAGE_ROUTES.ADMIN).map((route: any) => {
+          {pages.map((route: any) => {
             const { label, path } = PAGE_ROUTES.ADMIN[route];
             if (label) {
               const isActive = isActivePage(path);
@@ -90,7 +82,18 @@ export default function Navigation() {
           })}
         </List>
       </ListItem>
+    );
+  }
 
+  return (
+    <List size="sm" sx={{ "--ListItem-radius": "8px", "--List-gap": "4px" }}>
+      <ListSubheader>
+        <Typography level="body2" alignSelf="right">
+          Signed in: <b>{getMetadata()?.full_name}</b>
+        </Typography>
+      </ListSubheader>
+      {listItemTemplate("Application Stuff", ['AUTHORS', 'BOOKS', 'ARTISTS'])}
+      {listItemTemplate("User Stuff", ['PROFILE', 'USERS', 'EMAIL_SUBSCRIPTIONS'])}
       {/* <ListItem nested>
         <ListSubheader>
           Browse

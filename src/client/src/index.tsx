@@ -128,6 +128,18 @@ const router = createBrowserRouter([
             element: <EditArtist />,
           },
           {
+            path: PAGE_ROUTES.ADMIN.PROFILE.path,
+            element: <>Profile to go here</>,
+          },
+          {
+            path: PAGE_ROUTES.ADMIN.USERS.path,
+            element: <ListUsers />,
+          },
+          {
+            path: PAGE_ROUTES.ADMIN.USERS.EDIT.path,
+            element: <EditUser />,
+          },
+          {
             path: PAGE_ROUTES.ADMIN.EMAIL_SUBSCRIPTIONS.path,
             element: <ListEmailSubscriptions />,
           },
@@ -138,14 +150,6 @@ const router = createBrowserRouter([
           {
             path: PAGE_ROUTES.ADMIN.EMAIL_SUBSCRIPTIONS.EDIT.path,
             element: <EditEmailSubscription />,
-          },
-          {
-            path: PAGE_ROUTES.ADMIN.USERS.path,
-            element: <ListUsers />,
-          },
-          {
-            path: PAGE_ROUTES.ADMIN.USERS.EDIT.path,
-            element: <EditUser />,
           },
         ],
       },

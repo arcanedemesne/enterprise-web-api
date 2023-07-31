@@ -1,7 +1,7 @@
+import { IBaseEntity } from "../../store";
 import PAGE_ROUTES from "../../utilities/pageRoutes";
 
-export interface IAuthor {
-  id?: number;
+export interface IAuthor extends IBaseEntity {
   firstName: string;
   lastName: string;
   fullName: string;

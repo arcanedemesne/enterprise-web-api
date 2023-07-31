@@ -1,7 +1,7 @@
+import { IBaseEntity } from "../../store";
 import PAGE_ROUTES from "../../utilities/pageRoutes";
 
-export interface IEmailSubscription {
-  id?: number;
+export interface IEmailSubscription extends IBaseEntity {
   firstName: string;
   lastName: string;
   fullName: string;

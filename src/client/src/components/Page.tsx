@@ -12,10 +12,8 @@ const Page = ({ pageTitle, children }: any) => {
           sx={{
             height: "auto",
             width: "100hw",
-            mx: "auto", // margin left & right
-            my: 1, // margin top & bottom
-            py: 2, // padding top & bottom
-            px: 2, // padding left & right
+            py: 3, // padding top & bottom
+            px: 3, // padding left & right
             gap: 2,
             borderRadius: "md",
             boxShadow: "sm",

@@ -29,3 +29,12 @@ export type AppThunk<ReturnType = void> = ThunkAction<
   unknown,
   Action<string>
 >;
+
+export interface IBaseEntity { 
+  id?: number;
+  createdBy: string;
+  createdTs: number;
+  modifiedBy: string;
+  modifiedTs: number;
+  isDeleted: boolean;
+}

@@ -77,6 +77,11 @@ const PAGE_ROUTES: any = {
         endpoint: "artists/:id",
       },
     },
+
+    PROFILE: {
+      label: "Profile",
+      path: "/admin/profile",
+    },
     
     EMAIL_SUBSCRIPTIONS: {
       label: "Email Subscriptions",
