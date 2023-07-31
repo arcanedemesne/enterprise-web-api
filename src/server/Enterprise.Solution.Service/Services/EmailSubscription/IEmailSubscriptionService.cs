@@ -6,11 +6,5 @@ namespace Enterprise.Solution.Service.Services
 {
     public interface IEmailSubscriptionService : IBaseService<EmailSubscription>
     {
-        public Task<EntityListWithPaginationMetadata<EmailSubscription>> ListAllAsync(
-            int pageNumber,
-            int PageSize,
-            string? orderBy,
-            string? searchQuery,
-            bool onlyShowDeleted);
     }
 }

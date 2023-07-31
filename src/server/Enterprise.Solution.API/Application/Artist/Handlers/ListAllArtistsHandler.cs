@@ -15,7 +15,7 @@ namespace Enterprise.Solution.API.Application.Handlers
     /// <summary>
     /// Handler for ListAll Query
     /// </summary>
-    public class ListAllArtistsHandler : BaseHandler<ListAllArtistsHandler>, IRequestHandler<ListAllArtistsQuery, EntityListWithPaginationMetadata<Artist>>
+    public class ListAllArtistsHandler : BaseHandler<ListAllArtistsHandler>, IRequestHandler<ListAllArtistsQuery, IReadOnlyList<Artist>>
     {
         private readonly IArtistService _service;
 
@@ -43,20 +43,13 @@ namespace Enterprise.Solution.API.Application.Handlers
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<EntityListWithPaginationMetadata<Artist>> Handle(ListAllArtistsQuery request, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<Artist>> Handle(ListAllArtistsQuery request, CancellationToken cancellationToken)
         {
             LogInsideHandler<ListAllArtistsQuery>();
 
-            var (pageNumber, pageSize) = ValidatePagedParams(request.QueryParams.PageNumber, request.QueryParams.PageSize);
-
             LogTryServiceRequest<Artist>(RequestType.ListAll);
             return await _service.ListAllAsync(
-                pageNumber, pageSize,
-                request.QueryParams.OrderBy,
                 request.QueryParams.SearchQuery,
-                request.QueryParams.IncludeCovers ?? false,
-                request.QueryParams.IncludeCoversWithBook ?? false,
-                request.QueryParams.IncludeCoversWithBookAndAuthor ?? false,
                 request.QueryParams.OnlyShowDeleted ?? false);
         }
     }

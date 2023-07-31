@@ -3,7 +3,7 @@
     /// <summary>
     /// EmailSubscription query params with pagination
     /// </summary>
-    public class UserPagedQueryParams : IPagedQueryParams
+    public class UserPagedQueryParams : UserQueryParams, IPagedQueryParams
     {
         /// <summary>
         /// PageNumber
@@ -19,15 +19,5 @@
         /// OrderBy
         /// </summary>
         public string? OrderBy { get; set; } = null;
-
-        /// <summary>
-        /// SearchQuery
-        /// </summary>
-        public string? SearchQuery { get; set; } = null;
-
-        /// <summary>
-        /// OnlyShowDeleted
-        /// </summary>
-        public bool? OnlyShowDeleted { get; set; } = false;
     }
 }

@@ -10,7 +10,7 @@ namespace Enterprise.Solution.Repositories
     /// <typeparam name="Cover"></typeparam>
     public interface ICoverRepository : IBaseRepository<Cover>
     {
-        public Task<EntityListWithPaginationMetadata<Cover>> ListAllAsync(
+        public Task<EntityListWithPaginationMetadata<Cover>> ListPagedAsync(
             int pageNumber,
             int pageSize,
             string? orderBy,

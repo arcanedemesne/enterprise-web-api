@@ -6,7 +6,7 @@ namespace Enterprise.Solution.Service.Services
 {
     public interface IAuthorService : IBaseService<Author>
     {
-        public Task<EntityListWithPaginationMetadata<Author>> ListAllAsync(
+        public Task<EntityListWithPaginationMetadata<Author>> ListPagedAsync(
             int pageNumber,
             int PageSize,
             string? orderBy,

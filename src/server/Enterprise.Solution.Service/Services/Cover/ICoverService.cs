@@ -6,7 +6,7 @@ namespace Enterprise.Solution.Service.Services
 {
     public interface ICoverService : IBaseService<Cover>
     {
-        public Task<EntityListWithPaginationMetadata<Cover>> ListAllAsync(
+        public Task<EntityListWithPaginationMetadata<Cover>> ListPagedAsync(
             int pageNumber,
             int PageSize,
             string? orderBy,

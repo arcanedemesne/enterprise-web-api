@@ -6,7 +6,7 @@ namespace Enterprise.Solution.Service.Services
 {
     public interface IBookService : IBaseService<Book>
     {
-        public Task<EntityListWithPaginationMetadata<Book>> ListAllAsync(
+        public Task<EntityListWithPaginationMetadata<Book>> ListPagedAsync(
             int pageNumber,
             int PageSize,
             string? orderBy,

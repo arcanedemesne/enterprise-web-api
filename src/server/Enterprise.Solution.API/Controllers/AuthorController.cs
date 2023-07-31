@@ -37,14 +37,34 @@ namespace Enterprise.Solution.API.Controllers
         /// List All Authors
         /// </summary>
         /// <returns code="200">List of Authors</returns>
-        [HttpGet]
+        [HttpGet("all")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<AuthorDTO_Response>>> ListAllAsync([FromQuery] AuthorPagedQueryParams queryParams, CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<AuthorDTO_Response>>> ListAllAsync([FromQuery] AuthorQueryParams queryParams, CancellationToken cancellationToken)
         {
             try
             {
                 var response = await base._mediator!.Send(new ListAllAuthorsQuery(queryParams), cancellationToken);
+                return Ok(Mapper.Map<IReadOnlyList<AuthorDTO_Response>>(response));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// List Paged Authors
+        /// </summary>
+        /// <returns code="200">List of Authors</returns>
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<AuthorDTO_Response>>> ListPagedAsync([FromQuery] AuthorPagedQueryParams queryParams, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var response = await base._mediator!.Send(new ListPagedAuthorsQuery(queryParams), cancellationToken);
                 Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(response!.PaginationMetadata));
                 return Ok(Mapper.Map<IReadOnlyList<AuthorDTO_Response>>(response.Entities));
             }

@@ -128,6 +128,10 @@ const router = createBrowserRouter([
             element: <EditArtist />,
           },
           {
+            path: PAGE_ROUTES.ADMIN.RECYCLE_BIN.path,
+            element: <>Deleted items to go here</>,
+          },
+          {
             path: PAGE_ROUTES.ADMIN.PROFILE.path,
             element: <>Profile to go here</>,
           },

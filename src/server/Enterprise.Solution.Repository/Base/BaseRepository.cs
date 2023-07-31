@@ -19,15 +19,15 @@ namespace Enterprise.Solution.Repository.Base
             _logger = logger;
         }
 
-        public virtual async Task<IReadOnlyList<T>> ListAllAsync()
+        public virtual async Task<IReadOnlyList<T>> ListAllAsync(string? searchQuery, bool onlyShowDeleted)
         {
             return await _dbContext.Set<T>().ToListAsync();
         }
 
-        public virtual async Task<EntityListWithPaginationMetadata<T>> ListAllAsync(
+        public virtual async Task<EntityListWithPaginationMetadata<T>> ListPagedAsync(
             int pageNumber = 1,
             int pageSize = 10,
-            string orderBy = "Id ASC",
+            string? orderBy = "Id ASC",
             bool onlyShowDeleted = false)
         {
             var collection = _dbContext.Set<T>() as IQueryable<T>;
@@ -38,7 +38,7 @@ namespace Enterprise.Solution.Repository.Base
             var paginationMetadata = new PaginationMetadata(totalItemCount, pageSize, pageNumber, orderBy);
 
             var collectionToReturn = await collection
-                .OrderBy(orderBy)
+                .OrderBy(orderBy!)
                 .Skip(pageSize * (pageNumber - 1))
                 .Take(pageSize)
                 .ToListAsync();
@@ -46,7 +46,7 @@ namespace Enterprise.Solution.Repository.Base
             return new EntityListWithPaginationMetadata<T>(collectionToReturn, paginationMetadata);
         }
 
-        public virtual Task<EntityListWithPaginationMetadata<T>> ListAllAsync(
+        public virtual Task<EntityListWithPaginationMetadata<T>> ListPagedAsync(
             int pageNumber = 1,
             int pageSize = 10,
             string? orderBy = null,

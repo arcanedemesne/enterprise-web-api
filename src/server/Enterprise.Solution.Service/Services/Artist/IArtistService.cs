@@ -6,7 +6,7 @@ namespace Enterprise.Solution.Service.Services
 {
     public interface IArtistService : IBaseService<Artist>
     {
-        public Task<EntityListWithPaginationMetadata<Artist>> ListAllAsync(
+        public Task<EntityListWithPaginationMetadata<Artist>> ListPagedAsync(
             int pageNumber,
             int PageSize,
             string? orderBy,

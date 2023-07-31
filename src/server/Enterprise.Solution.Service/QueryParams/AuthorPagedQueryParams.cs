@@ -19,15 +19,5 @@
         /// OrderBy
         /// </summary>
         public string? OrderBy { get; set; } = null;
-
-        /// <summary>
-        /// SearchQuery
-        /// </summary>
-        public string? SearchQuery { get; set; } = null;
-
-        /// <summary>
-        /// OnlyShowDeleted
-        /// </summary>
-        public bool? OnlyShowDeleted { get; set; } = false;
     }
 }

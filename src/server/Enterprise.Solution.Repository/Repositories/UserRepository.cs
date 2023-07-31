@@ -13,7 +13,28 @@ namespace Enterprise.Solution.Repositories
     {
         public UserRepository(EnterpriseSolutionDbContext dbContext, ILogger<BaseRepository<User>> logger) : base(dbContext, logger) { }
 
-        public async override Task<EntityListWithPaginationMetadata<User>> ListAllAsync(
+        public async override Task<IReadOnlyList<User>> ListAllAsync(
+            string? searchQuery,
+            bool onlyShowDeleted)
+        {
+            var collection = _dbContext.Users as IQueryable<User>;
+
+            collection = collection.Where(c => c.IsDeleted == onlyShowDeleted);
+
+            if (!String.IsNullOrWhiteSpace(searchQuery))
+            {
+                searchQuery = searchQuery.Trim();
+                collection = collection
+                .Where(a =>
+                a.FirstName.ToLower().Contains(searchQuery.ToLower())
+                || a.LastName.ToLower().Contains(searchQuery.ToLower())
+                || a.EmailAddress.ToLower().Contains(searchQuery.ToLower())
+                || a.UserName.ToLower().Contains(searchQuery.ToLower()));
+            }
+
+            return await collection.ToListAsync();
+        }
+        public async override Task<EntityListWithPaginationMetadata<User>> ListPagedAsync(
             int pageNumber,
             int pageSize,
             string? orderBy,

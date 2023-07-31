@@ -14,7 +14,27 @@ namespace Enterprise.Solution.Repositories
     {
         public AuthorRepository(EnterpriseSolutionDbContext dbContext, ILogger<BaseRepository<Author>> logger) : base(dbContext, logger) { }
 
-        public async Task<EntityListWithPaginationMetadata<Author>> ListAllAsync(
+        public async override Task<IReadOnlyList<Author>> ListAllAsync(
+            string? searchQuery,
+            bool onlyShowDeleted)
+        {
+            var collection = _dbContext.Authors as IQueryable<Author>;
+
+            collection = collection.Where(c => c.IsDeleted == onlyShowDeleted);
+
+            if (!String.IsNullOrWhiteSpace(searchQuery))
+            {
+                searchQuery = searchQuery.Trim();
+                collection = collection
+                .Where(a =>
+                a.FirstName.ToLower().Contains(searchQuery.ToLower())
+                || a.LastName.ToLower().Contains(searchQuery.ToLower()));
+            }
+
+            return await collection.ToListAsync();
+        }
+
+        public async Task<EntityListWithPaginationMetadata<Author>> ListPagedAsync(
             int pageNumber,
             int pageSize,
             string? orderBy,

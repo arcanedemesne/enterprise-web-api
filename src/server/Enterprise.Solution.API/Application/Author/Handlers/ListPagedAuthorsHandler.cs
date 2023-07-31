@@ -13,11 +13,11 @@ using static Enterprise.Solution.Shared.Exceptions.ExceptionHelper;
 namespace Enterprise.Solution.API.Application.Handlers
 {
     /// <summary>
-    /// Handler for ListAll Query
+    /// Handler for ListPaged Query
     /// </summary>
-    public class ListAllEmailSubscriptionsHandler : BaseHandler<ListAllEmailSubscriptionsHandler>, IRequestHandler<ListAllEmailSubscriptionsQuery, IReadOnlyList<EmailSubscription>>
+    public class ListPagedAuthorsHandler : BaseHandler<ListPagedAuthorsHandler>, IRequestHandler<ListPagedAuthorsQuery, EntityListWithPaginationMetadata<Author>>
     {
-        private readonly IEmailSubscriptionService _service;
+        private readonly IAuthorService _service;
 
         /// <summary>
         /// Constructor
@@ -27,12 +27,12 @@ namespace Enterprise.Solution.API.Application.Handlers
         /// <param name="logger"></param>
         /// <param name="mapper"></param>
         /// <param name="service"></param>
-        public ListAllEmailSubscriptionsHandler(
+        public ListPagedAuthorsHandler(
             IOptions<SolutionSettings> solutionSettings,
             IMediator mediator,
-            ILogger<ListAllEmailSubscriptionsHandler> logger,
+            ILogger<ListPagedAuthorsHandler> logger,
             IMapper mapper,
-            IEmailSubscriptionService service) : base(solutionSettings, mediator, logger, mapper)
+            IAuthorService service) : base(solutionSettings, mediator, logger, mapper)
         {
             _service = service;
         }
@@ -43,13 +43,20 @@ namespace Enterprise.Solution.API.Application.Handlers
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<IReadOnlyList<EmailSubscription>> Handle(ListAllEmailSubscriptionsQuery request, CancellationToken cancellationToken)
+        public async Task<EntityListWithPaginationMetadata<Author>> Handle(ListPagedAuthorsQuery request, CancellationToken cancellationToken)
         {
-            LogInsideHandler<ListAllEmailSubscriptionsQuery>();
+            LogInsideHandler<ListPagedAuthorsQuery>();
 
-            LogTryServiceRequest<EmailSubscription>(RequestType.ListAll);
-            return await _service.ListAllAsync(
+            var (pageNumber, pageSize) = ValidatePagedParams(request.QueryParams.PageNumber, request.QueryParams.PageSize);
+
+            LogTryServiceRequest<Author>(RequestType.ListPaged);
+            return await _service.ListPagedAsync(
+                pageNumber, pageSize,
+                request.QueryParams.OrderBy,
                 request.QueryParams.SearchQuery,
+                request.QueryParams.IncludeBooks ?? false,
+                request.QueryParams.IncludeBooksWithCover ?? false,
+                request.QueryParams.IncludeBooksWithCoverAndArtists ?? false,
                 request.QueryParams.OnlyShowDeleted ?? false);
         }
     }

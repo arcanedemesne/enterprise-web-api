@@ -10,7 +10,7 @@ namespace Enterprise.Solution.Repositories
     /// <typeparam name="Artist"></typeparam>
     public interface IArtistRepository : IBaseRepository<Artist>
     {
-        public Task<EntityListWithPaginationMetadata<Artist>> ListAllAsync(
+        public Task<EntityListWithPaginationMetadata<Artist>> ListPagedAsync(
             int pageNumber,
             int pageSize,
             string? orderBy,

@@ -9,6 +9,7 @@
             public string Value { get; private set; }
 
             public static RequestType ListAll { get { return new RequestType("List All"); } }
+            public static RequestType ListPaged { get { return new RequestType("List Paged"); } }
             public static RequestType GetById { get { return new RequestType("Get By Id"); } }
             public static RequestType Add { get { return new RequestType("Add"); } }
             public static RequestType Update { get { return new RequestType("Update"); } }

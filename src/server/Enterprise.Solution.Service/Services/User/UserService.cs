@@ -20,14 +20,23 @@ namespace Enterprise.Solution.Service.Services
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
-        public async Task<EntityListWithPaginationMetadata<User>> ListAllAsync(
+        public async override Task<IReadOnlyList<User>> ListAllAsync(
+            string? searchQuery = null,
+            bool onlyShowDeleted = false)
+        {
+            return await _userRepository.ListAllAsync(
+                searchQuery,
+                onlyShowDeleted);
+        }
+
+        public async override Task<EntityListWithPaginationMetadata<User>> ListPagedAsync(
             int pageNumber,
             int pageSize,
             string? orderBy,
             string? searchQuery = null,
             bool onlyShowDeleted = false)
         {
-            return await _userRepository.ListAllAsync(
+            return await _userRepository.ListPagedAsync(
                 pageNumber,
                 pageSize,
                 orderBy,

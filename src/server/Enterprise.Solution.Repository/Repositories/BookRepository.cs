@@ -13,7 +13,25 @@ namespace Enterprise.Solution.Repositories
     {
         public BookRepository(EnterpriseSolutionDbContext dbContext, ILogger<BaseRepository<Book>> logger) : base(dbContext, logger) { }
 
-        public async Task<EntityListWithPaginationMetadata<Book>> ListAllAsync(
+
+        public async override Task<IReadOnlyList<Book>> ListAllAsync(
+            string? searchQuery,
+            bool onlyShowDeleted)
+        {
+            var collection = _dbContext.Books as IQueryable<Book>;
+
+            collection = collection.Where(c => c.IsDeleted == onlyShowDeleted);
+
+            if (!String.IsNullOrWhiteSpace(searchQuery))
+            {
+                searchQuery = searchQuery.Trim();
+                collection = collection
+                .Where(a => a.Title.ToLower().Contains(searchQuery.ToLower()));
+            }
+
+            return await collection.ToListAsync();
+        }
+        public async Task<EntityListWithPaginationMetadata<Book>> ListPagedAsync(
             int pageNumber,
             int pageSize,
             string? orderBy,

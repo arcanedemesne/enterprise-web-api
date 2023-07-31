@@ -6,6 +6,16 @@
     public class AuthorQueryParams
     {
         /// <summary>
+        /// SearchQuery
+        /// </summary>
+        public string? SearchQuery { get; set; } = null;
+
+        /// <summary>
+        /// OnlyShowDeleted
+        /// </summary>
+        public bool? OnlyShowDeleted { get; set; } = false;
+
+        /// <summary>
         /// Include Books
         /// </summary>
         public bool? IncludeBooks { get; set; } = false;

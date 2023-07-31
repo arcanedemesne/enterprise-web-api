@@ -9,5 +9,5 @@ namespace Enterprise.Solution.API.Application.Queries
     /// <summary>
     /// Query to List All
     /// </summary>
-    public record ListAllArtistsQuery(ArtistPagedQueryParams QueryParams) : IRequest<EntityListWithPaginationMetadata<Artist>>;
+    public record ListAllArtistsQuery(ArtistQueryParams QueryParams) : IRequest<IReadOnlyList<Artist>>;
 }

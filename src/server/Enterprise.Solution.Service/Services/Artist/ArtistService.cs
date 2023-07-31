@@ -20,7 +20,7 @@ namespace Enterprise.Solution.Service.Services
             _artistRepository = artistRepository ?? throw new ArgumentNullException(nameof(artistRepository));
         }
 
-        public async Task<EntityListWithPaginationMetadata<Artist>> ListAllAsync(
+        public async Task<EntityListWithPaginationMetadata<Artist>> ListPagedAsync(
             int pageNumber,
             int pageSize,
             string? orderBy,
@@ -30,7 +30,7 @@ namespace Enterprise.Solution.Service.Services
             bool includeCoversWithBookAndAuthor,
             bool onlyShowDeleted)
         {
-            return await _artistRepository.ListAllAsync(
+            return await _artistRepository.ListPagedAsync(
                 pageNumber,
                 pageSize,
                 orderBy,

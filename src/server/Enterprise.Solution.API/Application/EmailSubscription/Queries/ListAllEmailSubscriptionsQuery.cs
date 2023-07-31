@@ -9,5 +9,5 @@ namespace Enterprise.Solution.API.Application.Queries
     /// <summary>
     /// Query to List All
     /// </summary>
-    public record ListAllEmailSubscriptionsQuery(EmailSubscriptionPagedQueryParams QueryParams) : IRequest<EntityListWithPaginationMetadata<EmailSubscription>>;
+    public record ListAllEmailSubscriptionsQuery(EmailSubscriptionQueryParams QueryParams) : IRequest<IReadOnlyList<EmailSubscription>>;
 }

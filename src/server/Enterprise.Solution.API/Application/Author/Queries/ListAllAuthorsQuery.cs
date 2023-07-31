@@ -9,5 +9,5 @@ namespace Enterprise.Solution.API.Application.Queries
     /// <summary>
     /// Query to List All
     /// </summary>
-    public record ListAllAuthorsQuery(AuthorPagedQueryParams QueryParams) : IRequest<EntityListWithPaginationMetadata<Author>>;
+    public record ListAllAuthorsQuery(AuthorQueryParams QueryParams) : IRequest<IReadOnlyList<Author>>;
 }

@@ -6,6 +6,16 @@
     public class ArtistQueryParams
     {
         /// <summary>
+        /// SearchQuery
+        /// </summary>
+        public string? SearchQuery { get; set; } = null;
+
+        /// <summary>
+        /// OnlyShowDeleted
+        /// </summary>
+        public bool? OnlyShowDeleted { get; set; } = false;
+
+        /// <summary>
         /// Include Covers
         /// </summary>
         public bool? IncludeCovers { get; set; } = false;

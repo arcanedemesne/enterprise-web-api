@@ -15,7 +15,7 @@ namespace Enterprise.Solution.API.Application.Handlers
     /// <summary>
     /// Handler for ListAll Query
     /// </summary>
-    public class ListAllCoversHandler : BaseHandler<ListAllCoversHandler>, IRequestHandler<ListAllCoversQuery, EntityListWithPaginationMetadata<Cover>>
+    public class ListAllCoversHandler : BaseHandler<ListAllCoversHandler>, IRequestHandler<ListAllCoversQuery, IReadOnlyList<Cover>>
     {
         private readonly ICoverService _service;
 
@@ -43,20 +43,13 @@ namespace Enterprise.Solution.API.Application.Handlers
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<EntityListWithPaginationMetadata<Cover>> Handle(ListAllCoversQuery request, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<Cover>> Handle(ListAllCoversQuery request, CancellationToken cancellationToken)
         {
             LogInsideHandler<ListAllCoversQuery>();
 
-            var (pageNumber, pageSize) = ValidatePagedParams(request.QueryParams.PageNumber, request.QueryParams.PageSize);
-
             LogTryServiceRequest<Cover>(RequestType.ListAll);
             return await _service.ListAllAsync(
-                pageNumber, pageSize,
-                request.QueryParams.OrderBy,
                 request.QueryParams.SearchQuery,
-                request.QueryParams.IncludeAuthor ?? false,
-                request.QueryParams.IncludeCover ?? false,
-                request.QueryParams.IncludeCoverAndArtists ?? false,
                 request.QueryParams.OnlyShowDeleted ?? false);
         }
     }

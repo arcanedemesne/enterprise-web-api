@@ -37,14 +37,34 @@ namespace Enterprise.Solution.API.Controllers
         /// List All Covers
         /// </summary>
         /// <returns code="200">List of Covers</returns>
-        [HttpGet]
+        [HttpGet("all")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<CoverDTO_Response>>> ListAllAsync([FromQuery] CoverPagedQueryParams queryParams, CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<CoverDTO_Response>>> ListAllAsync([FromQuery] CoverQueryParams queryParams, CancellationToken cancellationToken)
         {
             try
             {
                 var response = await base._mediator!.Send(new ListAllCoversQuery(queryParams), cancellationToken);
+                return Ok(Mapper.Map<IReadOnlyList<CoverDTO_Response>>(response));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// List Paged Covers
+        /// </summary>
+        /// <returns code="200">List of Covers</returns>
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<CoverDTO_Response>>> ListPagedAsync([FromQuery] CoverPagedQueryParams queryParams, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var response = await base._mediator!.Send(new ListPagedCoversQuery(queryParams), cancellationToken);
                 Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(response!.PaginationMetadata));
                 return Ok(Mapper.Map<IReadOnlyList<CoverDTO_Response>>(response.Entities));
             }

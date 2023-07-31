@@ -15,7 +15,7 @@ namespace Enterprise.Solution.API.Application.Handlers
     /// <summary>
     /// Handler for ListAll Query
     /// </summary>
-    public class ListAllUsersHandler : BaseHandler<ListAllUsersHandler>, IRequestHandler<ListAllUsersQuery, EntityListWithPaginationMetadata<User>>
+    public class ListAllUsersHandler : BaseHandler<ListAllUsersHandler>, IRequestHandler<ListAllUsersQuery, IReadOnlyList<User>>
     {
         private readonly IUserService _service;
 
@@ -43,16 +43,12 @@ namespace Enterprise.Solution.API.Application.Handlers
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<EntityListWithPaginationMetadata<User>> Handle(ListAllUsersQuery request, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<User>> Handle(ListAllUsersQuery request, CancellationToken cancellationToken)
         {
             LogInsideHandler<ListAllUsersQuery>();
 
-            var (pageNumber, pageSize) = ValidatePagedParams(request.QueryParams.PageNumber, request.QueryParams.PageSize);
-
             LogTryServiceRequest<User>(RequestType.ListAll);
             return await _service.ListAllAsync(
-                pageNumber, pageSize,
-                request.QueryParams.OrderBy,
                 request.QueryParams.SearchQuery,
                 request.QueryParams.OnlyShowDeleted ?? false);
         }

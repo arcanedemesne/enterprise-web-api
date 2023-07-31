@@ -9,10 +9,10 @@ namespace Enterprise.Solution.Repository.Base
     /// <typeparam name="T"></typeparam>
     public interface IBaseRepository<T> where T : BaseEntity
     {
-        Task<IReadOnlyList<T>> ListAllAsync();
+        Task<IReadOnlyList<T>> ListAllAsync(string? searchQuery, bool onlyShowDeleted);
 
-        Task<EntityListWithPaginationMetadata<T>> ListAllAsync(int pageNumber, int pageSize, string? orderBy, bool onlyShowDeleted);
-        Task<EntityListWithPaginationMetadata<T>> ListAllAsync(int pageNumber, int pageSize, string? orderBy, string? searchQuery, bool onlyShowDeleted);
+        Task<EntityListWithPaginationMetadata<T>> ListPagedAsync(int pageNumber, int pageSize, string? orderBy, bool onlyShowDeleted);
+        Task<EntityListWithPaginationMetadata<T>> ListPagedAsync(int pageNumber, int pageSize, string? orderBy, string? searchQuery, bool onlyShowDeleted);
 
         //Task<IReadOnlyList<T>> ListAsync(ISpecification<T> spec);
 

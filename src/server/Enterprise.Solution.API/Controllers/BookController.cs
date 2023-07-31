@@ -37,14 +37,34 @@ namespace Enterprise.Solution.API.Controllers
         /// List All Books
         /// </summary>
         /// <returns code="200">List of Books</returns>
-        [HttpGet]
+        [HttpGet("all")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<BookDTO_Response>>> ListAllAsync([FromQuery] BookPagedQueryParams queryParams, CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<BookDTO_Response>>> ListAllAsync([FromQuery] BookQueryParams queryParams, CancellationToken cancellationToken)
         {
             try
             {
                 var response = await base._mediator!.Send(new ListAllBooksQuery(queryParams), cancellationToken);
+                return Ok(Mapper.Map<IReadOnlyList<BookDTO_Response>>(response));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// List Paged Books
+        /// </summary>
+        /// <returns code="200">List of Books</returns>
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<BookDTO_Response>>> ListPagedAsync([FromQuery] BookPagedQueryParams queryParams, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var response = await base._mediator!.Send(new ListPagedBooksQuery(queryParams), cancellationToken);
                 Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(response!.PaginationMetadata));
                 return Ok(Mapper.Map<IReadOnlyList<BookDTO_Response>>(response.Entities));
             }

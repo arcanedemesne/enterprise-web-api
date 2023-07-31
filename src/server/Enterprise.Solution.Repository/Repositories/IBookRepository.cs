@@ -10,7 +10,7 @@ namespace Enterprise.Solution.Repositories
     /// <typeparam name="Book"></typeparam>
     public interface IBookRepository : IBaseRepository<Book>
     {
-        public Task<EntityListWithPaginationMetadata<Book>> ListAllAsync(
+        public Task<EntityListWithPaginationMetadata<Book>> ListPagedAsync(
             int pageNumber,
             int pageSize,
             string? orderBy,

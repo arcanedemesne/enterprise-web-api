@@ -92,8 +92,9 @@ export default function Navigation() {
           Signed in: <b>{getMetadata()?.full_name}</b>
         </Typography>
       </ListSubheader>
-      {listItemTemplate("Application Stuff", ['AUTHORS', 'BOOKS', 'ARTISTS'])}
-      {listItemTemplate("User Stuff", ['PROFILE', 'USERS', 'EMAIL_SUBSCRIPTIONS'])}
+      {listItemTemplate("Monitor Stuff", ['DASHBOARD'])}
+      {listItemTemplate("View/Add/Change Stuff", ['AUTHORS', 'BOOKS', 'ARTISTS', 'RECYCLE_BIN'])}
+      {listItemTemplate("User Related Stuff", ['PROFILE', 'USERS', 'EMAIL_SUBSCRIPTIONS'])}
       {/* <ListItem nested>
         <ListSubheader>
           Browse

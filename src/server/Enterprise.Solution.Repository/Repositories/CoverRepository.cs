@@ -13,7 +13,23 @@ namespace Enterprise.Solution.Repositories
     {
         public CoverRepository(EnterpriseSolutionDbContext dbContext, ILogger<BaseRepository<Cover>> logger) : base(dbContext, logger) { }
 
-        public async Task<EntityListWithPaginationMetadata<Cover>> ListAllAsync(
+        public async override Task<IReadOnlyList<Cover>> ListAllAsync(
+            string? searchQuery,
+            bool onlyShowDeleted)
+        {
+            var collection = _dbContext.Covers as IQueryable<Cover>;
+
+            collection = collection.Where(c => c.IsDeleted == onlyShowDeleted);
+
+            if (!String.IsNullOrWhiteSpace(searchQuery))
+            {
+                throw new NotImplementedException();
+            }
+
+            return await collection.ToListAsync();
+        }
+
+            public async Task<EntityListWithPaginationMetadata<Cover>> ListPagedAsync(
             int pageNumber,
             int pageSize,
             string? orderBy,

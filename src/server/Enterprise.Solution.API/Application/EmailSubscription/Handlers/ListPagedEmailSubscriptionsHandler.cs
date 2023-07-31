@@ -13,9 +13,9 @@ using static Enterprise.Solution.Shared.Exceptions.ExceptionHelper;
 namespace Enterprise.Solution.API.Application.Handlers
 {
     /// <summary>
-    /// Handler for ListAll Query
+    /// Handler for ListPaged Query
     /// </summary>
-    public class ListAllEmailSubscriptionsHandler : BaseHandler<ListAllEmailSubscriptionsHandler>, IRequestHandler<ListAllEmailSubscriptionsQuery, IReadOnlyList<EmailSubscription>>
+    public class ListPagedEmailSubscriptionsHandler : BaseHandler<ListPagedEmailSubscriptionsHandler>, IRequestHandler<ListPagedEmailSubscriptionsQuery, EntityListWithPaginationMetadata<EmailSubscription>>
     {
         private readonly IEmailSubscriptionService _service;
 
@@ -27,10 +27,10 @@ namespace Enterprise.Solution.API.Application.Handlers
         /// <param name="logger"></param>
         /// <param name="mapper"></param>
         /// <param name="service"></param>
-        public ListAllEmailSubscriptionsHandler(
+        public ListPagedEmailSubscriptionsHandler(
             IOptions<SolutionSettings> solutionSettings,
             IMediator mediator,
-            ILogger<ListAllEmailSubscriptionsHandler> logger,
+            ILogger<ListPagedEmailSubscriptionsHandler> logger,
             IMapper mapper,
             IEmailSubscriptionService service) : base(solutionSettings, mediator, logger, mapper)
         {
@@ -43,12 +43,16 @@ namespace Enterprise.Solution.API.Application.Handlers
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<IReadOnlyList<EmailSubscription>> Handle(ListAllEmailSubscriptionsQuery request, CancellationToken cancellationToken)
+        public async Task<EntityListWithPaginationMetadata<EmailSubscription>> Handle(ListPagedEmailSubscriptionsQuery request, CancellationToken cancellationToken)
         {
-            LogInsideHandler<ListAllEmailSubscriptionsQuery>();
+            LogInsideHandler<ListPagedEmailSubscriptionsQuery>();
 
-            LogTryServiceRequest<EmailSubscription>(RequestType.ListAll);
-            return await _service.ListAllAsync(
+            var (pageNumber, pageSize) = ValidatePagedParams(request.QueryParams.PageNumber, request.QueryParams.PageSize);
+
+            LogTryServiceRequest<EmailSubscription>(RequestType.ListPaged);
+            return await _service.ListPagedAsync(
+                pageNumber, pageSize,
+                request.QueryParams.OrderBy ?? "",
                 request.QueryParams.SearchQuery,
                 request.QueryParams.OnlyShowDeleted ?? false);
         }

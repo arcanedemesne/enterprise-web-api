@@ -21,13 +21,19 @@ namespace Enterprise.Solution.Service.Base
             _repository = baseRepository ?? throw new ArgumentNullException(nameof(baseRepository));
         }
 
-        public async Task<IReadOnlyList<T>> ListAllAsync()
+        public async virtual Task<IReadOnlyList<T>> ListAllAsync(string? searchQuery, bool onlyShowDeleted)
         {
-            return await _repository.ListAllAsync();
+            return await _repository.ListAllAsync(searchQuery, onlyShowDeleted);
         }
-        public async Task<EntityListWithPaginationMetadata<T>> ListAllAsync(int pageNumber, int pageSize, string orderBy, bool onlyShowDeleted)
+
+        public async virtual Task<EntityListWithPaginationMetadata<T>> ListPagedAsync(int pageNumber, int pageSize, string orderBy, bool onlyShowDeleted)
         {
-            return await _repository.ListAllAsync(pageNumber, pageSize, orderBy, onlyShowDeleted);
+            return await _repository.ListPagedAsync(pageNumber, pageSize, orderBy, onlyShowDeleted);
+        }
+
+        public async virtual Task<EntityListWithPaginationMetadata<T>> ListPagedAsync(int pageNumber, int pageSize, string orderBy, string? searchQuery, bool onlyShowDeleted)
+        {
+            return await _repository.ListPagedAsync(pageNumber, pageSize, orderBy, searchQuery, onlyShowDeleted);
         }
 
         public async Task<T?> GetByIdAsync(int id)

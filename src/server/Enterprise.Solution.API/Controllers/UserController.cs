@@ -36,6 +36,26 @@ namespace Enterprise.Solution.API.Controllers
         /// List All Users
         /// </summary>
         /// <returns code="200">List of Users</returns>
+        [HttpGet("all")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<UserDTO_Response>>> ListAllAsync([FromQuery] UserQueryParams queryParams, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var response = await base._mediator!.Send(new ListAllUsersQuery(queryParams), cancellationToken);
+                return Ok(Mapper.Map<IReadOnlyList<UserDTO_Response>>(response));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// List All Users
+        /// </summary>
+        /// <returns code="200">List of Users</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -43,7 +63,7 @@ namespace Enterprise.Solution.API.Controllers
         {
             try
             {
-                var response = await base._mediator!.Send(new ListAllUsersQuery(queryParams), cancellationToken);
+                var response = await base._mediator!.Send(new ListPagedUsersQuery(queryParams), cancellationToken);
                 Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(response!.PaginationMetadata));
                 return Ok(Mapper.Map<IReadOnlyList<UserDTO_Response>>(response.Entities));
             }

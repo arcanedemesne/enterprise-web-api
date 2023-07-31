@@ -14,15 +14,36 @@ namespace Enterprise.Solution.Repositories
     {
         public ArtistRepository(EnterpriseSolutionDbContext dbContext, ILogger<BaseRepository<Artist>> logger) : base(dbContext, logger) { }
 
-        public async Task<EntityListWithPaginationMetadata<Artist>> ListAllAsync(
-            int pageNumber,
-            int pageSize,
-            string? orderBy,
+        public async override Task<IReadOnlyList<Artist>> ListAllAsync(
             string? searchQuery,
-            bool includeCovers,
-            bool includeCoversWithBook,
-            bool includeCoversWithBookAndAuthor,
             bool onlyShowDeleted)
+        {
+            var collection = _dbContext.Artists as IQueryable<Artist>;
+
+            // Check if IsDeleted
+            collection = collection.Where(a => a.IsDeleted == onlyShowDeleted);
+
+            if (!String.IsNullOrWhiteSpace(searchQuery))
+            {
+                searchQuery = searchQuery.Trim();
+                collection = collection
+                .Where(a =>
+                a.FirstName.ToLower().Contains(searchQuery.ToLower())
+                || a.LastName.ToLower().Contains(searchQuery.ToLower()));
+            }
+
+            return await collection.ToListAsync();
+        }
+
+        public async Task<EntityListWithPaginationMetadata<Artist>> ListPagedAsync(
+        int pageNumber,
+        int pageSize,
+        string? orderBy,
+        string? searchQuery,
+        bool includeCovers,
+        bool includeCoversWithBook,
+        bool includeCoversWithBookAndAuthor,
+        bool onlyShowDeleted)
         {
             if (orderBy == null) orderBy = "firstName asc, lastName asc";
             
