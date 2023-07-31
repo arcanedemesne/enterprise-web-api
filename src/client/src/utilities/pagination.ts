@@ -57,3 +57,5 @@ export const setPaginationValues = async ({
 export const parseHeaders = (headers: any) => {
   return JSON.parse(headers.get("x-pagination"));
 };
+
+export const paginationInitialState = { TotalItems: 0, CurrentPage: 1, PageSize: 10, OrderBy: "" };

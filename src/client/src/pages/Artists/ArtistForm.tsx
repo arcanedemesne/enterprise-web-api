@@ -1,15 +1,12 @@
 import { useState } from "react";
 import { Form, useNavigate } from "react-router-dom";
 
-import { DELETE, POST, PUT } from "../../utilities/httpRequest";
-import { useAppDispatch } from "../../store/hooks";
-
 import FormInput from "../../components/FormInput";
 import errorMessages from "../../utilities/errorMessages";
-import { CreateFormButtons, EditFormButtons } from "../../components/FormButtons";
 
-import { baseUri, domain } from ".";
-import { fetchArtists } from "./state";
+import { domain } from ".";
+import formHelper from "../../utilities/formHelper";
+import formButtonHelper from "../../utilities/formButtonHelper";
 
 export const hasErrors = (formValues: any): any => {
   const errors: any = {};
@@ -40,65 +37,25 @@ const ArtistForm = ({
   formType,
 }: ArtistFormProps) => {
   const navigate = useNavigate();
-  
-  const dispatch = useAppDispatch();
 
   const [formValues, setFormValues] = useState<any>(artist);
   const [errors, setErrors] = useState<any>({});
 
-  const addItem = async (data: any) => {
-    await POST({ endpoint: `${domain}`, data });
-    dispatch(await fetchArtists(baseUri));
-    navigate(`/admin/${domain}`);
-  };
+  const formActions = formHelper({
+    domain,
+    id: artist.id,
+    navigate,
+  });
 
-  const updateItem = async (data: any) => {
-    await PUT({ endpoint: `${domain}/${artist.id}`, data });
-    dispatch(await fetchArtists(baseUri));
-    navigate(`/admin/${domain}`);
-  };
-
-  const deleteItem = async () => {
-    await DELETE({ endpoint: `${domain}/${artist.id}` });
-    dispatch(await fetchArtists(baseUri));
-    navigate(`/admin/${domain}`);
-  };
-
-  let buttons = null;
-  if (formType === "create") {
-    buttons = (<CreateFormButtons
-      domain={domain}
-      handleSave={async (event) => {
-          event.preventDefault();
-        const errors = hasErrors(formValues);
-        if (errors) {
-          setErrors(errors);
-        } else {
-          await addItem(formValues);
-        }
-      }}
-    />);
-  } else if (formType === "edit") {
-    buttons = (<EditFormButtons
-      domain={domain}
-      handleSave={async (event) => {
-        event.preventDefault();
-        const errors = hasErrors(formValues);
-        if (errors) {
-          setErrors(errors);
-        } else {
-          await updateItem(formValues);
-        }
-      }}
-      handleDelete={async () => 
-        artist?.isDeleted
-          ? await deleteItem()
-          : await updateItem({
-              ...formValues,
-              isDeleted: true,
-            })}
-    />);
-  }
+  const buttons = formButtonHelper({
+    domain,
+    formType,
+    hasErrors,
+    setErrors,
+    formValues,
+    formActions,
+    isDeleted: artist.isDeleted,
+  });
 
   return (
     <Form method="post" id="artist-form">

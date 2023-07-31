@@ -26,41 +26,23 @@ import Admin from "./pages/Admin";
 import Dashboard from "./pages/Dashboard";
 
 import ListAuthors from "./pages/Authors/ListAuthors";
-import CreateAuthor, {
-  action as createAuthorAction,
-} from "./pages/Authors/CreateAuthor";
-import EditAuthor, {
-  loader as editAuthorLoader,
-  action as editAuthorAction,
-} from "./pages/Authors/EditAuthor";
+import CreateAuthor from "./pages/Authors/CreateAuthor";
+import EditAuthor from "./pages/Authors/EditAuthor";
 
 import ListBooks from "./pages/Books/ListBooks";
-import CreateBook, {
-  action as createBookAction,
-} from "./pages/Books/CreateBook";
-import EditBook, {
-  loader as editBookLoader,
-  action as editBookAction,
-} from "./pages/Books/EditBook";
+import CreateBook from "./pages/Books/CreateBook";
+import EditBook from "./pages/Books/EditBook";
 
 import ListArtists from "./pages/Artists/ListArtists";
 import CreateArtist from "./pages/Artists/CreateArtist";
 import EditArtist from "./pages/Artists/EditArtist";
 
 import ListEmailSubscriptions from "./pages/EmailSubscriptions/ListEmailSubscriptions";
-import CreateEmailSubscription, {
-  action as createEmailSubscriptionAction,
-} from "./pages/EmailSubscriptions/CreateEmailSubscription";
-import EditEmailSubscription, {
-  loader as editEmailSubscriptionLoader,
-  action as editEmailSubscriptionAction,
-} from "./pages/EmailSubscriptions/EditEmailSubscription";
+import CreateEmailSubscription from "./pages/EmailSubscriptions/CreateEmailSubscription";
+import EditEmailSubscription from "./pages/EmailSubscriptions/EditEmailSubscription";
 
 import ListUsers from "./pages/Users/ListUsers";
-import EditUser, {
-  loader as editUserLoader,
-  action as editUserAction,
-} from "./pages/Users/EditUser";
+import EditUser from "./pages/Users/EditUser";
 
 /* TEST */
 import Index from "./routes";
@@ -116,13 +98,10 @@ const router = createBrowserRouter([
           {
             path: PAGE_ROUTES.ADMIN.AUTHORS.CREATE.path,
             element: <CreateAuthor />,
-            action: createAuthorAction,
           },
           {
             path: PAGE_ROUTES.ADMIN.AUTHORS.EDIT.path,
             element: <EditAuthor />,
-            loader: editAuthorLoader,
-            action: editAuthorAction,
           },
           {
             path: PAGE_ROUTES.ADMIN.BOOKS.path,
@@ -131,13 +110,10 @@ const router = createBrowserRouter([
           {
             path: PAGE_ROUTES.ADMIN.BOOKS.CREATE.path,
             element: <CreateBook />,
-            action: createBookAction,
           },
           {
             path: PAGE_ROUTES.ADMIN.BOOKS.EDIT.path,
             element: <EditBook />,
-            loader: editBookLoader,
-            action: editBookAction,
           },
           {
             path: PAGE_ROUTES.ADMIN.ARTISTS.path,
@@ -158,13 +134,10 @@ const router = createBrowserRouter([
           {
             path: PAGE_ROUTES.ADMIN.EMAIL_SUBSCRIPTIONS.CREATE.path,
             element: <CreateEmailSubscription />,
-            action: createEmailSubscriptionAction,
           },
           {
             path: PAGE_ROUTES.ADMIN.EMAIL_SUBSCRIPTIONS.EDIT.path,
             element: <EditEmailSubscription />,
-            loader: editEmailSubscriptionLoader,
-            action: editEmailSubscriptionAction,
           },
           {
             path: PAGE_ROUTES.ADMIN.USERS.path,
@@ -173,8 +146,6 @@ const router = createBrowserRouter([
           {
             path: PAGE_ROUTES.ADMIN.USERS.EDIT.path,
             element: <EditUser />,
-            loader: editUserLoader,
-            action: editUserAction,
           },
         ],
       },

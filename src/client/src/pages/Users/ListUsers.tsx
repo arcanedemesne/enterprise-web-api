@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffectOnce } from "usehooks-ts";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 
 import Page from "../../components/Page";
@@ -8,7 +8,6 @@ import { baseUri } from ".";
 import { UserState, fetchUsers } from "./state";
 import { paginate } from "../../utilities/pagination";
 
-let initialized = false;
 const ListUsers = () => {
   const userState: UserState = useAppSelector((state) => state.userState);
   const dispatch = useAppDispatch();
@@ -29,15 +28,12 @@ const ListUsers = () => {
     });
   };
 
-  useEffect(() => {
+  useEffectOnce(() => {
     const fetchData = async () => {
       dispatch(await fetchUsers(baseUri));
     };
 
-    if (!initialized) {
-      fetchData();
-      initialized = true;
-    }
+    fetchData();
   });
 
   return (

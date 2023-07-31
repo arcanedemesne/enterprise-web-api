@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffectOnce } from "usehooks-ts";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 
 import Page from "../../components/Page";
@@ -9,7 +9,6 @@ import { baseUri, domain } from ".";
 import { EmailSubscriptionState, fetchEmailSubscriptions } from "./state";
 import { paginate } from "../../utilities/pagination";
 
-let initialized = false;
 const ListArtists = () => {
   const emailSubscriptionState: EmailSubscriptionState = useAppSelector((state) => state.emailSubscriptionState);
   const dispatch = useAppDispatch();
@@ -30,15 +29,12 @@ const ListArtists = () => {
     });
   };
 
-  useEffect(() => {
+  useEffectOnce(() => {
     const fetchData = async () => {
       dispatch(await fetchEmailSubscriptions(baseUri));
     };
 
-    if (!initialized) {
-      fetchData();
-      initialized = true;
-    }
+    fetchData();
   });
   return (
     <Page

@@ -1,65 +1,39 @@
-import { useState } from "react";
-import { useLoaderData, redirect } from "react-router-dom";
+import { useEffectOnce } from "usehooks-ts";
+import { useParams } from "react-router-dom";
 
-import { DELETE, GET, PUT } from "../../utilities/httpRequest";
+import { CircularProgress } from "@mui/joy";
+
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 
 import Page from "../../components/Page";
-import { EditFormButtons } from "../../components/FormButtons";
-import { IEmailSubscription, domain } from ".";
-import EmailSubscriptionForm, { hasErrors } from "./EmailSubscriptionForm";
 
-const updateItem = async (id: number, data: any) => {
-  await PUT({ endpoint: `${domain}/${id}`, data });
-};
-
-const deleteItem = async (id: number) => {
-  await DELETE({ endpoint: `${domain}/${id}` });
-};
-
-export const loader = async ({ params }: any) => {
-  return await GET({ endpoint: `${domain}/${params.id}` });
-};
-
-export const action = async ({ request, params }: any) => {
-  let formData = await request.formData();
-  const updates = Object.fromEntries(formData) as IEmailSubscription;
-  await updateItem(params.id, updates);
-  return redirect(`/admin/${domain}`);
-};
+import { EmailSubscriptionState, fetchEmailSubscriptionById } from "./state";
+import EmailSubscriptionForm from "./EmailSubscriptionForm";
 
 const EditEmailSubscription = () => {
-  const { data: emailSubscription }: any = useLoaderData() as { data: IEmailSubscription };
-  const [formValues, setFormValues] = useState(emailSubscription);
-  const [errors, setErrors] = useState({});
+  const emailSubscriptionState: EmailSubscriptionState = useAppSelector((state) => state.emailSubscriptionState);
+  const dispatch = useAppDispatch();
+  const params = useParams();
+
+  const emailSubscription = emailSubscriptionState.currentEmailSubscription;
+
+  useEffectOnce(() => {
+    const fetchData = async () => {
+      dispatch(await fetchEmailSubscriptionById(`email-subscriptions/${params.id}`));
+    };
+
+    fetchData();
+  });
 
   return (
     <Page
-      pageTitle={`Edit Email Subscription: ${emailSubscription?.id}`}
+      pageTitle={`Edit EmailSubscription: ${params?.id}`}
       children={
-        <EmailSubscriptionForm
-          formValues={formValues}
-          setFormValues={setFormValues}
-          errors={errors}
-          buttons={
-            <EditFormButtons
-              domain={domain}
-              handleSave={(event) => {
-                const errors = hasErrors(formValues);
-                if (errors) {
-                  event.preventDefault();
-                  setErrors(errors);
-                }
-              }}
-              handleDelete={async () =>
-                formValues.isDeleted
-                  ? await deleteItem(formValues.id)
-                  : await updateItem(formValues.id, {
-                      ...formValues,
-                      isDeleted: true,
-                    })}
-            />
-          }
-        />
+        emailSubscriptionState.status === "loading" || !emailSubscription?.id ? (
+          <CircularProgress />
+        ) : (
+          <EmailSubscriptionForm emailSubscription={{ ...emailSubscription }} formType="edit" />
+        )
       }
     />
   );

@@ -1,21 +1,18 @@
-import { Form } from "react-router-dom";
+import { useState } from "react";
+import { Form, useNavigate } from "react-router-dom";
 
 import FormInput from "../../components/FormInput";
+import errorMessages from "../../utilities/errorMessages";
+
+import { domain } from ".";
+import formHelper from "../../utilities/formHelper";
+import formButtonHelper from "../../utilities/formButtonHelper";
+
 import AsynchronousSearch, {
   IOption,
 } from "../../components/AsynchronousSearch";
 import { GET } from "../../utilities/httpRequest";
-import errorMessages from "../../utilities/errorMessages";
 import regex from "../../utilities/regex";
-import { IBook } from ".";
-import { useState } from "react";
-
-interface FormProps {
-  formValues: any;
-  setFormValues: (formValues: IBook) => void;
-  buttons: any;
-  errors?: any;
-}
 
 export const hasErrors = (formValues: any): any => {
   const errors: any = {};
@@ -42,26 +39,58 @@ export const hasErrors = (formValues: any): any => {
   return Object.keys(errors).length > 0 ? errors : false;
 };
 
+interface FormProps {
+  book: any;
+  formType: "create" | "edit";
+}
+
 // TODO: create dropdown for Authors and Covers so Create works
-const BookForm = ({
-  formValues,
-  setFormValues,
-  buttons,
-  errors = {},
-}: FormProps) => {
-  const defalutSearchValue = { label: formValues.author.fullName, id: formValues.authorId } as IOption;
-  const [ searchOptions, setSearchOptions ] = useState<IOption[]>([defalutSearchValue as IOption]);
-  const [ searchValue, setSearchValue ] = useState<IOption | undefined>(defalutSearchValue);
-  const [ searchInputValue, setSearchInputValue ] = useState<string | undefined>(defalutSearchValue.label);
+const BookForm = ({ book, formType }: FormProps) => {
+  const navigate = useNavigate();
+
+  const [formValues, setFormValues] = useState<any>(book);
+  const [errors, setErrors] = useState<any>({});
+
+  const formActions = formHelper({
+    domain,
+    id: book.id,
+    navigate,
+  });
+
+  const buttons = formButtonHelper({
+    domain,
+    formType,
+    hasErrors,
+    setErrors,
+    formValues,
+    formActions,
+    isDeleted: book.isDeleted,
+  });
+
+  const defalutSearchValue = {
+    label: formValues.author.fullName,
+    id: formValues.authorId,
+  } as IOption;
+  const [searchOptions, setSearchOptions] = useState<IOption[]>([
+    defalutSearchValue as IOption,
+  ]);
+  const [searchValue, setSearchValue] = useState<IOption | undefined>(
+    defalutSearchValue
+  );
+  const [searchInputValue, setSearchInputValue] = useState<string | undefined>(
+    defalutSearchValue.label
+  );
 
   const handleSearchAuthors = async (event: any, searchQuery: string) => {
     setSearchInputValue(searchQuery);
     const response = await await GET({
       endpoint: `authors?searchQuery=${searchQuery}`,
     });
-    setSearchOptions(response.data.map((x: any) => {
-      return { label: x.fullName, id: x.id };
-    }));
+    setSearchOptions(
+      response.data.map((x: any) => {
+        return { label: x.fullName, id: x.id };
+      })
+    );
   };
 
   const handleClickOption = (event: any, option: IOption) => {

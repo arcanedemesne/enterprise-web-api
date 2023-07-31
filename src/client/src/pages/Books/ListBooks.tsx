@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffectOnce } from "usehooks-ts";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 
 import Page from "../../components/Page";
@@ -9,7 +9,6 @@ import { baseUri, domain } from ".";
 import { BookState, fetchBooks } from "./state";
 import { paginate } from "../../utilities/pagination";
 
-let initialized = false;
 const ListBooks = () => {
   const bookState: BookState = useAppSelector((state) => state.bookState);
   const dispatch = useAppDispatch();
@@ -30,15 +29,12 @@ const ListBooks = () => {
     });
   };
 
-  useEffect(() => {
+  useEffectOnce(() => {
     const fetchData = async () => {
       dispatch(await fetchBooks(baseUri));
     };
 
-    if (!initialized) {
-      fetchData();
-      initialized = true;
-    }
+    fetchData();
   });
 
   return (

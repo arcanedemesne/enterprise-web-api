@@ -37,7 +37,7 @@ const PAGE_ROUTES: any = {
 
       EDIT: {
         label: "Edit Author",
-        path: "/admin/authors/:id",
+        path: "/admin/authors/:id/edit",
         endpoint: "authors/:id",
       },
     },
@@ -55,7 +55,7 @@ const PAGE_ROUTES: any = {
 
       EDIT: {
         label: "Edit Book",
-        path: "/admin/books/:id",
+        path: "/admin/books/:id/edit",
         endpoint: "books/:id",
       },
     },
@@ -73,14 +73,14 @@ const PAGE_ROUTES: any = {
 
       EDIT: {
         label: "Edit Artist",
-        path: "/admin/artists/:id",
+        path: "/admin/artists/:id/edit",
         endpoint: "artists/:id",
       },
     },
     
     EMAIL_SUBSCRIPTIONS: {
       label: "Email Subscriptions",
-      path: "/admin/email-subscrptions",
+      path: "/admin/email-subscriptions",
       endpoint: "email-subscriptions",
 
       CREATE: {
@@ -91,7 +91,7 @@ const PAGE_ROUTES: any = {
 
       EDIT: {
         label: "Edit Email Subscription",
-        path: "/admin/email-subscriptions/:id",
+        path: "/admin/email-subscriptions/:id/edit",
         endpoint: "email-subscriptions/:id",
       },
     },
@@ -109,7 +109,7 @@ const PAGE_ROUTES: any = {
 
       EDIT: {
         label: "Edit User",
-        path: "/admin/users/:id",
+        path: "/admin/users/:id/edit",
         endpoint: "users/:id",
       },
     },

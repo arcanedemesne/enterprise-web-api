@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { RootState } from "../../../store";
 import { IArtist } from "..";
-import { IPagination, parseHeaders } from "../../../utilities/pagination";
+import { IPagination, paginationInitialState, parseHeaders } from "../../../utilities/pagination";
 import { GET } from "../../../utilities/httpRequest";
 
 // Define a type for the slice state
@@ -17,7 +17,7 @@ export interface ArtistState {
 const initialState: ArtistState = {
   status: 'idle',
   artists: [],
-  pagination: { TotalItems: 0, CurrentPage: 1, PageSize: 10, OrderBy: "" },
+  pagination: paginationInitialState,
 
   currentArtist: null,
 };

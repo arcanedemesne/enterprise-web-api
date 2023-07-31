@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffectOnce } from "usehooks-ts";
 import { useParams } from "react-router-dom";
 
 import { CircularProgress } from "@mui/joy";
@@ -10,7 +10,6 @@ import Page from "../../components/Page";
 import { ArtistState, fetchArtistById } from "./state";
 import ArtistForm from "./ArtistForm";
 
-let initialized = false;
 const EditArtist = () => {
   const artistState: ArtistState = useAppSelector((state) => state.artistState);
   const dispatch = useAppDispatch();
@@ -18,15 +17,12 @@ const EditArtist = () => {
 
   const artist = artistState.currentArtist;
 
-  useEffect(() => {
+  useEffectOnce(() => {
     const fetchData = async () => {
       dispatch(await fetchArtistById(`artists/${params.id}`));
     };
 
-    if (!initialized) {
-      fetchData();
-      initialized = true;
-    }
+    fetchData();
   });
 
   return (

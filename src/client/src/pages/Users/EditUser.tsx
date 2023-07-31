@@ -1,65 +1,39 @@
-import { useState } from "react";
-import { useLoaderData, redirect } from "react-router-dom";
+import { useEffectOnce } from "usehooks-ts";
+import { useParams } from "react-router-dom";
 
-import { DELETE, GET, PUT } from "../../utilities/httpRequest";
+import { CircularProgress } from "@mui/joy";
+
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 
 import Page from "../../components/Page";
-import { EditFormButtons } from "../../components/FormButtons";
-import { IUser, domain } from ".";
-import UserForm, { hasErrors } from "./UserForm";
 
-const updateItem = async (id: number, data: any) => {
-  await PUT({ endpoint: `${domain}/${id}`, data });
-};
-
-const deleteItem = async (id: number) => {
-  await DELETE({ endpoint: `${domain}/${id}` });
-};
-
-export const loader = async ({ params }: any) => {
-  return await GET({ endpoint: `${domain}/${params.id}` });
-};
-
-export const action = async ({ request, params }: any) => {
-  let formData = await request.formData();
-  const updates = Object.fromEntries(formData) as IUser;
-  await updateItem(params.id, updates);
-  return redirect(`/admin/${domain}`);
-};
+import { UserState, fetchUserById } from "./state";
+import UserForm from "./UserForm";
 
 const EditUser = () => {
-  const { data: user }: any = useLoaderData() as { data: IUser };
-  const [formValues, setFormValues] = useState(user);
-  const [errors, setErrors] = useState({});
+  const userState: UserState = useAppSelector((state) => state.userState);
+  const dispatch = useAppDispatch();
+  const params = useParams();
+
+  const user = userState.currentUser;
+
+  useEffectOnce(() => {
+    const fetchData = async () => {
+      dispatch(await fetchUserById(`users/${params.id}`));
+    };
+
+    fetchData();
+  });
 
   return (
     <Page
-      pageTitle={`Edit user: ${user?.id}`}
+      pageTitle={`Edit User: ${params?.id}`}
       children={
-        <UserForm
-          formValues={formValues}
-          setFormValues={setFormValues}
-          errors={errors}
-          buttons={
-            <EditFormButtons
-              domain={domain}
-              handleSave={(event) => {
-                const errors = hasErrors(formValues);
-                if (errors) {
-                  event.preventDefault();
-                  setErrors(errors);
-                }
-              }}
-              handleDelete={async () =>
-                formValues.isDeleted
-                  ? await deleteItem(formValues.id)
-                  : await updateItem(formValues.id, {
-                      ...formValues,
-                      isDeleted: true,
-                    })}
-            />
-          }
-        />
+        userState.status === "loading" || !user?.id ? (
+          <CircularProgress />
+        ) : (
+          <UserForm user={{ ...user }} formType="edit" />
+        )
       }
     />
   );

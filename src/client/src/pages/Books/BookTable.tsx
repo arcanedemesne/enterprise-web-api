@@ -22,7 +22,7 @@ const BookTable = ({ loading, books, pagination, setNewPaginationValues }: BookT
   };
 
   const handleEditItem = async (id: number) => {
-    await navigate(`/admin/${domain}/${id}`);
+    await navigate(`/admin/${domain}/${id}/edit`);
   };
 
   const rows = books && books.map((x: any) => {

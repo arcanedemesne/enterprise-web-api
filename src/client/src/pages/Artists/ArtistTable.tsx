@@ -22,7 +22,7 @@ const ArtistTable = ({ loading, artists, pagination, setNewPaginationValues }: A
   };
 
   const handleEditItem = async (id: number) => {
-    await navigate(`/admin/${domain}/${id}`);
+    await navigate(`/admin/${domain}/${id}/edit`);
   };
 
   const rows = artists && artists.map((x: any) => {

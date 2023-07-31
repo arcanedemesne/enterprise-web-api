@@ -22,7 +22,7 @@ const AuthorTable = ({ loading, authors, pagination, setNewPaginationValues }: A
   };
 
   const handleEditItem = async (id: number) => {
-    await navigate(`/admin/${domain}/${id}`);
+    await navigate(`/admin/${domain}/${id}/edit`);
   };
 
   const rows = authors && authors.map((x: any) => {

@@ -22,7 +22,7 @@ const EmailSubscriptionTable = ({ loading, emailSubscriptions, pagination, setNe
   };
 
   const handleEditItem = async (id: number) => {
-    await navigate(`/admin/${domain}/${id}`);
+    await navigate(`/admin/${domain}/${id}/edit`);
   };
 
   const rows = emailSubscriptions && emailSubscriptions.map((x: any) => {

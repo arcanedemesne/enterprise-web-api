@@ -46,18 +46,46 @@ export default function Navigation() {
           }}
         >
           {Object.keys(PAGE_ROUTES.ADMIN).map((route: any) => {
-            if (PAGE_ROUTES.ADMIN[route].label) {
-              return (
-                <ListItem key={PAGE_ROUTES.ADMIN[route].path}>
-                  <ListItemButton
-                    variant={isActivePage(PAGE_ROUTES.ADMIN[route].path) ? "soft" : "plain"}
-                    color={isActivePage(PAGE_ROUTES.ADMIN[route].path) ? "primary" : "neutral"}
-                    onClick={() => navigate(`${PAGE_ROUTES.ADMIN[route].path}`)}
-                  >
-                    <ListItemContent>{PAGE_ROUTES.ADMIN[route].label}</ListItemContent>
-                  </ListItemButton>
-                </ListItem>
-              );
+            const { label, path } = PAGE_ROUTES.ADMIN[route];
+            if (label) {
+              const isActive = isActivePage(path);
+              const navLinkTemplate = ({ navLabel, navPath, isNavLinkActive, ml = 0}: any) => (
+              <ListItem key={navPath} sx={{ ml }}>
+                <ListItemButton
+                  variant={isNavLinkActive ? "soft" : "plain"}
+                  color={isNavLinkActive ? "primary" : "neutral"}
+                  onClick={() => navigate(`${navPath}`)}
+                >
+                  <ListItemContent>{navLabel}</ListItemContent>
+                </ListItemButton>
+              </ListItem>);
+              const navLinks = [navLinkTemplate({
+                navLabel: label,
+                navPath: path,
+                isNavLinkActive: isActive,
+              })];
+
+              const isCreate = window.location.href.includes("create");
+              const createRoute = PAGE_ROUTES.ADMIN[route].CREATE;
+              const isEdit = window.location.href.includes("edit");
+              const editRoute = PAGE_ROUTES.ADMIN[route].EDIT;
+              if (isActive && isCreate && createRoute) {
+                navLinks.push(navLinkTemplate({ 
+                  navLabel: createRoute.label,
+                  navPath: createRoute.path,
+                  isNavLinkActive: isCreate,
+                  ml: 2,
+                }));
+              } else if (isActive && isEdit && editRoute) {
+                navLinks.push(navLinkTemplate({
+                  navLabel: editRoute.label,
+                  navPath: editRoute.path,
+                  isNavLinkActive: isEdit,
+                  ml: 2,
+                }));
+              }
+
+              return navLinks.map((navLink) => navLink);
             } else return null;
           })}
         </List>

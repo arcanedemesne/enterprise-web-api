@@ -1,14 +1,12 @@
-import { Form } from "react-router-dom";
+import { useState } from "react";
+import { Form, useNavigate } from "react-router-dom";
+
 import FormInput from "../../components/FormInput";
 import errorMessages from "../../utilities/errorMessages";
-import { IEmailSubscription } from ".";
 
-interface EmailSubscriptionFormProps {
-  formValues: any;
-  setFormValues: (formValues: IEmailSubscription) => void;
-  buttons: any;
-  errors?: any;
-}
+import { domain } from ".";
+import formHelper from "../../utilities/formHelper";
+import formButtonHelper from "../../utilities/formButtonHelper";
 
 export const hasErrors = (formValues: any): any => {
   const errors: any = {};
@@ -29,16 +27,39 @@ export const hasErrors = (formValues: any): any => {
   return Object.keys(errors).length > 0 ? errors : false;
 };
 
+interface EmailSubscriptionFormProps {
+  emailSubscription: any;
+  formType: "create" | "edit";
+}
+
 const EmailSubscriptionForm = ({
-  formValues,
-  setFormValues,
-  buttons,
-  errors = {},
+  emailSubscription,
+  formType,
 }: EmailSubscriptionFormProps) => {
+  const navigate = useNavigate();
+
+  const [formValues, setFormValues] = useState<any>(emailSubscription);
+  const [errors, setErrors] = useState<any>({});
+
+  const formActions = formHelper({
+    domain,
+    id: emailSubscription.id,
+    navigate,
+  });
+
+  const buttons = formButtonHelper({
+    domain,
+    formType,
+    hasErrors,
+    setErrors,
+    formValues,
+    formActions,
+    isDeleted: emailSubscription.isDeleted,
+  });
+
   return (
     <Form method="post" id="email-subscription-form">
       <div>
-        <FormInput type="text" name="id" value={formValues.id} hidden={true} />
         <span>First Name</span>
         <FormInput
           placeholder="First"

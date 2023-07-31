@@ -22,7 +22,7 @@ const UserTable = ({ loading, users, pagination, setNewPaginationValues }: UserT
   };
 
   const handleEditItem = async (id: number) => {
-    await navigate(`/admin/${domain}/${id}`);
+    await navigate(`/admin/${domain}/${id}/edit`);
   };
 
   const rows = users && users.map((x: any) => {

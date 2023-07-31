@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { RootState } from "../../../store";
 import { IUser } from "..";
-import { IPagination, parseHeaders } from "../../../utilities/pagination";
+import { IPagination, paginationInitialState, parseHeaders } from "../../../utilities/pagination";
 import { GET } from "../../../utilities/httpRequest";
 
 // Define a type for the slice state
@@ -9,13 +9,17 @@ export interface UserState {
   status: 'idle' | 'loading' | 'failed';
   users: IUser[];
   pagination: IPagination;
+
+  currentUser: IUser | null;
 }
 
 // Define the initial state using that type
 const initialState: UserState = {
   status: 'idle',
   users: [],
-  pagination: { TotalItems: 0, CurrentPage: 1, PageSize: 10, OrderBy: "" },
+  pagination: paginationInitialState,
+
+  currentUser: null
 };
 
 export const fetchUsers = createAsyncThunk(
@@ -25,6 +29,14 @@ export const fetchUsers = createAsyncThunk(
     // The value we return becomes the `fulfilled` action payload
     const pagination = parseHeaders(response.headers);
     return { data: response.data, pagination };
+  }
+);
+
+export const fetchUserById = createAsyncThunk(
+  'userState/fetchUserById',
+  async (endpoint: string) => {
+    const response: any = await GET({ endpoint });
+    return { data: response.data };
   }
 );
 
@@ -45,6 +57,17 @@ export const userSlice = createSlice({
         state.pagination = action.payload.pagination;
       })
       .addCase(fetchUsers.rejected, (state) => {
+        state.status = 'failed';
+      })
+      
+      .addCase(fetchUserById.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchUserById.fulfilled, (state, action) => {
+        state.status = 'idle';
+        state.currentUser = action.payload.data;
+      })
+      .addCase(fetchUserById.rejected, (state) => {
         state.status = 'failed';
       });
   },

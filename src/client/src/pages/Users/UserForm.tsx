@@ -1,14 +1,12 @@
-import { Form } from "react-router-dom";
+import { useState } from "react";
+import { Form, useNavigate } from "react-router-dom";
+
 import FormInput from "../../components/FormInput";
 import errorMessages from "../../utilities/errorMessages";
-import { IUser } from ".";
 
-interface UserFormProps {
-  formValues: any;
-  setFormValues: (formValues: IUser) => void;
-  buttons: any;
-  errors?: any;
-}
+import { domain } from ".";
+import formHelper from "../../utilities/formHelper";
+import formButtonHelper from "../../utilities/formButtonHelper";
 
 export const hasErrors = (formValues: any): any => {
   const errors: any = {};
@@ -29,17 +27,39 @@ export const hasErrors = (formValues: any): any => {
   return Object.keys(errors).length > 0 ? errors : false;
 };
 
+interface UserFormProps {
+  user: any;
+  formType: "create" | "edit";
+}
+
 const UserForm = ({
-  formValues,
-  setFormValues,
-  buttons,
-  errors = {},
+  user,
+  formType,
 }: UserFormProps) => {
+  const navigate = useNavigate();
+
+  const [formValues, setFormValues] = useState<any>(user);
+  const [errors, setErrors] = useState<any>({});
+
+  const formActions = formHelper({
+    domain,
+    id: user.id,
+    navigate,
+  });
+
+  const buttons = formButtonHelper({
+    domain,
+    formType,
+    hasErrors,
+    setErrors,
+    formValues,
+    formActions,
+    isDeleted: user.isDeleted,
+  });
+
   return (
     <Form method="post" id="user-form">
       <div>
-        <FormInput type="text" name="id" value={formValues.id} hidden={true} />
-        <FormInput type="text" name="userName" value={formValues.userName} hidden={true} />
         <FormInput
           type="text"
           name="keycloakUniqueIdentifier"
