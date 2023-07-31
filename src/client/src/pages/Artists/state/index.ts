@@ -9,6 +9,8 @@ export interface ArtistState {
   status: 'idle' | 'loading' | 'failed';
   artists: IArtist[];
   pagination: IPagination;
+
+  currentArtist: IArtist | null;
 }
 
 // Define the initial state using that type
@@ -16,6 +18,8 @@ const initialState: ArtistState = {
   status: 'idle',
   artists: [],
   pagination: { TotalItems: 0, CurrentPage: 1, PageSize: 10, OrderBy: "" },
+
+  currentArtist: null,
 };
 
 export const fetchArtists = createAsyncThunk(
@@ -25,6 +29,14 @@ export const fetchArtists = createAsyncThunk(
     // The value we return becomes the `fulfilled` action payload
     const pagination = parseHeaders(response.headers);
     return { data: response.data, pagination };
+  }
+);
+
+export const fetchArtistById = createAsyncThunk(
+  'artistState/fetchArtistById',
+  async (endpoint: string) => {
+    const response: any = await GET({ endpoint });
+    return { data: response.data };
   }
 );
 
@@ -45,6 +57,17 @@ export const artistSlice = createSlice({
         state.pagination = action.payload.pagination;
       })
       .addCase(fetchArtists.rejected, (state) => {
+        state.status = 'failed';
+      })
+      
+      .addCase(fetchArtistById.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchArtistById.fulfilled, (state, action) => {
+        state.status = 'idle';
+        state.currentArtist = action.payload.data;
+      })
+      .addCase(fetchArtistById.rejected, (state) => {
         state.status = 'failed';
       });
   },

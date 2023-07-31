@@ -40,6 +40,7 @@ const ListArtists = () => {
       initialized = true;
     }
   });
+  
   return (
     <Page
       pageTitle="Viewing Artists"

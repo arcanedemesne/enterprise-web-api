@@ -44,13 +44,8 @@ import EditBook, {
 } from "./pages/Books/EditBook";
 
 import ListArtists from "./pages/Artists/ListArtists";
-import CreateArtist, {
-  action as createArtistAction,
-} from "./pages/Artists/CreateArtist";
-import EditArtist, {
-  loader as editArtistLoader,
-  action as editArtistAction,
-} from "./pages/Artists/EditArtist";
+import CreateArtist from "./pages/Artists/CreateArtist";
+import EditArtist from "./pages/Artists/EditArtist";
 
 import ListEmailSubscriptions from "./pages/EmailSubscriptions/ListEmailSubscriptions";
 import CreateEmailSubscription, {
@@ -151,13 +146,10 @@ const router = createBrowserRouter([
           {
             path: PAGE_ROUTES.ADMIN.ARTISTS.CREATE.path,
             element: <CreateArtist />,
-            action: createArtistAction,
           },
           {
             path: PAGE_ROUTES.ADMIN.ARTISTS.EDIT.path,
             element: <EditArtist />,
-            loader: editArtistLoader,
-            action: editArtistAction,
           },
           {
             path: PAGE_ROUTES.ADMIN.EMAIL_SUBSCRIPTIONS.path,

@@ -6,6 +6,12 @@ export interface IArtist {
   lastName: string;
   fullName: string;
   covers: any[];
+
+  createdBy: string;
+  createdTs: number;
+  modifiedBy: string;
+  modifiedTs: number;
+  isDeleted: boolean;
 }
 
 export const domain = PAGE_ROUTES.ADMIN.ARTISTS.endpoint;

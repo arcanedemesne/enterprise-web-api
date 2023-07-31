@@ -1,5 +1,6 @@
 import Box from "@mui/joy/Box";
 import Checkbox from "@mui/joy/Checkbox";
+import CircularProgress from "@mui/joy/CircularProgress";
 import FormControl from "@mui/joy/FormControl";
 import FormLabel from "@mui/joy/FormLabel";
 import IconButton from "@mui/joy/IconButton";
@@ -20,7 +21,6 @@ import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { visuallyHidden } from "@mui/utils";
 
 import createUniqueKey from "../utilities/uniqueKey";
-import CircularProgress from "@mui/joy/CircularProgress";
 
 const labelDisplayedRows = ({
   from,
