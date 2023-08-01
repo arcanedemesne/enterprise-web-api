@@ -8,9 +8,11 @@ import ArtistTable from "./ArtistTable";
 import { baseUri, domain } from ".";
 import { ArtistState, fetchArtists } from "./state";
 import { paginate } from "../../utilities/pagination";
+import { UserState } from "../Users/state";
 
 const ListArtists = () => {
   const artistState: ArtistState = useAppSelector((state) => state.artistState);
+  const userState: UserState = useAppSelector((state) => state.userState);
   const dispatch = useAppDispatch();
 
   const setNewPaginationValues = (
@@ -44,8 +46,9 @@ const ListArtists = () => {
         <>
           <CreateButton domain={domain} />
           <ArtistTable
-            loading={artistState.status === "loading"}
+            loading={artistState.status === "loading" && userState.status === "loading"}
             artists={artistState.artists}
+            users={userState.users}
             pagination={artistState.pagination}
             setNewPaginationValues={setNewPaginationValues}
           />

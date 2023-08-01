@@ -8,9 +8,11 @@ import AuthorTable from "./AuthorTable";
 import { baseUri, domain } from ".";
 import { AuthorState, fetchAuthors } from "./state";
 import { paginate } from "../../utilities/pagination";
+import { UserState } from "../Users/state";
 
 const ListAuthors = () => {
   const authorState: AuthorState = useAppSelector((state) => state.authorState);
+  const userState: UserState = useAppSelector((state) => state.userState);
   const dispatch = useAppDispatch();
 
   const setNewPaginationValues = (
@@ -44,8 +46,9 @@ const ListAuthors = () => {
         <>
           <CreateButton domain={domain} />
           <AuthorTable
-            loading={authorState.status === "loading"}
+            loading={authorState.status === "loading" && userState.status === "loading"}
             authors={authorState.authors}
+            users={userState.users}
             pagination={authorState.pagination}
             setNewPaginationValues={setNewPaginationValues}
           />

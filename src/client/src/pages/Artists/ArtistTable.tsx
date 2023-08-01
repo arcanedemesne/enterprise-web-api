@@ -4,17 +4,29 @@ import { useNavigate } from "react-router-dom";
 import DataTable from "../../components/DataTable";
 
 import { domain, IArtist } from "./";
+import { IUser } from "../Users";
 
 interface ArtistTableProps {
   loading: boolean;
   artists: IArtist[];
+  users: IUser[];
   pagination: any;
-  setNewPaginationValues: (pageNumber: number, pageSize: number, orderBy: string) => void;
+  setNewPaginationValues: (
+    pageNumber: number,
+    pageSize: number,
+    orderBy: string
+  ) => void;
 }
 
-const ArtistTable = ({ loading, artists, pagination, setNewPaginationValues }: ArtistTableProps) => {
+const ArtistTable = ({
+  loading,
+  artists,
+  users,
+  pagination,
+  setNewPaginationValues,
+}: ArtistTableProps) => {
   const navigate = useNavigate();
-  
+
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
 
   const handleDeleteItems = async () => {
@@ -25,12 +37,25 @@ const ArtistTable = ({ loading, artists, pagination, setNewPaginationValues }: A
     await navigate(`/admin/${domain}/${id}/edit`);
   };
 
-  const rows = artists && artists.map((x: any) => {
-    return {
-      id: x.id,
-      values: [x.id, `${x.firstName}`, `${x.lastName}`, x.covers.length],
-    };
-  });
+  const mapUserToKeycloakId = (kcId: string) => users.find(u => u.keycloakUniqueIdentifier === kcId);
+
+  const rows =
+    artists &&
+    artists.map((x: any) => {
+      return {
+        id: x.id,
+        values: [
+          x.id,
+          x.firstName,
+          x.lastName,
+          x.covers.length,
+          x.createdBy ? mapUserToKeycloakId(x.createdBy)?.fullName : 'N/A',
+          x.createdTs ? new Date(x.createdTs).toLocaleDateString() : 'N/A',
+          x.modifiedBy ? mapUserToKeycloakId(x.modifiedBy)?.fullName : '',
+          x.modifiedTs ? new Date(x.modifiedTs).toLocaleDateString() : '',
+        ],
+      };
+    });
   const tableData = {
     headers: [
       {
@@ -52,6 +77,18 @@ const ArtistTable = ({ loading, artists, pagination, setNewPaginationValues }: A
       {
         label: "Cover Art Count",
         numeric: true,
+      },
+      {
+        label: "Created By",
+      },
+      {
+        label: "Created Date",
+      },
+      {
+        label: "Modified By",
+      },
+      {
+        label: "Modified Date",
       },
     ],
     rows,

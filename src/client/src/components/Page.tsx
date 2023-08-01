@@ -8,7 +8,7 @@ const Page = ({ pageTitle, children }: any) => {
       sx={{
         height: "auto",
         width: "100hw",
-        pt: 3, // padding top & bottom
+        py: 3, // padding top & bottom
         px: 3, // padding left & right
         gap: 2,
         borderRadius: "md",

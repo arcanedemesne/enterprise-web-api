@@ -8,9 +8,11 @@ import BookTable from "./BookTable";
 import { baseUri, domain } from ".";
 import { BookState, fetchBooks } from "./state";
 import { paginate } from "../../utilities/pagination";
+import { UserState } from "../Users/state";
 
 const ListBooks = () => {
   const bookState: BookState = useAppSelector((state) => state.bookState);
+  const userState: UserState = useAppSelector((state) => state.userState);
   const dispatch = useAppDispatch();
 
   const setNewPaginationValues = (
@@ -44,8 +46,9 @@ const ListBooks = () => {
         <>
           <CreateButton domain={domain} />
           <BookTable 
-            loading={bookState.status === "loading"}
+            loading={bookState.status === "loading" && userState.status === "loading"}
             books={bookState.books}
+            users={userState.users}
             pagination={bookState.pagination}
             setNewPaginationValues={setNewPaginationValues}
           />

@@ -25,10 +25,17 @@ const UserTable = ({ loading, users, pagination, setNewPaginationValues }: UserT
     await navigate(`/admin/${domain}/${id}/edit`);
   };
 
+  const mapUserToKeycloakId = (kcId: string) =>
+    users.find((u) => u.keycloakUniqueIdentifier === kcId);
+
   const rows = users && users.map((x: any) => {
     return {
       id: x.id,
-      values: [x.id, x.userName, x.firstName, x.lastName, x.emailAddress],
+      values: [x.id, x.userName, x.firstName, x.lastName, x.emailAddress,
+        x.createdBy ? mapUserToKeycloakId(x.createdBy)?.fullName : "N/A",
+        x.createdTs ? new Date(x.createdTs).toLocaleDateString() : "N/A",
+        x.modifiedBy ? mapUserToKeycloakId(x.modifiedBy)?.fullName : "",
+        x.modifiedTs ? new Date(x.modifiedTs).toLocaleDateString() : "",],
     };
   });
   const tableData = {
@@ -58,6 +65,18 @@ const UserTable = ({ loading, users, pagination, setNewPaginationValues }: UserT
         id: "emailAddress",
         label: "Email Address",
         numeric: false,
+      },
+      {
+        label: "Created By",
+      },
+      {
+        label: "Created Date",
+      },
+      {
+        label: "Modified By",
+      },
+      {
+        label: "Modified Date",
       },
     ],
     rows,

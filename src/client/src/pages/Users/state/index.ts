@@ -22,6 +22,15 @@ const initialState: UserState = {
   currentUser: null
 };
 
+export const fetchAllUsers = createAsyncThunk(
+  'userState/fetchAllUsers',
+  async (endpoint: string) => {
+    const response: any = await GET({ endpoint });
+    // The value we return becomes the `fulfilled` action payload
+    return { data: response.data };
+  }
+);
+
 export const fetchUsers = createAsyncThunk(
   'userState/fetchUsers',
   async (endpoint: string) => {
@@ -48,6 +57,17 @@ export const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchAllUsers.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchAllUsers.fulfilled, (state, action) => {
+        state.status = 'idle';
+        state.users = action.payload.data;
+      })
+      .addCase(fetchAllUsers.rejected, (state) => {
+        state.status = 'failed';
+      })
+      
       .addCase(fetchUsers.pending, (state) => {
         state.status = 'loading';
       })
