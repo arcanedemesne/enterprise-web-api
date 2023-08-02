@@ -5,7 +5,7 @@
 ## Project Overview
 ### Description
 
-This is a demo project to implement the lastest techiniques and best practices in a .NET Core WebAPI using .NET Core 7, EF Core 7, PostgreSQL, Redis, & Docker
+This is a demo project to implement the lastest techiniques and best practices in a .NET Core WebAPI using .NET Core 7, EF Core 7, PostgreSQL, Redis, & Docker. The front end is React, leveraging React-Router-Don, Reduux Toolkit, and JoyUI from MUI.
 
 ---
 
@@ -13,16 +13,17 @@ This is a demo project to implement the lastest techiniques and best practices i
 ## Development Environment Setup
 ###Prerequisites
 
-1. Install Visual Studio 2022 or later (https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022)
-2. Install .NET Core 7 SDK or later (https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
-2. Install openssl (https://slproweb.com/products/Win32OpenSSL.html)
-3. Install Docker Desktop (https://www.docker.com/products/docker-desktop/)
-4. Run the Power Shell script 'setup-dev-certs.ps1' in [src/server/] in order, this will install the nginx certificates
-5. Inside [src/server/] Run docker-compose build, and then docker-compose up. Everything should just start running :)
+1. Install Git, NVM for Windows, and latest LTS Node through NVM.
+2. Install Visual Studio 2022 or later (https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022)
+3. Install .NET Core 7 SDK or later (https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
+4. Install openssl (https://slproweb.com/products/Win32OpenSSL.html)
+5. Install Docker Desktop (https://www.docker.com/products/docker-desktop/)
+6. Run the script 'setup-dev-certs.ps1' in [src/server/] in OpenSSL Terminal, this will install the nginx certificates
+7. Inside [src/server/] Run docker-compose build, and then docker-compose up. Everything should start running.
    [Note: make sure Docker Desktop is Running]
-6. Once Keycloak is running, import the realm ( using 'enterprise-solution-realm.json' in [src/server/]).
+8. Once Keycloak is running, import the realm (using 'enterprise-solution-realm.json' in [src/server/]).
    This will contain a test user with admin priviledges, and a swagger user for testing in swagger.
-
+9. Run the front end in [src/client] using npm install & npm start. Enjoy :)
 
 ### Find your Services
 
@@ -30,6 +31,7 @@ This is a demo project to implement the lastest techiniques and best practices i
 2. Keycloak @ http://localhost:8080/auth/
 3. Mailhog  @ http://localhost:8025/
 4. .NET API @ https://localhost/swagger/index.html
+5. React FE @ http://localhost:3000
 
 
 ### PostgreSQL Tools

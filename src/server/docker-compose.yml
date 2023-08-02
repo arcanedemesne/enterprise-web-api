@@ -29,6 +29,11 @@ services:
       - SolutionApi_SolutionSettings__Cache__Host=redisCache
       - SolutionApi_SolutionSettings__Database__Host=postgres
       - SolutionApi_SolutionSettings__MailSettings__Host=mailhog
+      
+      - SolutionApi_SolutionSettings__Authentication__Schemes__Keycloak__Authority=http://host.docker.internal:8080/auth/realms/enterprise-solution-realm
+      - SolutionApi_SolutionSettings__Authentication__Schemes__Keycloak__Metadata=http://host.docker.internal:8080/auth/realms/enterprise-solution-realm/.well-known/openid-configuration
+      - SolutionApi_SolutionSettings__Authentication__Schemes__Keycloak__TokenExchange=http://host.docker.internal:8080/auth/realms/enterprise-solution-realm/protocol/openid-connect/token
+      - SolutionApi_SolutionSettings__Authentication__Schemes__Keycloak__Users=http://host.docker.internal:8080/auth/admin/realms/enterprise-solution-realm/users
     expose:
       - "5000"
     restart: always
