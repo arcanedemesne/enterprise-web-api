@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import Button from "@mui/joy/Button";
 
-import AlertDialogModal from "./AlertDialogModal";
+import DeleteDialogModal from "./DeleteDialogModal";
 
 interface CreateFormButtonsProps {
   domain: string;
@@ -46,16 +46,15 @@ export const EditFormButtons = ({
   handleDelete,
 }: EditFormButtonsProps) => {
   const navigate = useNavigate();
-  
+
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
-  
+
   return (
     <>
-      <AlertDialogModal
+      <DeleteDialogModal
         open={openDeleteModal}
-        message={(<>This will delete the {domain.substring(0, domain.length - 1)}.</>)}
-        actionButtonLabel="Delete"
-        handleActionButtonClick={async () => {
+        domain={domain}
+        handleDelete={async () => {
           await handleDelete();
           navigate(`/admin/${domain}`);
         }}

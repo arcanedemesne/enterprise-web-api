@@ -5,7 +5,7 @@ import FormInput from "../../components/FormInput";
 import errorMessages from "../../utilities/errorMessages";
 
 import { domain } from ".";
-import formHelper from "../../utilities/formHelper";
+import formHelper, { createFormErrorAlert } from "../../utilities/formHelper";
 import formButtonHelper from "../../utilities/formButtonHelper";
 
 import AsynchronousSearch, {
@@ -13,31 +13,8 @@ import AsynchronousSearch, {
 } from "../../components/AsynchronousSearch";
 import { GET } from "../../utilities/httpRequest";
 import regex from "../../utilities/regex";
-
-export const hasErrors = (formValues: any): any => {
-  const errors: any = {};
-
-  // First Name
-  if (!formValues?.title || formValues?.title.length === 0) {
-    errors.title = `Title ${errorMessages.isRequired}.`;
-  } else if (formValues?.title.length > 50) {
-    errors.title = `Title ${errorMessages.mustBeFiftyCharsOrLess}.`;
-  }
-  // Base Price
-  if (!formValues?.basePrice || formValues?.basePrice.length === 0) {
-    errors.basePrice = `Base Price ${errorMessages.isRequired}.`;
-  } else if (formValues?.basePrice.search(regex.monetaryFormat) < 0) {
-    errors.basePrice = `Base Price ${errorMessages.mustBeMonetaryFormat}.`;
-  }
-  // Publish Date
-  if (!formValues?.publishDate || formValues?.publishDate.length === 0) {
-    errors.publishDate = `Publish Date ${errorMessages.isRequired}.`;
-  } else if (formValues?.publishDate.search(regex.dateFormat) < 0) {
-    errors.publishDate = `Publish Date ${errorMessages.mustBeDateFormat}.`;
-  }
-
-  return Object.keys(errors).length > 0 ? errors : false;
-};
+import { addAlert } from "../../store/AlertState";
+import { useAppDispatch } from "../../store/hooks";
 
 interface FormProps {
   book: any;
@@ -47,10 +24,41 @@ interface FormProps {
 // TODO: create dropdown for Authors and Covers so Create works
 const BookForm = ({ book, formType }: FormProps) => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const [formValues, setFormValues] = useState<any>(book);
   const [errors, setErrors] = useState<any>({});
 
+  const hasErrors = (formValues: any): any => {
+    const errors: any = {};
+  
+    // First Name
+    if (!formValues?.title || formValues?.title.length === 0) {
+      errors.title = `Title ${errorMessages.isRequired}.`;
+    } else if (formValues?.title.length > 50) {
+      errors.title = `Title ${errorMessages.mustBeFiftyCharsOrLess}.`;
+    }
+    // Base Price
+    if (!formValues?.basePrice || formValues?.basePrice.length === 0) {
+      errors.basePrice = `Base Price ${errorMessages.isRequired}.`;
+    } else if (formValues?.basePrice.search(regex.monetaryFormat) < 0) {
+      errors.basePrice = `Base Price ${errorMessages.mustBeMonetaryFormat}.`;
+    }
+    // Publish Date
+    if (!formValues?.publishDate || formValues?.publishDate.length === 0) {
+      errors.publishDate = `Publish Date ${errorMessages.isRequired}.`;
+    } else if (formValues?.publishDate.search(regex.dateFormat) < 0) {
+      errors.publishDate = `Publish Date ${errorMessages.mustBeDateFormat}.`;
+    }
+  
+    const errorsExist = Object.keys(errors).length > 0;
+    if (errorsExist) { 
+      dispatch(addAlert(createFormErrorAlert()));
+      return errors;
+    }
+    return false;
+  };
+    
   const formActions = formHelper({
     domain,
     id: book.id,

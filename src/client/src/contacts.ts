@@ -38,7 +38,6 @@ export const getContacts = (q: string): Contact[] => {
 };
 
 export const getContact = ({ params }: any): Contact | undefined => {
-  console.info(params);
   return data.find(c => c.id === Number(params.contactId));
 };
 

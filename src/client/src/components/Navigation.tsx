@@ -94,7 +94,7 @@ export default function Navigation() {
       </ListSubheader>
       {listItemTemplate("Monitor Stuff", ['DASHBOARD'])}
       {listItemTemplate("View/Add/Change Stuff", ['AUTHORS', 'BOOKS', 'ARTISTS', 'RECYCLE_BIN'])}
-      {listItemTemplate("User Related Stuff", ['PROFILE', 'USERS', 'EMAIL_SUBSCRIPTIONS'])}
+      {listItemTemplate("User Related Stuff", ['PROFILE', 'EMAIL_SUBSCRIPTIONS', 'USERS'])}
       {/* <ListItem nested>
         <ListSubheader>
           Browse

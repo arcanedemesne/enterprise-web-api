@@ -14,7 +14,7 @@ interface AlertDialogModalProps {
   handleClose: () => void;
 }
 
-const AlertDialogModal = ({
+const DialogModal = ({
   open,
   message,
   actionButtonLabel,
@@ -62,4 +62,4 @@ const AlertDialogModal = ({
   );
 };
 
-export default AlertDialogModal;
+export default DialogModal;

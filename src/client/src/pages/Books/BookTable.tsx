@@ -2,9 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import DataTable from "../../components/DataTable";
+import DeleteDialogModal from "../../components/DeleteDialogModal";
 
 import { domain, IBook } from "./";
 import { IUser } from "../Users";
+import { DELETE } from "../../utilities/httpRequest";
 
 interface BookTableProps {
   loading: boolean;
@@ -27,14 +29,21 @@ const BookTable = ({
 }: BookTableProps) => {
   const navigate = useNavigate();
 
-  const [selectedRows, setSelectedRows] = useState<number[]>([]);
-
-  const handleDeleteItems = async () => {
-    await navigate(`/admin/${domain}/delete?ids=${selectedRows}`);
-  };
+  const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
+  const [idToDelete, setIdToDelete] = useState<number>(-1);
 
   const handleEditItem = async (id: number) => {
     await navigate(`/admin/${domain}/${id}/edit`);
+  };
+
+  const handleDeleteItem = async (id: number) => {
+    setOpenDeleteModal(true);
+    setIdToDelete(id);
+  };
+
+  const handleDelete = async () => {
+    await DELETE({ endpoint: `${domain}/${idToDelete}` });
+    navigate(`/admin/${domain}`);
   };
 
   const mapUserToKeycloakId = (kcId: string) =>
@@ -54,9 +63,9 @@ const BookTable = ({
           x.cover?.artists.length || 0,
           new Date(x.publishDate).toDateString(),
           x.createdBy ? mapUserToKeycloakId(x.createdBy)?.fullName : "N/A",
-          x.createdTs ? new Date(x.createdTs).toLocaleDateString() : "N/A",
+          x.createdTs ? new Date(x.createdTs).toDateString() : "N/A",
           x.modifiedBy ? mapUserToKeycloakId(x.modifiedBy)?.fullName : "",
-          x.modifiedTs ? new Date(x.modifiedTs).toLocaleDateString() : "",
+          x.modifiedTs ? new Date(x.modifiedTs).toDateString() : "",
         ],
       };
     });
@@ -64,7 +73,6 @@ const BookTable = ({
     headers: [
       {
         id: "id",
-        width: 100,
         label: "Id",
         numeric: true,
       },
@@ -81,14 +89,17 @@ const BookTable = ({
         id: "basePrice",
         label: "Base Price ($)",
         numeric: true,
+        width: 110
       },
       {
-        label: "Has Cover Art",
+        label: "Has Art",
         numeric: false,
+        width: 80
       },
       {
-        label: "Cover Artist Count",
+        label: "# Artists",
         numeric: true,
+        width: 65
       },
       {
         id: "publishDate",
@@ -112,23 +123,28 @@ const BookTable = ({
   };
 
   return (
-    <DataTable
-      title="Books"
-      caption="This table contains Books"
-      loading={loading}
-      data={tableData}
-      pagination={pagination}
-      setNewPaginationValues={setNewPaginationValues}
-      canDeleteItems
-      handleDeleteItems={handleDeleteItems}
-      canEditItems
-      handleEditItem={handleEditItem}
-      canFilterItems
-      selectedRows={selectedRows}
-      setSelectedRows={setSelectedRows}
-      borderAxis="xBetween"
-      hoverRow
-    />
+    <>
+      <DeleteDialogModal
+        open={openDeleteModal}
+        domain={domain}
+        handleDelete={handleDelete}
+        handleClose={() => setOpenDeleteModal(false)}
+      />
+      <DataTable
+        title="Books"
+        caption="This table contains Books"
+        loading={loading}
+        data={tableData}
+        pagination={pagination}
+        setNewPaginationValues={setNewPaginationValues}
+        canDeleteItems
+        handleDeleteItem={handleDeleteItem}
+        canEditItems
+        handleEditItem={handleEditItem}
+        borderAxis="xBetween"
+        hoverRow
+      />
+    </>
   );
 };
 

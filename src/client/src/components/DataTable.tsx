@@ -1,5 +1,5 @@
 import Box from "@mui/joy/Box";
-import Checkbox from "@mui/joy/Checkbox";
+import { Button, Tooltip } from "@mui/joy";
 import CircularProgress from "@mui/joy/CircularProgress";
 import FormControl from "@mui/joy/FormControl";
 import FormLabel from "@mui/joy/FormLabel";
@@ -9,12 +9,9 @@ import Option from "@mui/joy/Option";
 import Select from "@mui/joy/Select";
 import Sheet from "@mui/joy/Sheet";
 import Table from "@mui/joy/Table";
-import Tooltip from "@mui/joy/Tooltip";
 import Typography from "@mui/joy/Typography";
 
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import DeleteIcon from "@mui/icons-material/Delete";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 
@@ -42,12 +39,9 @@ const DataTable = ({
   pagination,
   setNewPaginationValues,
   canDeleteItems,
-  handleDeleteItems,
+  handleDeleteItem,
   canEditItems,
   handleEditItem,
-  canFilterItems,
-  selectedRows,
-  setSelectedRows,
   ...props
 }: any) => {
   const handleChangeCurrentPage = async (currentPage: number) => {
@@ -71,27 +65,12 @@ const DataTable = ({
     );
   };
 
-  const handleRowSelected = (id: number) => {
-    const newSelectedRows = [...selectedRows];
-    if (!selectedRows.includes(id)) {
-      newSelectedRows.push(id);
-    } else {
-      const index = selectedRows.indexOf(id);
-      newSelectedRows.splice(index, 1);
-    }
-    setSelectedRows(newSelectedRows);
-  };
-
-  const handleDeleteSelectedRows = async () => {
-    await handleDeleteItems();
+  const handleDeleteSelectedRow = async (id: number) => {
+    await handleDeleteItem(id);
   };
 
   const handleEditSelectedRow = async (id: number) => {
     await handleEditItem(id);
-  };
-
-  const handleFilterItems = async () => {
-    console.info(`filter items`);
   };
 
   const getLabelDisplayedRowsTo = () => {
@@ -99,7 +78,7 @@ const DataTable = ({
     return to > pagination.TotalItemCount ? pagination.TotalItemCount : to;
   };
 
-  const EnhancedTableToolbar = ({ numSelected }: { numSelected: number }) => {
+  const EnhancedTableToolbar = () => {
     return (
       <Box
         sx={{
@@ -108,53 +87,18 @@ const DataTable = ({
           py: 1,
           pl: { sm: 2 },
           pr: { xs: 1, sm: 1 },
-          ...(numSelected > 0 && {
-            bgcolor: "background.level1",
-          }),
           borderTopLeftRadius: "var(--unstable_actionRadius)",
           borderTopRightRadius: "var(--unstable_actionRadius)",
         }}
       >
-        {numSelected > 0 ? (
-          <Typography sx={{ flex: "1 1 100%" }} component="span">
-            {numSelected} selected
-          </Typography>
-        ) : (
-          <Typography
-            level="h6"
-            sx={{ flex: "1 1 100%" }}
-            id="tableTitle"
-            component="span"
-          >
-            {title}
-          </Typography>
-        )}
-
-        {numSelected && canDeleteItems > 0 ? (
-          <Tooltip title="Delete">
-            <IconButton
-              size="sm"
-              color="danger"
-              variant="solid"
-              onClick={async () => await handleDeleteSelectedRows()}
-            >
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        ) : canFilterItems ? (
-          <>
-            <Tooltip title="Filter list">
-              <IconButton
-                size="sm"
-                variant="outlined"
-                color="neutral"
-                onClick={async () => await handleFilterItems()}
-              >
-                <FilterListIcon />
-              </IconButton>
-            </Tooltip>
-          </>
-        ) : null}
+        <Typography
+          level="h6"
+          sx={{ flex: "1 1 100%" }}
+          id="tableTitle"
+          component="span"
+        >
+          {title}
+        </Typography>
       </Box>
     );
   };
@@ -162,16 +106,42 @@ const DataTable = ({
   return (
     <Sheet
       variant="outlined"
-      sx={{ width: "100%", boxShadow: "sm", borderRadius: "sm", my: 3 }}
+      sx={{
+        width: "100%",
+        boxShadow: "sm",
+        borderRadius: "sm",
+        my: 3,
+        "--Table-firstColumnWidth": "56px",
+        "--Table-lastColumnWidth": "144px",
+        overflow: "auto",
+        backgroundRepeat: "no-repeat",
+        backgroundAttachment: "local, local, scroll, scroll",
+        backgroundPosition:
+          "var(--Table-firstColumnWidth) var(--TableCell-height), calc(100% - var(--Table-lastColumnWidth)) var(--TableCell-height), var(--Table-firstColumnWidth) var(--TableCell-height), calc(100% - var(--Table-lastColumnWidth)) var(--TableCell-height)",
+      }}
     >
-      <EnhancedTableToolbar numSelected={selectedRows.length} />
-      <Table aria-label="basic table" {...props}>
+      <EnhancedTableToolbar />
+      <Table
+        aria-label="data table"
+        {...props}
+        sx={{
+          "& tr > *:first-child": {
+            position: "sticky",
+            left: 0,
+            bgcolor: "background.surface",
+          },
+          "& tr > *:last-child": {
+            position: "sticky",
+            right: 0,
+            bgcolor: "var(--TableCell-headBackground)",
+          },
+        }}
+      >
         <caption>{caption}</caption>
         <thead>
           <tr>
-            {canDeleteItems && <th style={{ width: 50 }}>&nbsp;</th>}
             {data.headers.length > 0 &&
-              data.headers.map((headCell: any) => {
+              data.headers.map((headCell: any, columnIndex: number) => {
                 const firstOrderBy = pagination.OrderBy.includes(",")
                   ? pagination.OrderBy.split(",")[0]
                   : pagination.OrderBy;
@@ -180,7 +150,12 @@ const DataTable = ({
                 const active = orderBy === headCell.id;
                 return (
                   <th
-                    style={{ width: headCell.width ?? "auto" }}
+                    style={{
+                      width:
+                        columnIndex === 0
+                          ? "var(--Table-firstColumnWidth)"
+                          : headCell.width ?? 150,
+                    }}
                     key={createUniqueKey(10)}
                     aria-sort={
                       active
@@ -191,52 +166,53 @@ const DataTable = ({
                     }
                   >
                     {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                    {headCell.id ? (
-                      <Link
-                        underline="none"
-                        color="neutral"
-                        textColor={active ? "primary.plainColor" : undefined}
-                        component="button"
-                        onClick={async () => {
-                          await handleChangeOrderBy(
-                            headCell.id,
-                            order === "asc" && orderBy === headCell.id
-                              ? "desc"
-                              : "asc"
-                          );
-                        }}
-                        fontWeight="lg"
-                        startDecorator={
-                          headCell.numeric ? (
-                            <ArrowDownwardIcon
-                              sx={{ opacity: active ? 1 : 0 }}
-                            />
-                          ) : null
-                        }
-                        endDecorator={
-                          !headCell.numeric ? (
-                            <ArrowDownwardIcon
-                              sx={{ opacity: active ? 1 : 0 }}
-                            />
-                          ) : null
-                        }
-                        sx={{
-                          "& svg": {
-                            transition: "0.2s",
-                            transform:
-                              active && order === "desc"
-                                ? "rotate(0deg)"
-                                : "rotate(180deg)",
-                          },
-                          "&:hover": { "& svg": { opacity: 1 } },
-                        }}
-                      >
-                        {headCell.label}
-                      </Link>
-                    ) : (
-                      <>{headCell.label}</>
-                    )}
-
+                    <Tooltip title={headCell.label} arrow placement="top">
+                      {headCell.id ? (
+                        <Link
+                          underline="none"
+                          color="neutral"
+                          textColor={active ? "primary.plainColor" : undefined}
+                          component="button"
+                          onClick={async () => {
+                            await handleChangeOrderBy(
+                              headCell.id,
+                              order === "asc" && orderBy === headCell.id
+                                ? "desc"
+                                : "asc"
+                            );
+                          }}
+                          fontWeight="lg"
+                          startDecorator={
+                            headCell.numeric ? (
+                              <ArrowDownwardIcon
+                                sx={{ opacity: active ? 1 : 0 }}
+                              />
+                            ) : null
+                          }
+                          endDecorator={
+                            !headCell.numeric ? (
+                              <ArrowDownwardIcon
+                                sx={{ opacity: active ? 1 : 0 }}
+                              />
+                            ) : null
+                          }
+                          sx={{
+                            "& svg": {
+                              transition: "0.2s",
+                              transform:
+                                active && order === "desc"
+                                  ? "rotate(0deg)"
+                                  : "rotate(180deg)",
+                            },
+                            "&:hover": { "& svg": { opacity: 1 } },
+                          }}
+                        >
+                          {headCell.label}
+                        </Link>
+                      ) : (
+                        <span>{columnIndex > 1 && headCell.label}</span>
+                      )}
+                    </Tooltip>
                     {active ? (
                       <Box component="span" sx={visuallyHidden}>
                         {order === "desc"
@@ -247,6 +223,12 @@ const DataTable = ({
                   </th>
                 );
               })}
+            {(canEditItems || canDeleteItems) && (
+              <th
+                aria-label="last"
+                style={{ width: "var(--Table-lastColumnWidth)" }}
+              ></th>
+            )}
           </tr>
         </thead>
 
@@ -254,7 +236,9 @@ const DataTable = ({
           <tbody>
             <tr>
               <td
-                colSpan={data.headers.length + 1}
+                colSpan={
+                  data.headers.length + (canEditItems || canDeleteItems ? 1 : 0)
+                }
                 align="center"
                 style={{ padding: 10 }}
               >
@@ -263,71 +247,73 @@ const DataTable = ({
             </tr>
           </tbody>
         ) : (
-        <tbody>
-          {data.rows.length > 0 &&
-            data.rows.map((row: any, rowIndex: number) => {
-              const isItemSelected = selectedRows.indexOf(row.id) !== -1;
-              const labelId = `enhanced-table-checkbox-${rowIndex}`;
-
-              return (
-                <tr key={createUniqueKey(10)}>
-                  {canDeleteItems && (
-                    <th scope="row" key={createUniqueKey(10)}>
-                      <Checkbox
-                        checked={isItemSelected}
-                        slotProps={{
-                          input: {
-                            "aria-labelledby": labelId,
-                          },
-                        }}
-                        sx={{ verticalAlign: "top" }}
-                        onClick={() => handleRowSelected(row.id)}
-                      />
-                    </th>
-                  )}
-                  {row.values.map((value: any, columnIndex: number) => (
-                    <td
-                      key={createUniqueKey(10)}
-                      onClick={async () => {
-                        if (columnIndex === 0 && canEditItems)
-                          handleEditSelectedRow(row.id);
-                      }}
-                    >
-                      {columnIndex === 0 && canEditItems ? (
-                        <>
-                          <u
-                            style={{
-                              cursor:
-                                columnIndex === 0 && canEditItems
-                                  ? "pointer"
-                                  : "auto",
-                              color:
-                                columnIndex === 0 && canEditItems
-                                  ? "#64b5f6"
-                                  : "auto",
-                            }}
+          <tbody>
+            {data.rows.length > 0 &&
+              data.rows.map((row: any, rowIndex: number) => {
+                return (
+                  <tr key={createUniqueKey(10)}>
+                    {row.values.map((value: any, columnIndex: number) => {
+                      const alignRight =
+                        columnIndex === 0 || data.headers[columnIndex].numeric;
+                      return (
+                        <td
+                          key={createUniqueKey(10)}
+                          align={alignRight ? "right" : "left"}
+                        >
+                          {value}
+                          {alignRight && <>&nbsp;&nbsp;</>}
+                        </td>
+                      );
+                    })}
+                    {(canEditItems || canDeleteItems) && (
+                      <td>
+                        {canEditItems ? (
+                          <Button
+                            size="sm"
+                            variant="plain"
+                            color="neutral"
+                            onClick={async () => handleEditSelectedRow(row.id)}
                           >
-                            edit
-                          </u>{" "}
-                          |{" "}
-                        </>
-                      ) : (
-                        ""
-                      )}
-                      {value}{" "}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
-        </tbody>
+                            Edit
+                          </Button>
+                        ) : (
+                          ""
+                        )}
+                        {canDeleteItems ? (
+                          <Button
+                            size="sm"
+                            variant="soft"
+                            color="danger"
+                            onClick={async () =>
+                              handleDeleteSelectedRow(row.id)
+                            }
+                          >
+                            Delete
+                          </Button>
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                );
+              })}
+          </tbody>
         )}
         <tfoot>
           <tr>
             <td
               colSpan={
-                canDeleteItems ? data.headers.length + 1 : data.headers.length
+                canEditItems || canDeleteItems
+                  ? data.headers.length - 2
+                  : data.headers.length - 1
               }
+            ></td>
+            <td
+              colSpan={3}
+              style={{
+                position: "sticky",
+              }}
             >
               <Box
                 component="span"

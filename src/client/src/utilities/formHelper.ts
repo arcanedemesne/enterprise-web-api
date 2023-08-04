@@ -1,4 +1,6 @@
+import { IAlert } from "../store/AlertState";
 import { DELETE, POST, PUT } from "./httpRequest";
+import createUniqueKey from "./uniqueKey";
 
 const formHelper = ({ domain, id, navigate }: any) => {
   return {
@@ -18,5 +20,13 @@ const formHelper = ({ domain, id, navigate }: any) => {
     },
   };
 };
+
+export const createFormErrorAlert = () => {
+  return {
+    id: createUniqueKey(10),
+    type: "warning",
+    message: "Invalid form, please correct the highlighted fields.",
+  } as IAlert;
+}
 
 export default formHelper;

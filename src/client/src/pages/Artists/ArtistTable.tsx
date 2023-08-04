@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { DELETE } from "../../utilities/httpRequest";
 import DataTable from "../../components/DataTable";
+import DeleteDialogModal from "../../components/DeleteDialogModal";
 
 import { domain, IArtist } from "./";
 import { IUser } from "../Users";
@@ -27,17 +29,27 @@ const ArtistTable = ({
 }: ArtistTableProps) => {
   const navigate = useNavigate();
 
-  const [selectedRows, setSelectedRows] = useState<any[]>([]);
+  const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
+  const [idToDelete, setIdToDelete] = useState<number>(-1);
 
-  const handleDeleteItems = async () => {
-    await navigate(`/admin/${domain}/delete?ids=${selectedRows}`);
-  };
+  
 
   const handleEditItem = async (id: number) => {
     await navigate(`/admin/${domain}/${id}/edit`);
   };
 
-  const mapUserToKeycloakId = (kcId: string) => users.find(u => u.keycloakUniqueIdentifier === kcId);
+  const handleDeleteItem = async (id: number) => {
+    setOpenDeleteModal(true);
+    setIdToDelete(id);
+  };
+
+  const handleDelete = async () => {
+    await DELETE({ endpoint: `${domain}/${idToDelete}` });
+    navigate(`/admin/${domain}`);
+  };
+
+  const mapUserToKeycloakId = (kcId: string) =>
+    users.find((u) => u.keycloakUniqueIdentifier === kcId);
 
   const rows =
     artists &&
@@ -49,10 +61,10 @@ const ArtistTable = ({
           x.firstName,
           x.lastName,
           x.covers.length,
-          x.createdBy ? mapUserToKeycloakId(x.createdBy)?.fullName : 'N/A',
-          x.createdTs ? new Date(x.createdTs).toLocaleDateString() : 'N/A',
-          x.modifiedBy ? mapUserToKeycloakId(x.modifiedBy)?.fullName : '',
-          x.modifiedTs ? new Date(x.modifiedTs).toLocaleDateString() : '',
+          x.createdBy ? mapUserToKeycloakId(x.createdBy)?.fullName : "N/A",
+          x.createdTs ? new Date(x.createdTs).toDateString() : "N/A",
+          x.modifiedBy ? mapUserToKeycloakId(x.modifiedBy)?.fullName : "",
+          x.modifiedTs ? new Date(x.modifiedTs).toDateString() : "",
         ],
       };
     });
@@ -60,7 +72,6 @@ const ArtistTable = ({
     headers: [
       {
         id: "id",
-        width: 100,
         label: "Id",
         numeric: true,
       },
@@ -75,8 +86,9 @@ const ArtistTable = ({
         numeric: false,
       },
       {
-        label: "Cover Art Count",
+        label: "# Covers",
         numeric: true,
+        width: 50
       },
       {
         label: "Created By",
@@ -95,23 +107,29 @@ const ArtistTable = ({
   };
 
   return (
-    <DataTable
-      title="Artists"
-      caption="This table contains Artists"
-      loading={loading}
-      data={tableData}
-      pagination={pagination}
-      setNewPaginationValues={setNewPaginationValues}
-      canDeleteItems
-      handleDeleteItems={handleDeleteItems}
-      canEditItems
-      handleEditItem={handleEditItem}
-      canFilterItems
-      selectedRows={selectedRows}
-      setSelectedRows={setSelectedRows}
-      borderAxis="xBetween"
-      hoverRow
-    />
+    <>
+      <DeleteDialogModal
+        open={openDeleteModal}
+        domain={domain}
+        handleDelete={handleDelete}
+        handleClose={() => setOpenDeleteModal(false)}
+      />
+      <DataTable
+        title="Artists"
+        caption="This table contains Artists"
+        loading={loading}
+        data={tableData}
+        pagination={pagination}
+        setNewPaginationValues={setNewPaginationValues}
+        canDeleteItems
+        handleDeleteItem={handleDeleteItem}
+        canEditItems
+        handleEditItem={handleEditItem}
+        canFilterItems
+        borderAxis="xBetween"
+        hoverRow
+      />
+    </>
   );
 };
 

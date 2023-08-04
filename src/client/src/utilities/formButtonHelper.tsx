@@ -7,7 +7,7 @@ const formButtonHelper = ({
   setErrors,
   formValues,
   formActions,
-  isDeleted
+  isDeleted,
 } : any) => {
   let buttons = null;
   if (formType === "create") {

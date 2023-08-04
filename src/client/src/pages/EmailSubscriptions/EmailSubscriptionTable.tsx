@@ -2,40 +2,59 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import DataTable from "../../components/DataTable";
+import DeleteDialogModal from "../../components/DeleteDialogModal";
 
 import { domain, IEmailSubscription } from "./";
+import { DELETE } from "../../utilities/httpRequest";
 
 interface EmailSubscriptionTableProps {
   loading: boolean;
   emailSubscriptions: IEmailSubscription[];
   pagination: any;
-  setNewPaginationValues: (pageNumber: number, pageSize: number, orderBy: string) => void;
+  setNewPaginationValues: (
+    pageNumber: number,
+    pageSize: number,
+    orderBy: string
+  ) => void;
 }
 
-const EmailSubscriptionTable = ({ loading, emailSubscriptions, pagination, setNewPaginationValues }: EmailSubscriptionTableProps) => {
+const EmailSubscriptionTable = ({
+  loading,
+  emailSubscriptions,
+  pagination,
+  setNewPaginationValues,
+}: EmailSubscriptionTableProps) => {
   const navigate = useNavigate();
 
-  const [selectedRows, setSelectedRows] = useState<number[]>([]);
-
-  const handleDeleteItems = async () => {
-    await navigate(`/admin/${domain}/delete?ids=${selectedRows}`);
-  };
+  const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
+  const [idToDelete, setIdToDelete] = useState<number>(-1);
 
   const handleEditItem = async (id: number) => {
     await navigate(`/admin/${domain}/${id}/edit`);
   };
 
-  const rows = emailSubscriptions && emailSubscriptions.map((x: any) => {
-    return {
-      id: x.id,
-      values: [x.id, x.firstName, x.lastName, x.emailAddress],
-    };
-  });
+  const handleDeleteItem = async (id: number) => {
+    setOpenDeleteModal(true);
+    setIdToDelete(id);
+  };
+
+  const handleDelete = async () => {
+    await DELETE({ endpoint: `${domain}/${idToDelete}` });
+    navigate(`/admin/${domain}`);
+  };
+
+  const rows =
+    emailSubscriptions &&
+    emailSubscriptions.map((x: any) => {
+      return {
+        id: x.id,
+        values: [x.id, x.firstName, x.lastName, x.emailAddress],
+      };
+    });
   const tableData = {
     headers: [
       {
         id: "id",
-        width: 100,
         label: "Id",
         numeric: true,
       },
@@ -59,23 +78,28 @@ const EmailSubscriptionTable = ({ loading, emailSubscriptions, pagination, setNe
   };
 
   return (
-    <DataTable
-      title="Email Subscriptions"
-      caption="This table contains Email Subscriptions"
-      loading={loading}
-      data={tableData}
-      pagination={pagination}
-      setNewPaginationValues={setNewPaginationValues}
-      canDeleteItems
-      handleDeleteItems={handleDeleteItems}
-      canEditItems
-      handleEditItem={handleEditItem}
-      canFilterItems
-      selectedRows={selectedRows}
-      setSelectedRows={setSelectedRows}
-      borderAxis="xBetween"
-      hoverRow
-    />
+    <>
+      <DeleteDialogModal
+        open={openDeleteModal}
+        domain={domain}
+        handleDelete={handleDelete}
+        handleClose={() => setOpenDeleteModal(false)}
+      />
+      <DataTable
+        title="Email Subscriptions"
+        caption="This table contains Email Subscriptions"
+        loading={loading}
+        data={tableData}
+        pagination={pagination}
+        setNewPaginationValues={setNewPaginationValues}
+        canDeleteItems
+        handleDeleteItem={handleDeleteItem}
+        canEditItems
+        handleEditItem={handleEditItem}
+        borderAxis="xBetween"
+        hoverRow
+      />
+    </>
   );
 };
 

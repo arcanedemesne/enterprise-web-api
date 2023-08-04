@@ -5,27 +5,10 @@ import FormInput from "../../components/FormInput";
 import errorMessages from "../../utilities/errorMessages";
 
 import { domain } from ".";
-import formHelper from "../../utilities/formHelper";
+import formHelper, { createFormErrorAlert } from "../../utilities/formHelper";
 import formButtonHelper from "../../utilities/formButtonHelper";
-
-export const hasErrors = (formValues: any): any => {
-  const errors: any = {};
-
-  // First Name
-  if (!formValues?.firstName || formValues?.firstName.length === 0) {
-    errors.firstName = `First Name ${errorMessages.isRequired}.`;
-  } else if (formValues?.firstName.length > 50) {
-    errors.firstName = `First Name ${errorMessages.mustBeFiftyCharsOrLess}.`;
-  }
-  // Last Name
-  if (!formValues?.lastName || formValues?.lastName.length === 0) {
-    errors.lastName = `Last Name ${errorMessages.isRequired}.`;
-  } else if (formValues?.lastName.length > 50) {
-    errors.lastName = `Last Name ${errorMessages.mustBeFiftyCharsOrLess}.`;
-  }
-
-  return Object.keys(errors).length > 0 ? errors : false;
-};
+import { useAppDispatch } from "../../store/hooks";
+import { addAlert } from "../../store/AlertState";
 
 interface EmailSubscriptionFormProps {
   emailSubscription: any;
@@ -37,9 +20,34 @@ const EmailSubscriptionForm = ({
   formType,
 }: EmailSubscriptionFormProps) => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const [formValues, setFormValues] = useState<any>(emailSubscription);
   const [errors, setErrors] = useState<any>({});
+
+  const hasErrors = (formValues: any): any => {
+    const errors: any = {};
+  
+    // First Name
+    if (!formValues?.firstName || formValues?.firstName.length === 0) {
+      errors.firstName = `First Name ${errorMessages.isRequired}.`;
+    } else if (formValues?.firstName.length > 50) {
+      errors.firstName = `First Name ${errorMessages.mustBeFiftyCharsOrLess}.`;
+    }
+    // Last Name
+    if (!formValues?.lastName || formValues?.lastName.length === 0) {
+      errors.lastName = `Last Name ${errorMessages.isRequired}.`;
+    } else if (formValues?.lastName.length > 50) {
+      errors.lastName = `Last Name ${errorMessages.mustBeFiftyCharsOrLess}.`;
+    }
+  
+    const errorsExist = Object.keys(errors).length > 0;
+    if (errorsExist) { 
+      dispatch(addAlert(createFormErrorAlert()));
+      return errors;
+    }
+    return false;
+  };
 
   const formActions = formHelper({
     domain,
