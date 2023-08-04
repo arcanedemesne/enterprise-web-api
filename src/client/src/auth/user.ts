@@ -155,7 +155,7 @@ export const signOut = (): void => {
   setIdToken(null);
   setAccessToken(null);
   setRefreshToken(null);
-  window.location.href = PAGE_ROUTES.SIGN_IN.path;
+  window.location.href = `${PAGE_ROUTES.SIGN_IN.path}?redirect=${window.location.pathname}`;
 };
 
 export interface ISignUpProps {

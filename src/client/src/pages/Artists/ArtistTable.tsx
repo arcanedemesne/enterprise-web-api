@@ -125,7 +125,6 @@ const ArtistTable = ({
         handleDeleteItem={handleDeleteItem}
         canEditItems
         handleEditItem={handleEditItem}
-        canFilterItems
         borderAxis="xBetween"
         hoverRow
       />

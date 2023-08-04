@@ -5,10 +5,8 @@ import FormInput from "../../components/FormInput";
 import errorMessages from "../../utilities/errorMessages";
 
 import { domain } from ".";
-import formHelper, { createFormErrorAlert } from "../../utilities/formHelper";
+import formHelper from "../../utilities/formHelper";
 import formButtonHelper from "../../utilities/formButtonHelper";
-import { useAppDispatch } from "../../store/hooks";
-import { addAlert } from "../../store/AlertState";
 
 interface AuthorFormProps {
   author: any;
@@ -20,7 +18,6 @@ const AuthorForm = ({
   formType,
 }: AuthorFormProps) => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
 
   const [formValues, setFormValues] = useState<any>(author);
   const [errors, setErrors] = useState<any>({});
@@ -41,12 +38,7 @@ const AuthorForm = ({
       errors.lastName = `Last Name ${errorMessages.mustBeFiftyCharsOrLess}.`;
     }
 
-    const errorsExist = Object.keys(errors).length > 0;
-    if (errorsExist) { 
-      dispatch(addAlert(createFormErrorAlert()));
-      return errors;
-    }
-    return false;
+    return Object.keys(errors).length > 0 ? errors : false;
   };
 
   const formActions = formHelper({

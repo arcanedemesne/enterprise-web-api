@@ -9,6 +9,8 @@ import { baseUri, domain } from ".";
 import { AuthorState, fetchAuthors } from "./state";
 import { paginate } from "../../utilities/pagination";
 import { UserState } from "../Users/state";
+import { IAlert, addAlert } from "../../store/AlertState";
+import createUniqueKey from "../../utilities/uniqueKey";
 
 const ListAuthors = () => {
   const authorState: AuthorState = useAppSelector((state) => state.authorState);
@@ -26,14 +28,32 @@ const ListAuthors = () => {
       pageSize,
       orderBy,
       callback: async (endpoint: string) => {
-        dispatch(await fetchAuthors(endpoint));
+        const response: any = await dispatch(await fetchAuthors(endpoint));
+        if (response.error) {
+          dispatch(
+            addAlert({
+              id: createUniqueKey(10),
+              type: "danger",
+              message: response.error.message,
+            } as IAlert)
+          );
+        }
       },
     });
   };
 
   useEffectOnce(() => {
     const fetchData = async () => {
-      dispatch(await fetchAuthors(baseUri));
+      const response: any = await dispatch(await fetchAuthors(baseUri));
+      if (response.error) {
+        dispatch(
+          addAlert({
+            id: createUniqueKey(10),
+            type: "danger",
+            message: response.error.message,
+          } as IAlert)
+        );
+      }
     };
 
     fetchData();

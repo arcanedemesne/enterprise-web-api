@@ -7,6 +7,8 @@ import UserTable from "./UserTable";
 import { baseUri } from ".";
 import { UserState, fetchUsers } from "./state";
 import { paginate } from "../../utilities/pagination";
+import { IAlert, addAlert } from "../../store/AlertState";
+import createUniqueKey from "../../utilities/uniqueKey";
 
 const ListUsers = () => {
   const userState: UserState = useAppSelector((state) => state.userState);
@@ -23,14 +25,32 @@ const ListUsers = () => {
       pageSize,
       orderBy,
       callback: async (endpoint: string) => {
-        dispatch(await fetchUsers(endpoint));
+        const response: any = await dispatch(await fetchUsers(endpoint));
+        if (response.error) {
+          dispatch(
+            addAlert({
+              id: createUniqueKey(10),
+              type: "danger",
+              message: response.error.message,
+            } as IAlert)
+          );
+        }
       },
     });
   };
 
   useEffectOnce(() => {
     const fetchData = async () => {
-      dispatch(await fetchUsers(baseUri));
+      const response: any = await dispatch(await fetchUsers(baseUri));
+      if (response.error) {
+        dispatch(
+          addAlert({
+            id: createUniqueKey(10),
+            type: "danger",
+            message: response.error.message,
+          } as IAlert)
+        );
+      }
     };
 
     fetchData();

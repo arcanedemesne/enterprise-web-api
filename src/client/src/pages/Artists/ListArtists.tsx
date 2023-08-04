@@ -9,6 +9,8 @@ import { baseUri, domain } from ".";
 import { ArtistState, fetchArtists } from "./state";
 import { paginate } from "../../utilities/pagination";
 import { UserState } from "../Users/state";
+import { IAlert, addAlert } from "../../store/AlertState";
+import createUniqueKey from "../../utilities/uniqueKey";
 
 const ListArtists = () => {
   const artistState: ArtistState = useAppSelector((state) => state.artistState);
@@ -26,19 +28,37 @@ const ListArtists = () => {
       pageSize,
       orderBy,
       callback: async (endpoint: string) => {
-        dispatch(await fetchArtists(endpoint));
+        const response: any = await dispatch(await fetchArtists(endpoint));
+        if (response.error) {
+          dispatch(
+            addAlert({
+              id: createUniqueKey(10),
+              type: "danger",
+              message: response.error.message,
+            } as IAlert)
+          );
+        }
       },
     });
   };
 
   useEffectOnce(() => {
     const fetchData = async () => {
-      dispatch(await fetchArtists(baseUri));
+      const response: any = await dispatch(await fetchArtists(baseUri));
+      if (response.error) {
+        dispatch(
+          addAlert({
+            id: createUniqueKey(10),
+            type: "danger",
+            message: response.error.message,
+          } as IAlert)
+        );
+      }
     };
 
     fetchData();
   });
-  
+
   return (
     <Page
       pageTitle="Viewing Artists"
@@ -46,7 +66,9 @@ const ListArtists = () => {
         <>
           <CreateButton domain={domain} />
           <ArtistTable
-            loading={artistState.status === "loading" && userState.status === "loading"}
+            loading={
+              artistState.status === "loading" && userState.status === "loading"
+            }
             artists={artistState.artists}
             users={userState.users}
             pagination={artistState.pagination}

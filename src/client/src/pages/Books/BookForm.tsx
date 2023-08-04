@@ -5,7 +5,7 @@ import FormInput from "../../components/FormInput";
 import errorMessages from "../../utilities/errorMessages";
 
 import { domain } from ".";
-import formHelper, { createFormErrorAlert } from "../../utilities/formHelper";
+import formHelper from "../../utilities/formHelper";
 import formButtonHelper from "../../utilities/formButtonHelper";
 
 import AsynchronousSearch, {
@@ -13,8 +13,6 @@ import AsynchronousSearch, {
 } from "../../components/AsynchronousSearch";
 import { GET } from "../../utilities/httpRequest";
 import regex from "../../utilities/regex";
-import { addAlert } from "../../store/AlertState";
-import { useAppDispatch } from "../../store/hooks";
 
 interface FormProps {
   book: any;
@@ -24,7 +22,6 @@ interface FormProps {
 // TODO: create dropdown for Authors and Covers so Create works
 const BookForm = ({ book, formType }: FormProps) => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
 
   const [formValues, setFormValues] = useState<any>(book);
   const [errors, setErrors] = useState<any>({});
@@ -51,12 +48,7 @@ const BookForm = ({ book, formType }: FormProps) => {
       errors.publishDate = `Publish Date ${errorMessages.mustBeDateFormat}.`;
     }
   
-    const errorsExist = Object.keys(errors).length > 0;
-    if (errorsExist) { 
-      dispatch(addAlert(createFormErrorAlert()));
-      return errors;
-    }
-    return false;
+    return Object.keys(errors).length > 0 ? errors : false;
   };
     
   const formActions = formHelper({

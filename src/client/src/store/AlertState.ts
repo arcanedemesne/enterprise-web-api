@@ -32,7 +32,7 @@ export const alertSlice = createSlice({
   },
 });
 
-export const { addAlert, removeAlert } = alertSlice.actions
+export const { addAlert, removeAlert } = alertSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const getUserState = (state: RootState) => state.alertState;

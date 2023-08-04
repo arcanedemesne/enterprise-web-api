@@ -15,7 +15,7 @@ const EditUser = () => {
   const dispatch = useAppDispatch();
   const params = useParams();
 
-  const user = userState.currentUser;
+  const user = userState.editUser;
 
   useEffectOnce(() => {
     const fetchData = async () => {

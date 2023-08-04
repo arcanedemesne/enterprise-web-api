@@ -125,7 +125,7 @@ const DataTable = ({
         aria-label="data table"
         {...props}
         sx={{
-          "& tr > *:first-child": {
+          "& tr > *:first-of-type": {
             position: "sticky",
             left: 0,
             bgcolor: "background.surface",

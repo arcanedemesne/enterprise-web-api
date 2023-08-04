@@ -8,9 +8,13 @@ import EmailSubscriptionTable from "./EmailSubscriptionTable";
 import { baseUri, domain } from ".";
 import { EmailSubscriptionState, fetchEmailSubscriptions } from "./state";
 import { paginate } from "../../utilities/pagination";
+import { IAlert, addAlert } from "../../store/AlertState";
+import createUniqueKey from "../../utilities/uniqueKey";
 
 const ListArtists = () => {
-  const emailSubscriptionState: EmailSubscriptionState = useAppSelector((state) => state.emailSubscriptionState);
+  const emailSubscriptionState: EmailSubscriptionState = useAppSelector(
+    (state) => state.emailSubscriptionState
+  );
   const dispatch = useAppDispatch();
 
   const setNewPaginationValues = (
@@ -24,14 +28,36 @@ const ListArtists = () => {
       pageSize,
       orderBy,
       callback: async (endpoint: string) => {
-        dispatch(await fetchEmailSubscriptions(endpoint));
+        const response: any = await dispatch(
+          await fetchEmailSubscriptions(endpoint)
+        );
+        if (response.error) {
+          dispatch(
+            addAlert({
+              id: createUniqueKey(10),
+              type: "danger",
+              message: response.error.message,
+            } as IAlert)
+          );
+        }
       },
     });
   };
 
   useEffectOnce(() => {
     const fetchData = async () => {
-      dispatch(await fetchEmailSubscriptions(baseUri));
+      const response: any = await dispatch(
+        await fetchEmailSubscriptions(baseUri)
+      );
+      if (response.error) {
+        dispatch(
+          addAlert({
+            id: createUniqueKey(10),
+            type: "danger",
+            message: response.error.message,
+          } as IAlert)
+        );
+      }
     };
 
     fetchData();

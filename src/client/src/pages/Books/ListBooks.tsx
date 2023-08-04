@@ -9,6 +9,8 @@ import { baseUri, domain } from ".";
 import { BookState, fetchBooks } from "./state";
 import { paginate } from "../../utilities/pagination";
 import { UserState } from "../Users/state";
+import { IAlert, addAlert } from "../../store/AlertState";
+import createUniqueKey from "../../utilities/uniqueKey";
 
 const ListBooks = () => {
   const bookState: BookState = useAppSelector((state) => state.bookState);
@@ -26,14 +28,32 @@ const ListBooks = () => {
       pageSize,
       orderBy,
       callback: async (endpoint: string) => {
-        dispatch(await fetchBooks(endpoint));
+        const response: any = await dispatch(await fetchBooks(endpoint));
+        if (response.error) {
+          dispatch(
+            addAlert({
+              id: createUniqueKey(10),
+              type: "danger",
+              message: response.error.message,
+            } as IAlert)
+          );
+        }
       },
     });
   };
 
   useEffectOnce(() => {
     const fetchData = async () => {
-      dispatch(await fetchBooks(baseUri));
+      const response: any = await dispatch(await fetchBooks(baseUri));
+      if (response.error) {
+        dispatch(
+          addAlert({
+            id: createUniqueKey(10),
+            type: "danger",
+            message: response.error.message,
+          } as IAlert)
+        );
+      }
     };
 
     fetchData();

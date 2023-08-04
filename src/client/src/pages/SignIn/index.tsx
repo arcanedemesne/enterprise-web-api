@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import Button from "@mui/joy/Button";
 import Link from "@mui/joy/Link";
@@ -12,10 +12,13 @@ import FormInput from "../../components/FormInput";
 import PAGE_ROUTES from "../../utilities/pageRoutes";
 
 const adminUrl: string = "/admin/dashboard";
-let redirectUrl: string = "";
+let redirectUrl: string | null = null;
 
 const SignIn = () => {
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+
+  redirectUrl = searchParams.get("redirect"); 
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>("jennifer.allen");
@@ -28,7 +31,7 @@ const SignIn = () => {
         password,
       } as ISignInProps)) as UserMetadata | undefined;
       if (metadata?.email_address) {
-        navigate(redirectUrl.length > 0 ? redirectUrl : adminUrl);
+        navigate(redirectUrl != null ? redirectUrl : adminUrl);
       }
     } catch (error: any) {
       setErrorMessage(error.statusText);
