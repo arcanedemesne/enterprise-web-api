@@ -8,7 +8,7 @@ import Typography from "@mui/joy/Typography";
 
 import { ISignInProps, signIn, UserMetadata } from "../../auth/user";
 import AuthenticationLayout from "../../layouts/AuthenticationLayout";
-import FormInput from "../../components/FormInput";
+import FormInput from "../../components/Inputs/FormInput";
 import PAGE_ROUTES from "../../utilities/pageRoutes";
 
 const adminUrl: string = "/admin/dashboard";

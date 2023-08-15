@@ -11,6 +11,7 @@ import { GET } from "../../../utilities/httpRequest";
 // Define a type for the slice state
 export interface UserState {
   status: "idle" | "loading" | "failed";
+  allUsers: IUser[];
   users: IUser[];
   pagination: IPagination;
   editUser: IUser | null;
@@ -21,6 +22,7 @@ export interface UserState {
 // Define the initial state using that type
 const initialState: UserState = {
   status: "idle",
+  allUsers: [],
   users: [],
   pagination: paginationInitialState,
 
@@ -71,7 +73,7 @@ export const userSlice = createSlice({
       })
       .addCase(fetchAllUsers.fulfilled, (state, action) => {
         state.status = "idle";
-        state.users = action.payload.data;
+        state.allUsers = action.payload.data;
       })
       .addCase(fetchAllUsers.rejected, (state) => {
         state.status = "failed";

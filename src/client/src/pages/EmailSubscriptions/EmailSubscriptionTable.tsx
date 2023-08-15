@@ -87,7 +87,7 @@ const EmailSubscriptionTable = ({
       />
       <DataTable
         title="Email Subscriptions"
-        caption="This table contains Email Subscriptions"
+        caption="Email Subscriptions are created by those who wish to here new things"
         loading={loading}
         data={tableData}
         pagination={pagination}

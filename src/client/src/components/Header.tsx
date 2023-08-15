@@ -14,7 +14,11 @@ import Menu from "./Menu";
 import { ColorSchemeToggle } from "./ColorSchemeToggle";
 import { signOut } from "../auth/user";
 
-const Header = () => {
+interface HeaderProps {
+  setDrawerOpen: (drawerOpen: boolean) => void;
+}
+
+const Header = ({ setDrawerOpen }: HeaderProps) => {
   const navigate = useNavigate();
 
   return (
@@ -26,12 +30,11 @@ const Header = () => {
           alignItems: "center",
           gap: 1.5,
         }}
-        onClick={() => navigate("/")}
       >
         <IconButton
           variant="outlined"
           size="sm"
-          //onClick={() => setDrawerOpen(true)}
+          onClick={() => setDrawerOpen(true)}
           sx={{ display: { sm: "none" } }}
         >
           <MenuIcon />
@@ -43,7 +46,12 @@ const Header = () => {
         >
           <GroupRoundedIcon />
         </IconButton>
-        <Typography component="h1" fontWeight="xl" sx={{ cursor: "pointer" }}>
+        <Typography
+          component="h1"
+          fontWeight="xl"
+          sx={{ cursor: "pointer" }}
+          onClick={() => navigate("/")}
+        >
           Application Name
         </Typography>
       </Box>
@@ -64,17 +72,23 @@ const Header = () => {
             {
               label: "Profile",
               href: "/admin/profile",
-              active: window.location.href.toLocaleLowerCase().includes('profile'),
+              active: window.location.href
+                .toLocaleLowerCase()
+                .includes("profile"),
             },
             {
               label: "Users",
               href: "/admin/users",
-              active: window.location.href.toLocaleLowerCase().includes('users'),
+              active: window.location.href
+                .toLocaleLowerCase()
+                .includes("users"),
             },
             {
               label: "Email Subscriptions",
               href: "/admin/email-subscriptions",
-              active: window.location.href.toLocaleLowerCase().includes('email-subscriptions'),
+              active: window.location.href
+                .toLocaleLowerCase()
+                .includes("email-subscriptions"),
             },
           ]}
         />
@@ -86,7 +100,6 @@ const Header = () => {
           component="a"
           onClick={signOut}
         >
-          
           <LogoutRoundedIcon />
         </IconButton>
       </Box>

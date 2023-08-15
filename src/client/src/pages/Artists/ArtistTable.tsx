@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { DELETE } from "../../utilities/httpRequest";
+import userHelper from "../../utilities/userHelper";
 import DataTable from "../../components/DataTable";
 import DeleteDialogModal from "../../components/DeleteDialogModal";
 
@@ -32,8 +33,6 @@ const ArtistTable = ({
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
   const [idToDelete, setIdToDelete] = useState<number>(-1);
 
-  
-
   const handleEditItem = async (id: number) => {
     await navigate(`/admin/${domain}/${id}/edit`);
   };
@@ -48,9 +47,6 @@ const ArtistTable = ({
     navigate(`/admin/${domain}`);
   };
 
-  const mapUserToKeycloakId = (kcId: string) =>
-    users.find((u) => u.keycloakUniqueIdentifier === kcId);
-
   const rows =
     artists &&
     artists.map((x: any) => {
@@ -61,9 +57,9 @@ const ArtistTable = ({
           x.firstName,
           x.lastName,
           x.covers.length,
-          x.createdBy ? mapUserToKeycloakId(x.createdBy)?.fullName : "N/A",
+          x.createdBy ? userHelper.mapUserToKeycloakId(x.createdBy)?.fullName : "N/A",
           x.createdTs ? new Date(x.createdTs).toDateString() : "N/A",
-          x.modifiedBy ? mapUserToKeycloakId(x.modifiedBy)?.fullName : "",
+          x.modifiedBy ? userHelper.mapUserToKeycloakId(x.modifiedBy)?.fullName : "",
           x.modifiedTs ? new Date(x.modifiedTs).toDateString() : "",
         ],
       };
@@ -88,7 +84,7 @@ const ArtistTable = ({
       {
         label: "# Covers",
         numeric: true,
-        width: 50
+        width: 65,
       },
       {
         label: "Created By",
@@ -116,7 +112,7 @@ const ArtistTable = ({
       />
       <DataTable
         title="Artists"
-        caption="This table contains Artists"
+        caption="Artists create artwork for books"
         loading={loading}
         data={tableData}
         pagination={pagination}

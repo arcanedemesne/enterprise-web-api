@@ -6,6 +6,7 @@ import DeleteDialogModal from "../../components/DeleteDialogModal";
 
 import { domain, IUser } from "./";
 import { DELETE } from "../../utilities/httpRequest";
+import userHelper from "../../utilities/userHelper";
 
 interface UserTableProps {
   loading: boolean;
@@ -42,9 +43,7 @@ const UserTable = ({
     await DELETE({ endpoint: `${domain}/${idToDelete}` });
     navigate(`/admin/${domain}`);
   };
-  const mapUserToKeycloakId = (kcId: string) =>
-    users.find((u) => u.keycloakUniqueIdentifier === kcId);
-
+  
   const rows =
     users &&
     users.map((x: any) => {
@@ -56,9 +55,9 @@ const UserTable = ({
           x.firstName,
           x.lastName,
           x.emailAddress,
-          x.createdBy ? mapUserToKeycloakId(x.createdBy)?.fullName : "N/A",
+          x.createdBy ? userHelper.mapUserToKeycloakId(x.createdBy)?.fullName : "N/A",
           x.createdTs ? new Date(x.createdTs).toDateString() : "N/A",
-          x.modifiedBy ? mapUserToKeycloakId(x.modifiedBy)?.fullName : "",
+          x.modifiedBy ? userHelper.mapUserToKeycloakId(x.modifiedBy)?.fullName : "",
           x.modifiedTs ? new Date(x.modifiedTs).toDateString() : "",
         ],
       };
@@ -118,7 +117,7 @@ const UserTable = ({
       />
       <DataTable
         title="Users"
-        caption="This table contains Users"
+        caption="Users are people who belong to this application"
         loading={loading}
         data={tableData}
         pagination={pagination}

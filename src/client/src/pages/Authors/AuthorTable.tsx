@@ -7,6 +7,7 @@ import DeleteDialogModal from "../../components/DeleteDialogModal";
 import { domain, IAuthor } from "./";
 import { IUser } from "../Users";
 import { DELETE } from "../../utilities/httpRequest";
+import userHelper from "../../utilities/userHelper";
 
 interface AuthorTableProps {
   loading: boolean;
@@ -46,9 +47,6 @@ const AuthorTable = ({
     navigate(`/admin/${domain}`);
   };
 
-  const mapUserToKeycloakId = (kcId: string) =>
-    users.find((u) => u.keycloakUniqueIdentifier === kcId);
-
   const rows =
     authors &&
     authors.map((x: any) => {
@@ -59,9 +57,9 @@ const AuthorTable = ({
           x.firstName,
           x.lastName,
           x.books?.length,
-          x.createdBy ? mapUserToKeycloakId(x.createdBy)?.fullName : "N/A",
+          x.createdBy ? userHelper.mapUserToKeycloakId(x.createdBy)?.fullName : "N/A",
           x.createdTs ? new Date(x.createdTs).toDateString() : "N/A",
-          x.modifiedBy ? mapUserToKeycloakId(x.modifiedBy)?.fullName : "",
+          x.modifiedBy ? userHelper.mapUserToKeycloakId(x.modifiedBy)?.fullName : "",
           x.modifiedTs ? new Date(x.modifiedTs).toDateString() : "",
         ],
       };
@@ -86,7 +84,7 @@ const AuthorTable = ({
       {
         label: "# Books",
         numeric: true,
-        width: 50
+        width: 60
       },
       {
         label: "Created By",
@@ -114,7 +112,7 @@ const AuthorTable = ({
       />
       <DataTable
         title="Authors"
-        caption="This table contains Authors"
+        caption="Authors write books"
         loading={loading}
         data={tableData}
         pagination={pagination}

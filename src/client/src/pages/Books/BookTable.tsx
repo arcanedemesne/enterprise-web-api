@@ -7,6 +7,7 @@ import DeleteDialogModal from "../../components/DeleteDialogModal";
 import { domain, IBook } from "./";
 import { IUser } from "../Users";
 import { DELETE } from "../../utilities/httpRequest";
+import userHelper from "../../utilities/userHelper";
 
 interface BookTableProps {
   loading: boolean;
@@ -46,9 +47,6 @@ const BookTable = ({
     navigate(`/admin/${domain}`);
   };
 
-  const mapUserToKeycloakId = (kcId: string) =>
-    users.find((u) => u.keycloakUniqueIdentifier === kcId);
-
   const rows =
     books &&
     books.map((x: any) => {
@@ -62,9 +60,9 @@ const BookTable = ({
           x.coverId ? "true" : "false",
           x.cover?.artists.length || 0,
           new Date(x.publishDate).toDateString(),
-          x.createdBy ? mapUserToKeycloakId(x.createdBy)?.fullName : "N/A",
+          x.createdBy ? userHelper.mapUserToKeycloakId(x.createdBy)?.fullName : "N/A",
           x.createdTs ? new Date(x.createdTs).toDateString() : "N/A",
-          x.modifiedBy ? mapUserToKeycloakId(x.modifiedBy)?.fullName : "",
+          x.modifiedBy ?userHelper.mapUserToKeycloakId(x.modifiedBy)?.fullName : "",
           x.modifiedTs ? new Date(x.modifiedTs).toDateString() : "",
         ],
       };
@@ -89,7 +87,7 @@ const BookTable = ({
         id: "basePrice",
         label: "Base Price ($)",
         numeric: true,
-        width: 110
+        width: 120
       },
       {
         label: "Has Art",
@@ -99,7 +97,7 @@ const BookTable = ({
       {
         label: "# Artists",
         numeric: true,
-        width: 65
+        width: 75
       },
       {
         id: "publishDate",
@@ -132,7 +130,7 @@ const BookTable = ({
       />
       <DataTable
         title="Books"
-        caption="This table contains Books"
+        caption="Books are written by authors, and have cover art produced by artists"
         loading={loading}
         data={tableData}
         pagination={pagination}

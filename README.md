@@ -13,17 +13,18 @@ This is a demo project to implement the lastest techiniques and best practices i
 ## Development Environment Setup
 ###Prerequisites
 
-1. Install Git, NVM for Windows, and latest LTS Node through NVM.
-2. Install Visual Studio 2022 or later (https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022)
-3. Install .NET Core 7 SDK or later (https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
-4. Install openssl (https://slproweb.com/products/Win32OpenSSL.html)
-5. Install Docker Desktop (https://www.docker.com/products/docker-desktop/)
-6. Run the script 'setup-dev-certs.ps1' in [src/server/] in OpenSSL Terminal, this will install the nginx certificates
-7. Inside [src/server/] Run docker-compose build, and then docker-compose up. Everything should start running.
-   [Note: make sure Docker Desktop is Running]
-8. Once Keycloak is running, import the realm (using 'enterprise-solution-realm.json' in [src/server/]).
-   This will contain a test user with admin priviledges, and a swagger user for testing in swagger.
-9. Run the front end in [src/client] using npm install & npm start. Enjoy :)
+01. Install Git (https://git-scm.com/downloads), NVM for Windows (https://github.com/coreybutler/nvm-windows), and latest LTS Node through NVM (I'm currently using v18.12.0). 
+02. Install Azure CLI (https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-windows?tabs=azure-cli)
+03. Install Visual Studio 2022 or later (https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022)
+04. Install .NET Core 7 SDK or later (https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
+05. Install openssl (https://slproweb.com/products/Win32OpenSSL.html)
+06. Install Docker Desktop (https://www.docker.com/products/docker-desktop/)
+07. Run the script 'setup-dev-certs.ps1' in [src/server/] in OpenSSL Terminal, this will install the nginx certificates
+08. Inside [src/server/] Run docker-compose build, and then docker-compose up. Everything should start running.
+    [Note: make sure Docker Desktop is Running]
+09. Once Keycloak is running, import the realm (using 'enterprise-solution-realm.json' in [src/server/]).
+    This will contain a test user with admin priviledges, and a swagger user for testing in swagger.
+10. Run the front end in [src/client] using npm install & npm start. Enjoy :)
 
 ### Find your Services
 

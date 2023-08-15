@@ -59,7 +59,7 @@ namespace Enterprise.Solution.API.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<UserDTO_Response>>> ListAllAsync([FromQuery] UserPagedQueryParams queryParams, CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<UserDTO_Response>>> ListPagedAsync([FromQuery] UserPagedQueryParams queryParams, CancellationToken cancellationToken)
         {
             try
             {

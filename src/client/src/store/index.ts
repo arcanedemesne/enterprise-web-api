@@ -7,6 +7,7 @@ import artistReducer from "../pages/Artists/state";
 import emailSubscriptionReducer from "../pages/EmailSubscriptions/state";
 import userReducer from "../pages/Users/state";
 import alertReducer from "./AlertState";
+import notificationReducer from "../components/Communication/Notifications/state";
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     userState: userReducer,
 
     alertState: alertReducer,
+    notificationState: notificationReducer,
   },
 });
 

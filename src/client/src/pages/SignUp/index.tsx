@@ -6,7 +6,7 @@ import Sheet from "@mui/joy/Sheet";
 import Typography from "@mui/joy/Typography";
 
 import AuthenticationLayout from "../../layouts/AuthenticationLayout";
-import FormInput from "../../components/FormInput";
+import FormInput from "../../components/Inputs/FormInput";
 
 const SignUp = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

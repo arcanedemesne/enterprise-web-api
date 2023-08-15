@@ -8,6 +8,7 @@ import Typography from "@mui/joy/Typography";
 
 interface AlertDialogModalProps {
   open: boolean;
+  title?: React.JSX.Element | null;
   message: React.JSX.Element;
   actionButtonLabel: string;
   handleActionButtonClick: () => void;
@@ -16,6 +17,7 @@ interface AlertDialogModalProps {
 
 const DialogModal = ({
   open,
+  title,
   message,
   actionButtonLabel,
   handleActionButtonClick,
@@ -28,14 +30,18 @@ const DialogModal = ({
         role="alertdialog"
         aria-labelledby="alert-dialog-modal-title"
         aria-describedby="alert-dialog-modal-description"
+        sx={{
+          minWidth: 400,
+          maxWidth: 800
+        }}
       >
-        <Typography
+        {title ? title : (<Typography
           id="alert-dialog-modal-title"
           component="h2"
           startDecorator={<WarningRoundedIcon />}
         >
           Confirmation
-        </Typography>
+        </Typography>)}
         <Divider />
         <Typography
           id="alert-dialog-modal-description"

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Form, useNavigate } from "react-router-dom";
 
-import FormInput from "../../components/FormInput";
+import FormInput from "../../components/Inputs/FormInput";
 import errorMessages from "../../utilities/errorMessages";
 
 import { domain } from ".";

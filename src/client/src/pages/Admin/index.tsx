@@ -5,31 +5,46 @@ import { Outlet } from "react-router-dom";
 // custom;
 import { fetchAllUsers } from "../Users/state";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { AlertState } from "../../store/AlertState";
+import { AlertState, IAlert, addAlert } from "../../store/AlertState";
 
 import * as Layout from "../../layouts";
 import Navigation from "../../components/Navigation";
 import Header from "../../components/Header";
 import AlertModal from "../../components/AlertModal";
 import Box from "@mui/joy/Box";
-import Details from "../../components/Details";
+import Communication from "../../components/Communication";
+import createUniqueKey from "../../utilities/uniqueKey";
 
 export default function Admin() {
   const dispatch = useAppDispatch();
   const alertState: AlertState = useAppSelector((state) => state.alertState);
 
+  const [ drawerOpen, setDrawerOpen] = React.useState(false);
+
   useEffectOnce(() => {
     const fetchData = async () => {
-      dispatch(await fetchAllUsers("users/all"));
+      const response: any = await dispatch(await fetchAllUsers("users/all"));
+      if (response.error) {
+        dispatch(
+          addAlert({
+            id: createUniqueKey(10),
+            type: "danger",
+            message: response.error.message,
+          } as IAlert)
+        );
+      }
     };
 
     fetchData();
   });
 
-  const [drawerOpen] = React.useState(true);
-
   return (
     <>
+      {drawerOpen && (
+        <Layout.SideDrawer onClose={() => setDrawerOpen(false)}>
+          <Navigation />
+        </Layout.SideDrawer>
+      )}
       <Layout.Root
         sx={{
           gridTemplateColumns: {
@@ -43,7 +58,7 @@ export default function Admin() {
           }),
         }}
       >
-        <Header />
+        <Header setDrawerOpen={setDrawerOpen} />
         <Layout.SideNav>
           <Navigation />
         </Layout.SideNav>
@@ -70,7 +85,7 @@ export default function Admin() {
           )}
           <Outlet />
         </Layout.Main>
-        <Details />
+        <Communication />
       </Layout.Root>
     </>
   );

@@ -42,6 +42,8 @@ const DataTable = ({
   handleDeleteItem,
   canEditItems,
   handleEditItem,
+  canRestoreItems,
+  handleRestoreItem,
   ...props
 }: any) => {
   const handleChangeCurrentPage = async (currentPage: number) => {
@@ -64,6 +66,10 @@ const DataTable = ({
       newOrderBy
     );
   };
+
+  const handleRestoreSelectedRow = async (id: number) => {
+    await handleRestoreItem(id);
+  }
 
   const handleDeleteSelectedRow = async (id: number) => {
     await handleDeleteItem(id);
@@ -223,7 +229,7 @@ const DataTable = ({
                   </th>
                 );
               })}
-            {(canEditItems || canDeleteItems) && (
+            {(canEditItems || canDeleteItems || canRestoreItems) && (
               <th
                 aria-label="last"
                 style={{ width: "var(--Table-lastColumnWidth)" }}
@@ -237,7 +243,7 @@ const DataTable = ({
             <tr>
               <td
                 colSpan={
-                  data.headers.length + (canEditItems || canDeleteItems ? 1 : 0)
+                  data.headers.length + (canEditItems || canDeleteItems || canRestoreItems ? 1 : 0)
                 }
                 align="center"
                 style={{ padding: 10 }}
@@ -265,8 +271,8 @@ const DataTable = ({
                         </td>
                       );
                     })}
-                    {(canEditItems || canDeleteItems) && (
-                      <td>
+                    {(canEditItems || canDeleteItems || canRestoreItems) && (
+                      <td align="right">
                         {canEditItems ? (
                           <Button
                             size="sm"
@@ -289,6 +295,20 @@ const DataTable = ({
                             }
                           >
                             Delete
+                          </Button>
+                        ) : (
+                          ""
+                        )}
+                        {canRestoreItems ? (
+                          <Button
+                            size="sm"
+                            variant="soft"
+                            color="info"
+                            onClick={async () =>
+                              handleRestoreSelectedRow(row.id)
+                            }
+                          >
+                            Restore
                           </Button>
                         ) : (
                           ""

@@ -20,7 +20,7 @@ services:
     
   api:
     container_name: solution_api
-    image: enterprisesolutionapi:dev
+    image: arcaneenterprisewebcontainerregistry.azurecr.io/enterprisesolutionapi:dev
     build:
       context: .
       dockerfile: Enterprise.Solution.API/Dockerfile

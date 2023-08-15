@@ -17,11 +17,14 @@ export default function TwoSidedLayout({
         flexDirection: reversed ? "column-reverse" : "column",
         alignItems: "center",
         gap: 4,
-        [theme.breakpoints.up(834)]: {
+        [theme.breakpoints.down("md")]: {
+          mt: 5,
+        },
+        [theme.breakpoints.up("md")]: {
           flexDirection: "row",
           gap: 6,
         },
-        [theme.breakpoints.up(1199)]: {
+        [theme.breakpoints.up("lg")]: {
           gap: 12,
         },
       })}

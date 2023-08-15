@@ -89,9 +89,10 @@ export default function Navigation() {
     <List size="sm" sx={{ "--ListItem-radius": "8px", "--List-gap": "4px" }}>
       <ListSubheader>
         <Typography level="body2" alignSelf="right">
-          Signed in: <b>{getMetadata()?.full_name}</b>
+          Signed in as:
         </Typography>
       </ListSubheader>
+      <span style={{ marginLeft: ".5rem", color: "gray" }}>{getMetadata()?.full_name}</span>
       {listItemTemplate("Monitor Stuff", ['DASHBOARD'])}
       {listItemTemplate("View/Add/Change Stuff", ['AUTHORS', 'BOOKS', 'ARTISTS', 'RECYCLE_BIN'])}
       {listItemTemplate("User Related Stuff", ['PROFILE', 'EMAIL_SUBSCRIPTIONS', 'USERS'])}

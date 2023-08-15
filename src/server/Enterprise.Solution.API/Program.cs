@@ -171,6 +171,10 @@ services.AddScoped<IArtistService, ArtistService>();
 services.AddScoped(typeof(IEmailSubscriptionRepository), typeof(EmailSubscriptionRepository));
 services.AddScoped<IEmailSubscriptionService, EmailSubscriptionService>();
 
+// Notification DI
+services.AddScoped(typeof(INotificationRepository), typeof(NotificationRepository));
+services.AddScoped<INotificationService, NotificationService>();
+
 // User DI
 services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 services.AddScoped<IUserService, UserService>();

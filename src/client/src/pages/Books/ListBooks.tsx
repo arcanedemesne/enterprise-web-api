@@ -65,8 +65,10 @@ const ListBooks = () => {
       children={
         <>
           <CreateButton domain={domain} />
-          <BookTable 
-            loading={bookState.status === "loading" && userState.status === "loading"}
+          <BookTable
+            loading={
+              bookState.status === "loading" && userState.status === "loading"
+            }
             books={bookState.books}
             users={userState.users}
             pagination={bookState.pagination}

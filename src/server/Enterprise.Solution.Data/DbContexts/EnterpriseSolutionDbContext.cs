@@ -12,6 +12,7 @@ namespace Enterprise.Solution.Data.DbContexts
         public DbSet<Cover> Covers { get; set; }
         public DbSet<Artist> Artists { get; set; }
         public DbSet<EmailSubscription> EmailSubscriptions { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
 

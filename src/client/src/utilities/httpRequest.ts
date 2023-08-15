@@ -7,7 +7,7 @@ import {
 } from "../auth/user";
 import PAGE_ROUTES from "./pageRoutes";
 
-export const apiServer = "localhost"; // "localhost:32768";
+export const apiServer = "localhost:32768"; // "localhost";
 export const apiVersion = "v1";
 export const apiRoute = `https://${apiServer}/api`;
 
